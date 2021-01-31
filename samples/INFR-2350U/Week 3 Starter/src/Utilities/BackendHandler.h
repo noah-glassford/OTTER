@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utilities/Util.h"
+#include "Graphics/Framebuffer.h"
 
 #include <iostream>
 #include <Logging.h>

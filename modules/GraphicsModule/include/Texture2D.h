@@ -40,10 +40,9 @@ class Texture2D final : public ITexture
 public:
 	// We'll disallow moving and copying, since we want to manually control when the destructor is called
 	// We'll use these classes via pointers
-	Texture2D(const Texture2D& other) = delete;
-	Texture2D(Texture2D&& other) = delete;
-	Texture2D& operator=(const Texture2D& other) = delete;
-	Texture2D& operator=(Texture2D&& other) = delete;
+	Texture2D() { }
+	//Texture2D& operator=(const Texture2D& other) = delete;
+	//Texture2D& operator=(Texture2D&& other) = delete;
 
 	typedef std::shared_ptr<Texture2D> sptr;
 	static inline sptr Create(const Texture2DDescription& description = Texture2DDescription()) {

@@ -48,6 +48,10 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 	{
 		cam.ResizeWindow(width, height);
 	});
+	Application::Instance().ActiveScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
+	{
+		buf.Reshape(width, height);
+	});
 }
 
 bool BackendHandler::InitGLFW()
