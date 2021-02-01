@@ -30,6 +30,12 @@ entt::handle GameScene::CreateEntity(entt::entity prefab, const std::string& nam
 	return entt::handle(_registry, instance);
 }
 
+void GameScene::RemoveEntity(entt::handle handle)
+{
+	//Destroy entity handle
+	_registry.destroy(handle);
+}
+
 entt::handle GameScene::FindFirst(const std::string& name)
 {
 	entt::entity result = entt::null;
