@@ -21,6 +21,7 @@ public:
 	
 	entt::handle CreateEntity(const std::string& name = "");
 	entt::handle CreateEntity(entt::entity prefab, const std::string& name = "");
+	void RemoveEntity(entt::handle handle);
 
 	entt::handle FindFirst(const std::string& name);
 
