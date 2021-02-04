@@ -76,7 +76,7 @@ void RenderingManager::Init()
 		}
 		});
 
-	SkyBox = Shader::Create();
+	SkyBox = std::make_shared<Shader>();
 	//Want to add a test skybox
 	// Load our shaders
 
@@ -108,6 +108,7 @@ void RenderingManager::Render()
 
 	//get the camera mat4s
 	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+	
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
 	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 	glm::mat4 viewProjection = projection * view;

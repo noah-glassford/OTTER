@@ -2,6 +2,7 @@
 #include "GameScene.h"
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
+#include <PhysicsBody.h>
 #include "Framebuffer.h"
 void MainGameScene::InitGameScene()
 {
@@ -37,6 +38,11 @@ void MainGameScene::InitGameScene()
 	{
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
+
+
+		//adds physics body
+		PhysicsBody& phys = obj1.emplace<PhysicsBody>();
+		phys.AddBody(1.f, btVector3(0, 99, 3), btVector3(1, 2, 1));
 	}
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -51,6 +57,7 @@ void MainGameScene::InitGameScene()
 		camera.SetFovDegrees(90.0f); // Set an initial FOV
 		camera.SetOrthoHeight(3.0f);
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
+
 	}
 	//skybox
 	{
