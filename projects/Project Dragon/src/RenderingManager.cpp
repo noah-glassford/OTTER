@@ -1,13 +1,20 @@
 #include "RenderingManager.h"
 #include <RendererComponent.h>
 #include <Transform.h>
-#include <Framebuffer.h>
+#include "Framebuffer.h"
 #include "BackendHandler.h"
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 GameScene::sptr RenderingManager::activeScene;
 void RenderingManager::Init()
 {
+
+	// GL states
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LEQUAL); // New 
+
+
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
@@ -129,7 +136,9 @@ void RenderingManager::Render()
 	// Start by assuming no shader or material is applied
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
+
 	testBuffer->Bind();
+
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
@@ -143,12 +152,19 @@ void RenderingManager::Render()
 			currentMat = renderer.Material;
 			currentMat->Apply();
 		}
-		testBuffer->Unbind();
-
-		testBuffer->DrawToBackBuffer();
-
-		// Render the mesh
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
+		testBuffer->Unbind();
+
+		testBuffer->DrawToBackbuffer();
+
+		activeScene->Poll();
+		glfwSwapBuffers(BackendHandler::window);
+
+
+
+
+	Application::Instance().ActiveScene = nullptr;
+
 
 }

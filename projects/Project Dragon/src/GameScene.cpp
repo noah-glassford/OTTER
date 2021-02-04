@@ -2,7 +2,7 @@
 #include "GameScene.h"
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
-#include <Framebuffer.h>
+#include "Framebuffer.h"
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();

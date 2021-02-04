@@ -1,5 +1,6 @@
 #include "BackendHandler.h"
 #include "RenderingManager.h"
+#include <Framebuffer.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
@@ -47,14 +48,14 @@ bool BackendHandler::InitAll()
 void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	Application::Instance().ActiveScene->Registry().view<Camera>().each([=](Camera& cam) 
+	RenderingManager::activeScene->Registry().view<Camera>().each([=](Camera& cam) 
 	{
 		cam.ResizeWindow(width, height);
 	});
-	//Application::Instance().ActiveScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
-	//	{
-	//		buf.Reshape(width, height);
-	//	});
+	RenderingManager::activeScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
+		{
+			buf.Reshape(width, height);
+		});
 }
 
 bool BackendHandler::InitGLFW()
@@ -69,7 +70,7 @@ bool BackendHandler::InitGLFW()
 #endif
 
 	//Create a new GLFW window
-	window = glfwCreateWindow(800, 800, "INFR1350U", nullptr, nullptr);
+	window = glfwCreateWindow(1280, 720, "Project Dragon", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	// Set our window resized callback

@@ -10,8 +10,8 @@ int main()
 		glfwPollEvents();
 		RenderingManager::Render();
 		BackendHandler::RenderImGui();
-		std::cout << "frame";
 	}
+	BackendHandler::ShutdownImGui();
 	
 	return 0; 
 } 
