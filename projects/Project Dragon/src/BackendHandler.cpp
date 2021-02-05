@@ -3,8 +3,16 @@
 #include <Framebuffer.h>
 #include <InputHelpers.h>
 #include <IBehaviour.h>
+#include <Camera.h>
+#include <bullet/LinearMath/btVector3.h>
+#include <PhysicsBody.h>
+#define GLM_ENABLE_EXPERIMENTAL 
+#include <glm/gtx/rotate_vector.hpp>
+#include <BtToGlm.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
+
+
 
 
 
@@ -62,16 +70,22 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 
 void BackendHandler::UpdateInput()
 {
-	if (glfwGetKey(BackendHandler::window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		RenderingManager::activeScene->FindFirst("Camera").get<Transform>().MoveLocal(RenderingManager::activeScene->FindFirst("Camera").get<Camera>().GetForward());
-	}
+	btVector3 movement = btVector3(0, 0, 0);
+	//creates a single camera object to call
+	Camera cam = RenderingManager::activeScene->FindFirst("Camera").get<Camera>();
+	Transform t = RenderingManager::activeScene->FindFirst("Camera").get<Transform>();
+	PhysicsBody phys = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>();
+	//get a forward vector using fancy maths
+	glm::vec3 forward(0,1,0);
+	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
+	cam.SetForward(forward);
 
-	std::vector<KeyPressWatcher> keyToggles;
-
-	for (const KeyPressWatcher& watcher : keyToggles) {
-		watcher.Poll(BackendHandler::window);
-	}
+	std::cout << t.GetLocalRotation().x << " " << t.GetLocalRotation().y << " " << t.GetLocalRotation().z << " \n";
+	
+	
+	RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().ApplyForce(movement);
+	
+	
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
 		for (const auto& behaviour : binding.Behaviours) {

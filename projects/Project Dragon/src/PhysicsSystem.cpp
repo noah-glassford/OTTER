@@ -36,7 +36,7 @@ void PhysicsSystem::Init()
 
 	m_World = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
-	m_World->setGravity(btVector3(0, -30, 0));
+	m_World->setGravity(btVector3(0, 0, -30));
 }
 
 void PhysicsSystem::Update()
@@ -71,7 +71,7 @@ void PhysicsSystem::Update()
 		
 		Trans.SetLocalPosition(BtToGlm::BTTOGLMV3(physBod.GetBody()->getCenterOfMassTransform().getOrigin()));
 		Trans.Recalculate();
-		std::cout << Trans.GetLocalPosition().y;
+		//std::cout << Trans.GetLocalPosition().y;
 
 		
 	}

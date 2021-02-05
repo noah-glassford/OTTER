@@ -37,17 +37,17 @@ void MainGameScene::InitGameScene()
 
 	GameObject obj1 = scene->CreateEntity("Ground");
 	{
-		obj1.get<Transform>().SetLocalPosition(0, 3, 20).LookAt(glm::vec3(0, 0, 0));
+		obj1.get<Transform>().SetLocalPosition(0, 3, 3);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
 		obj1.emplace<PhysicsBody>();
-		obj1.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 0), btVector3(10, 1, 10));
+		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(10, 10, 1));
 	}
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
-		cameraObject.get<Transform>().SetLocalPosition(0, 3, 3).LookAt(glm::vec3(0, 0, 0));
-
+		cameraObject.get<Transform>().SetLocalPosition(0, 0, 0).LookAt(glm::vec3(0, 0, 0));
+		//cameraObject.get<Transform>().setForward(glm::vec3(0, 0, -1));
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
 		camera.SetPosition(glm::vec3(0, 3, 3));
@@ -56,8 +56,8 @@ void MainGameScene::InitGameScene()
 		camera.SetFovDegrees(90.0f); // Set an initial FOV
 		camera.SetOrthoHeight(3.0f);
 
-		//cameraObject.emplace<PhysicsBody>();
-		//cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 5, 0), btVector3(1, 1, 1));
+		cameraObject.emplace<PhysicsBody>();
+		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 1));
 	
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 
@@ -66,7 +66,6 @@ void MainGameScene::InitGameScene()
 	GameObject handObject = scene->CreateEntity("Hand");
 	{
 		
-		handObject.get<Transform>().SetParent(cameraObject);
 
 		
 		

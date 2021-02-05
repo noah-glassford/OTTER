@@ -222,5 +222,6 @@ private:
 	entt::handle _gameObject;
 	int _hierarchyDepth;
 
+
 	void _UpdateLocalTransformIfDirty() const;
 };
