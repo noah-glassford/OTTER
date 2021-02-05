@@ -70,21 +70,46 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 
 void BackendHandler::UpdateInput()
 {
-	btVector3 movement = btVector3(0, 0, 0);
+	
 	//creates a single camera object to call
-	Camera cam = RenderingManager::activeScene->FindFirst("Camera").get<Camera>();
-	Transform t = RenderingManager::activeScene->FindFirst("Camera").get<Transform>();
-	PhysicsBody phys = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>();
+	
+	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
+
+	Camera cam = cameraObj.get<Camera>();
+	Transform t = cameraObj.get<Transform>();
+	PhysicsBody phys = cameraObj.get<PhysicsBody>();
 	//get a forward vector using fancy maths
 	glm::vec3 forward(0,1,0);
 	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
 	cam.SetForward(forward);
 
+	btVector3 movement = btVector3(0, 0, 0);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		movement += BtToGlm::GLMTOBTV3(cam.GetForward());
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		movement -= BtToGlm::GLMTOBTV3(cam.GetForward());
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		glm::vec3 direction = glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
+		movement.setX(movement.getX() - direction.x * 1.8);
+		movement.setY(movement.getY() - direction.y * 1.8);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		glm::vec3 direction = -glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
+		movement.setX(movement.getX() - direction.x * 1.8);
+		movement.setY(movement.getY() - direction.y * 1.8);
+	}
+
 	std::cout << t.GetLocalRotation().x << " " << t.GetLocalRotation().y << " " << t.GetLocalRotation().z << " \n";
 	
 	
-	RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().ApplyForce(movement);
-	
+	phys.ApplyForce(movement);
 	
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
