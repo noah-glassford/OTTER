@@ -9,6 +9,7 @@ void MainGameScene::InitGameScene()
 	GameScene::RegisterComponentType<Camera>();
 	GameScene::RegisterComponentType<RendererComponent>();
 	GameScene::RegisterComponentType<BehaviourBinding>();
+	GameScene::RegisterComponentType<PhysicsBody>();
 
 	scene = GameScene::Create("GameScene");
 	Application::Instance().ActiveScene = scene;
@@ -36,13 +37,11 @@ void MainGameScene::InitGameScene()
 
 	GameObject obj1 = scene->CreateEntity("Ground");
 	{
+		obj1.get<Transform>().SetLocalPosition(0, 3, 20).LookAt(glm::vec3(0, 0, 0));
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
-
-
-		//adds physics body
-		PhysicsBody& phys = obj1.emplace<PhysicsBody>();
-		phys.AddBody(1.f, btVector3(0, 99, 3), btVector3(1, 2, 1));
+		obj1.emplace<PhysicsBody>();
+		obj1.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 0), btVector3(10, 1, 10));
 	}
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -56,8 +55,24 @@ void MainGameScene::InitGameScene()
 		camera.LookAt(glm::vec3(0));
 		camera.SetFovDegrees(90.0f); // Set an initial FOV
 		camera.SetOrthoHeight(3.0f);
+
+		//cameraObject.emplace<PhysicsBody>();
+		//cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 5, 0), btVector3(1, 1, 1));
+	
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 
+	}
+	//test for parenting
+	GameObject handObject = scene->CreateEntity("Hand");
+	{
+		
+		handObject.get<Transform>().SetParent(cameraObject);
+
+		
+		
+		
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		handObject.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
 	}
 	//skybox
 	{
@@ -90,6 +105,6 @@ void MainGameScene::InitGameScene()
 		testBuffer->Init(width, height);
 	}
 
-
+	
 
 }

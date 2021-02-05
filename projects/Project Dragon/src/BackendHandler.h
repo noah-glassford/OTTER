@@ -44,6 +44,8 @@ public:
 	//Window resize callback
 	static void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
 
+	static void UpdateInput();
+
 	//Backend Graphic Init Functions
 	static bool InitGLFW();
 	static bool InitGLAD();

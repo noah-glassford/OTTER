@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "PhysicsSystem.h"
+#include "Timer.h"
 int main() 
 { 
 	BackendHandler::InitAll();
@@ -10,9 +11,14 @@ int main()
 	///// Game loop /////
 	while (!glfwWindowShouldClose(BackendHandler::window)) {
 		glfwPollEvents();
+		Timer::Tick();
+		BackendHandler::UpdateInput();
 		PhysicsSystem::Update();
-		RenderingManager::Render();
 		BackendHandler::RenderImGui();
+		RenderingManager::Render();
+		
+		
+	
 		
 	}
 	BackendHandler::ShutdownImGui();

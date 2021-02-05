@@ -23,6 +23,12 @@ uniform float u_LightAttenuationConstant;
 uniform float u_LightAttenuationLinear;
 uniform float u_LightAttenuationQuadratic;
 
+//cel shading & outline
+//https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Toon_Shading
+uniform vec4 _OutlineColor;
+uniform float _LitOutlineThickness;
+uniform float _UnlitOutlineThickness;
+
 uniform float u_TextureMix;
 
 uniform vec3  u_CamPos;

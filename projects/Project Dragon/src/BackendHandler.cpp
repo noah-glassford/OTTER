@@ -1,6 +1,8 @@
 #include "BackendHandler.h"
 #include "RenderingManager.h"
 #include <Framebuffer.h>
+#include <InputHelpers.h>
+#include <IBehaviour.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
@@ -55,6 +57,28 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 	RenderingManager::activeScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
 		{
 			buf.Reshape(width, height);
+		});
+}
+
+void BackendHandler::UpdateInput()
+{
+	if (glfwGetKey(BackendHandler::window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		RenderingManager::activeScene->FindFirst("Camera").get<Transform>().MoveLocal(RenderingManager::activeScene->FindFirst("Camera").get<Camera>().GetForward());
+	}
+
+	std::vector<KeyPressWatcher> keyToggles;
+
+	for (const KeyPressWatcher& watcher : keyToggles) {
+		watcher.Poll(BackendHandler::window);
+	}
+	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
+		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
+		for (const auto& behaviour : binding.Behaviours) {
+			if (behaviour->Enabled) {
+				behaviour->Update(entt::handle(RenderingManager::activeScene->Registry(), entity));
+			}
+		}
 		});
 }
 
@@ -155,7 +179,7 @@ void BackendHandler::RenderImGui()
 
 	// Render all of our ImGui elements
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
 
 	// If we have multiple viewports enabled (can drag into a new window)
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {

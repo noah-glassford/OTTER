@@ -44,6 +44,7 @@ void PhysicsBody::AddBody(float mass, btVector3 origin, btVector3 size)
 	PhysicsSystem::m_bodies.push_back(m_Body);
 	m_BodyId = PhysicsSystem::m_bodies.size() - 1;
 	m_Body->setFriction(1.f);
+
 	
 
 }

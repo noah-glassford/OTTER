@@ -41,24 +41,41 @@ void PhysicsSystem::Init()
 
 void PhysicsSystem::Update()
 {
+	
+	m_World->stepSimulation(Timer::dt, 1);
+
+
 	auto reg = &RenderingManager::activeScene->Registry();
 
-	m_World->stepSimulation(Timer::dt, 10);
+	/*
+	entt::basic_group<entt::entity, entt::exclude_t<>, entt::get_t<Transform>, PhysicsBody> Phys =
+		reg->group<PhysicsBody>(entt::get_t<Transform>());
+	
+	Phys.each([&](entt::entity e, PhysicsBody& bod, Transform& transform) 
+		{
+			transform.SetLocalPosition(BtToGlm::BTTOGLMV3(bod.GetBody()->getCenterOfMassTransform().getOrigin()));
+			std::cout << transform.GetLocalPosition().y;
+			std::cout << bod.GetBody()->getCenterOfMassTransform().getOrigin().getY();
+		
+		});
 
 
-	auto view = reg->view<PhysicsBody, Transform>();
+	*/
 
+	auto& view = reg->view<Transform, PhysicsBody>();
 	for (auto entity : view)
 	{
+		
 		PhysicsBody& physBod = view.get<PhysicsBody>(entity);
 		Transform& Trans = view.get<Transform>(entity);
-		std::cout << "Transform" << Trans.GetLocalPosition().y << std::endl;
-		std::cout << "Phys" << physBod.GetBody()->getCenterOfMassTransform().getOrigin() << std::endl;
+		
 		Trans.SetLocalPosition(BtToGlm::BTTOGLMV3(physBod.GetBody()->getCenterOfMassTransform().getOrigin()));
+		Trans.Recalculate();
+		std::cout << Trans.GetLocalPosition().y;
 
-		Trans.UpdateWorldMatrix();
+		
 	}
-
+	
 }
 
 void PhysicsSystem::ClearWorld()
