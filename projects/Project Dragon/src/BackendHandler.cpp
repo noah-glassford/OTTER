@@ -1,14 +1,15 @@
 #include "BackendHandler.h"
 #include "RenderingManager.h"
-#include <Framebuffer.h>
 #include <InputHelpers.h>
 #include <IBehaviour.h>
 #include <Camera.h>
 #include <bullet/LinearMath/btVector3.h>
+#include <GreyscaleEffect.h>
 #include <PhysicsBody.h>
 #define GLM_ENABLE_EXPERIMENTAL 
 #include <glm/gtx/rotate_vector.hpp>
 #include <BtToGlm.h>
+#include <ColorCorrection.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
@@ -50,6 +51,7 @@ bool BackendHandler::InitAll()
 		return 1;
 	if (!InitGLAD())
 		return 1;
+	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
 
 	InitImGui();
@@ -63,6 +65,18 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 		cam.ResizeWindow(width, height);
 	});
 	RenderingManager::activeScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
+		{
+			buf.Reshape(width, height);
+		});
+	RenderingManager::activeScene->Registry().view<PostEffect>().each([=](PostEffect& buf)
+		{
+			buf.Reshape(width, height);
+		});
+	RenderingManager::activeScene->Registry().view<GreyscaleEffect>().each([=](GreyscaleEffect& buf)
+		{
+			buf.Reshape(width, height);
+		});
+	RenderingManager::activeScene->Registry().view<ColorCorrectionEffect>().each([=](ColorCorrectionEffect& buf)
 		{
 			buf.Reshape(width, height);
 		});
@@ -105,8 +119,6 @@ void BackendHandler::UpdateInput()
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-
-	std::cout << t.GetLocalRotation().x << " " << t.GetLocalRotation().y << " " << t.GetLocalRotation().z << " \n";
 	
 	
 	phys.ApplyForce(movement);

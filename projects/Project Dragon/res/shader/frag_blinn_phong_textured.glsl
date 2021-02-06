@@ -35,6 +35,10 @@ uniform vec3  u_CamPos;
 
 out vec4 frag_color;
 
+//apply cel shading
+const int bands = 6;
+const float scaleFactor = 1.0 / 6;
+
 // https://learnopengl.com/Advanced-Lighting/Advanced-Lighting
 void main() {
 	// Lecture 5
@@ -46,6 +50,9 @@ void main() {
 
 	float dif = max(dot(N, lightDir), 0.0);
 	vec3 diffuse = dif * u_LightCol;// add diffuse intensity
+
+	//the banding effect for cel-shading
+	diffuse = floor(diffuse * bands)*scaleFactor;
 
 	//Attenuation
 	float dist = length(u_LightPos - inPos);
@@ -72,6 +79,12 @@ void main() {
 		(u_AmbientCol * u_AmbientStrength) + // global ambient light
 		(ambient + diffuse + specular) * attenuation // light factors from our single light
 		) * inColor * textureColor.rgb; // Object color
+
+		
+
+
+
+
 
 	frag_color = vec4(result, textureColor.a);
 }

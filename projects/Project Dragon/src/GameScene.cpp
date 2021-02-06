@@ -3,7 +3,9 @@
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
 #include <PhysicsBody.h>
-#include "Framebuffer.h"
+#include <GreyscaleEffect.h>
+#include <ColorCorrection.h>
+
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -15,9 +17,12 @@ void MainGameScene::InitGameScene()
 	Application::Instance().ActiveScene = scene;
 	RenderingManager::activeScene = scene;
 
-	Texture2D::sptr grass = Texture2D::LoadFromFile("image/Stone_001_Diffuse.png");
-	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/Stone_001_Specular.png");
+	Texture2D::sptr grass = Texture2D::LoadFromFile("image/grass.jpg");
+	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
+
+	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
+
 
 	// Creating an empty texture
 	Texture2DDescription desc = Texture2DDescription();
@@ -35,13 +40,27 @@ void MainGameScene::InitGameScene()
 	grassMat->Set("u_Shininess", 2.0f);
 	grassMat->Set("u_TextureMix", 0.0f);
 
+	ShaderMaterial::sptr handMat = ShaderMaterial::Create();
+	handMat->Shader = RenderingManager::BaseShader;
+	handMat->Set("s_Diffuse", hand);
+	handMat->Set("s_Specular", noSpec);
+	handMat->Set("u_Shininess", 1.0f);
+	handMat->Set("u_TextureMix", 0.0f);
+
 	GameObject obj1 = scene->CreateEntity("Ground");
 	{
-		obj1.get<Transform>().SetLocalPosition(0, 3, 3);
+		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
 		obj1.emplace<PhysicsBody>();
-		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(10, 10, 1));
+		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
+	}
+	GameObject obj2 = scene->CreateEntity("Hand");
+	{
+		obj2.get<Transform>().SetLocalPosition(0, -5, 3);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+		
 	}
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -62,17 +81,6 @@ void MainGameScene::InitGameScene()
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 
 	}
-	//test for parenting
-	GameObject handObject = scene->CreateEntity("Hand");
-	{
-		
-
-		
-		
-		
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		handObject.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
-	}
 	//skybox
 	{
 		
@@ -91,17 +99,38 @@ void MainGameScene::InitGameScene()
 		skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
 	}
 
-	//frame buffer
-	Framebuffer* testBuffer;
-	GameObject framebufferObject = scene->CreateEntity("Basic Buffer");
+	//Blank post processing effect
+	PostEffect* basicEffect;
+	GameObject framebufferObject = scene->CreateEntity("Basic Effect");
 	{
 		int width, height;
 		glfwGetWindowSize(BackendHandler::window, &width, &height);
 
-		testBuffer = &framebufferObject.emplace<Framebuffer>();
-		testBuffer->AddDepthTarget();
-		testBuffer->AddColorTarget(GL_RGBA8);
-		testBuffer->Init(width, height);
+		basicEffect = &framebufferObject.emplace<PostEffect>();
+		basicEffect->Init(width, height);
+	}
+
+	//greyscale effect
+	GreyscaleEffect* greyscaleEffect;
+	GameObject greyScaleEffectObject = scene->CreateEntity("Greyscale Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
+		greyscaleEffect = &greyScaleEffectObject.emplace<GreyscaleEffect>();
+		greyscaleEffect->Init(width, height);
+		greyscaleEffect->SetIntensity(0.f);
+	}
+
+	//color grading effect
+	ColorCorrectionEffect* colorEffect;
+	GameObject colorEffectObject = scene->CreateEntity("ColorGrading Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
+		
+		colorEffect = &colorEffectObject.emplace<ColorCorrectionEffect>();
+		colorEffect->Init(width, height);
+		colorEffect->LoadLUT("cube/test.cube");
 	}
 
 	

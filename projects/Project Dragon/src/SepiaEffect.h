@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/Post/PostEffect.h"
+#include "PostEffect.h"
 
 class SepiaEffect : public PostEffect
 {

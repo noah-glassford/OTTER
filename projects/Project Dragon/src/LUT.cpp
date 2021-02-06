@@ -11,7 +11,7 @@ LUT3D::LUT3D(std::string path)
 
 void LUT3D::loadFromFile(std::string path)
 {
-	std::string filePath = "./Resources/cube/" + path;
+	std::string filePath = path;
 	std::ifstream LUTstream;
 	LUTstream.open(filePath);
 

@@ -14,8 +14,9 @@ int main()
 		Timer::Tick();
 		BackendHandler::UpdateInput();
 		PhysicsSystem::Update();
-		BackendHandler::RenderImGui();
+		
 		RenderingManager::Render();
+		BackendHandler::RenderImGui();
 		
 		
 	

@@ -3,8 +3,11 @@
 #include <Transform.h>
 #include "Framebuffer.h"
 #include "BackendHandler.h"
+#include <GreyscaleEffect.h>
+#include <ColorCorrection.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
+Shader::sptr RenderingManager::Passthrough = NULL;
 GameScene::sptr RenderingManager::activeScene;
 void RenderingManager::Init()
 {
@@ -84,17 +87,29 @@ void RenderingManager::Init()
 	SkyBox->LoadShaderPartFromFile("shader/skybox-shader.frag.glsl", GL_FRAGMENT_SHADER);
 	SkyBox->Link();
 
+	Passthrough = std::make_shared<Shader>();
+
+	Passthrough->LoadShaderPartFromFile("shader/passthrough_vert.glsl", GL_VERTEX_SHADER);
+	Passthrough->LoadShaderPartFromFile("shader/passthrough_frag.glsl", GL_FRAGMENT_SHADER);
+	Passthrough->Link();
+
 }
 
 void RenderingManager::Render()
 {
 	//gets frame buffer from the active scene
-	Framebuffer* testBuffer;
-
-	testBuffer = &activeScene->FindFirst("Basic Buffer").get<Framebuffer>();
+	PostEffect* postEffect;
+	GreyscaleEffect* greyscale;
+	ColorCorrectionEffect* colEffect;
+	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
+	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
+	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
 
 	// Clear the screen
-	testBuffer->Clear();
+	
+	//greyscale->Clear();
+	postEffect->Clear();
+	colEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -138,7 +153,7 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
-	testBuffer->Bind();
+	postEffect->BindBuffer(0);
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -155,9 +170,15 @@ void RenderingManager::Render()
 		}
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
-		testBuffer->Unbind();
+		
 
-		testBuffer->DrawToBackbuffer();
+		//greyscale->ApplyEffect(postEffect);
+		//greyscale->DrawToScreen();
+		colEffect->ApplyEffect(postEffect);
+		colEffect->DrawToScreen();
+		
+
+		postEffect->UnBindBuffer();
 
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
