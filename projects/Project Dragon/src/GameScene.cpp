@@ -19,6 +19,7 @@ void MainGameScene::InitGameScene()
 
 	Texture2D::sptr grass = Texture2D::LoadFromFile("image/grass.jpg");
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+	Texture2D::sptr FireEnemy = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
 	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
@@ -47,6 +48,13 @@ void MainGameScene::InitGameScene()
 	handMat->Set("u_Shininess", 1.0f);
 	handMat->Set("u_TextureMix", 0.0f);
 
+	ShaderMaterial::sptr FE_Mat = ShaderMaterial::Create();
+	FE_Mat->Shader = RenderingManager::BaseShader;
+	FE_Mat->Set("s_Diffuse", FireEnemy);
+	FE_Mat->Set("s_Specular", noSpec);
+	FE_Mat->Set("u_Shininess", 3.0f);
+	FE_Mat->Set("u_TextureMix", 0.0f);
+
 	GameObject obj1 = scene->CreateEntity("Ground");
 	{
 		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
@@ -61,6 +69,14 @@ void MainGameScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 		
+	}
+	GameObject obj3 = scene->CreateEntity("Enemy");
+	{
+		obj3.get<Transform>().SetLocalPosition(0, -5, 3);
+		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Fire_Enemy.obj");
+		obj3.emplace<RendererComponent>().SetMesh(vao).SetMaterial(FE_Mat);
+
 	}
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -136,9 +152,9 @@ void MainGameScene::InitGameScene()
 		
 		//number here doesn't matter
 		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
-		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
-		colorEffect->LoadLUT("cube/test.cube",0);
+		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
+		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 

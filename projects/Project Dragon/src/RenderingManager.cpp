@@ -30,7 +30,7 @@ void RenderingManager::Init()
 	float     lightAmbientPow = 0.05f;
 	float     lightSpecularPow = 1.0f;
 	glm::vec3 ambientCol = glm::vec3(1.0f);
-	float     ambientPow = 0.1f;
+	float     ambientPow = 0.7f;
 	float     lightLinearFalloff = 0.09f;
 	float     lightQuadraticFalloff = 0.032f;
 

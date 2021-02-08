@@ -94,7 +94,6 @@ void BackendHandler::UpdateInput()
 	//creates a single camera object to call
 	
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
-	GameObject ColCorrectObj = RenderingManager::activeScene->FindFirst("ColorGrading Effect");
 	//loads the LUTS to switch them
 
 
@@ -124,7 +123,7 @@ void BackendHandler::UpdateInput()
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-	ColorCorrectionEffect& colCor = ColCorrectObj.get<ColorCorrectionEffect>();
+
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
@@ -133,53 +132,6 @@ void BackendHandler::UpdateInput()
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
 	
-
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 1);
-		colCor._LUT = colCor._LUTS[0];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 2);
-		colCor._LUT = colCor._LUTS[0];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 3);
-		colCor._LUT = colCor._LUTS[0];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 4);
-		colCor._LUT = colCor._LUTS[0];
-	}
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 5);
-		colCor._LUT = colCor._LUTS[0];
-
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
-	{
-		colCor._LUT = colCor._LUTS[1];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
-	{
-		//ColCorrectObj.get<ColorCorrectionEffect>()._LUT = cool;
-		colCor._LUT = colCor._LUTS[2];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-	{
-		//ColCorrectObj.get<ColorCorrectionEffect>()._LUT = custom;
-		colCor._LUT = colCor._LUTS[3];
-	}
 
 
 	phys.ApplyForce(movement);
