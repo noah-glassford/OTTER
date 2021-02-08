@@ -192,7 +192,7 @@ public:
 
 	void UpdateWorldMatrix() const;
 
-	const glm::mat4& WorldTransform() const { return _worldTransform; }
+	const glm::mat4& WorldTransform() const { return _worldTransform; };
 	const glm::mat3& WorldNormalMatrix() const { return _worldNormalMatrix; };
 
 	/// <summary>
@@ -201,6 +201,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int GetHierarchyDepth() const { return _hierarchyDepth; }
+
+	void SetWorldMatrix(glm::mat4 t) { _worldTransform = t; };
 
 private:
 	mutable bool _isLocalDirty;
@@ -219,6 +221,7 @@ private:
 	entt::entity _parent;
 	entt::handle _gameObject;
 	int _hierarchyDepth;
+
 
 	void _UpdateLocalTransformIfDirty() const;
 };

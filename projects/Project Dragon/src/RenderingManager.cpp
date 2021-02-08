@@ -1,13 +1,23 @@
 #include "RenderingManager.h"
 #include <RendererComponent.h>
 #include <Transform.h>
-#include <Framebuffer.h>
+#include "Framebuffer.h"
 #include "BackendHandler.h"
+#include <GreyscaleEffect.h>
+#include <ColorCorrection.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
+Shader::sptr RenderingManager::Passthrough = NULL;
 GameScene::sptr RenderingManager::activeScene;
 void RenderingManager::Init()
 {
+
+	// GL states
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LEQUAL); // New 
+
+
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
@@ -69,7 +79,7 @@ void RenderingManager::Init()
 		}
 		});
 
-	SkyBox = Shader::Create();
+	SkyBox = std::make_shared<Shader>();
 	//Want to add a test skybox
 	// Load our shaders
 
@@ -77,17 +87,29 @@ void RenderingManager::Init()
 	SkyBox->LoadShaderPartFromFile("shader/skybox-shader.frag.glsl", GL_FRAGMENT_SHADER);
 	SkyBox->Link();
 
+	Passthrough = std::make_shared<Shader>();
+
+	Passthrough->LoadShaderPartFromFile("shader/passthrough_vert.glsl", GL_VERTEX_SHADER);
+	Passthrough->LoadShaderPartFromFile("shader/passthrough_frag.glsl", GL_FRAGMENT_SHADER);
+	Passthrough->Link();
+
 }
 
 void RenderingManager::Render()
 {
 	//gets frame buffer from the active scene
-	Framebuffer* testBuffer;
-
-	testBuffer = &activeScene->FindFirst("Basic Buffer").get<Framebuffer>();
+	PostEffect* postEffect;
+	GreyscaleEffect* greyscale;
+	ColorCorrectionEffect* colEffect;
+	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
+	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
+	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
 
 	// Clear the screen
-	testBuffer->Clear();
+	
+	//greyscale->Clear();
+	postEffect->Clear();
+	colEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -101,6 +123,7 @@ void RenderingManager::Render()
 
 	//get the camera mat4s
 	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+	
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
 	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 	glm::mat4 viewProjection = projection * view;
@@ -129,7 +152,9 @@ void RenderingManager::Render()
 	// Start by assuming no shader or material is applied
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
-	testBuffer->Bind();
+
+	postEffect->BindBuffer(0);
+
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
@@ -143,12 +168,25 @@ void RenderingManager::Render()
 			currentMat = renderer.Material;
 			currentMat->Apply();
 		}
-		testBuffer->Unbind();
-
-		testBuffer->DrawToBackBuffer();
-
-		// Render the mesh
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
+		
+
+		//greyscale->ApplyEffect(postEffect);
+		//greyscale->DrawToScreen();
+		colEffect->ApplyEffect(postEffect);
+		colEffect->DrawToScreen();
+		
+
+		postEffect->UnBindBuffer();
+
+		activeScene->Poll();
+		glfwSwapBuffers(BackendHandler::window);
+
+
+
+
+	Application::Instance().ActiveScene = nullptr;
+
 
 }

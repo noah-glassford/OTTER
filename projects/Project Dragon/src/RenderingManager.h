@@ -9,5 +9,6 @@ public:
 	static void Render();
 	static Shader::sptr BaseShader;
 	static Shader::sptr SkyBox;
+	static Shader::sptr Passthrough;
 	static GameScene::sptr activeScene; //keeps track of the active scene
 };

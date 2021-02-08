@@ -44,6 +44,8 @@ public:
 	//Window resize callback
 	static void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
 
+	static void UpdateInput();
+
 	//Backend Graphic Init Functions
 	static bool InitGLFW();
 	static bool InitGLAD();
@@ -58,6 +60,6 @@ public:
 	static void SetupShaderForFrame(const Shader::sptr& shader, const glm::mat4& view, const glm::mat4& projection);
 
 	static GLFWwindow* window;
-	static std::vector<std::function<void()>> imGuiCallbacks;
+	static std::vector<std::function<void()>> imGuiCallbacks;	
 	
 };
