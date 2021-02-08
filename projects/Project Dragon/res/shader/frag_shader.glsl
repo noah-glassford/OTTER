@@ -136,7 +136,24 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     diffuse = dirLight.diffuse * diff * vec3(texture(s_Diffuse, inUV));
     specular = dirLight.specular * spec * vec3(texture(s_Specular, inUV));
     }
-
+    if (u_Lightingtoggle == 5)
+    {
+    }
+    if (u_Lightingtoggle == 6)
+    {
+    }
+    if (u_Lightingtoggle == 7)
+    {
+    }
+    if (u_Lightingtoggle == 8)
+    {
+    }
+    if (u_Lightingtoggle == 9)
+    {
+    }
+    if (u_Lightingtoggle == 0)
+    {
+    }
     return (ambient + diffuse + specular);
 }
 
@@ -161,6 +178,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation;
     return (ambient + diffuse + specular);
 }
+
 
 // calculates the color when using a spot light.
 /*

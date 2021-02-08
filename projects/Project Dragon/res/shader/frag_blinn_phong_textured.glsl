@@ -33,6 +33,9 @@ uniform float u_TextureMix;
 
 uniform vec3  u_CamPos;
 
+//for light toggle
+uniform int u_Lightingtoggle;
+
 out vec4 frag_color;
 
 //apply cel shading
@@ -51,9 +54,15 @@ void main() {
 	float dif = max(dot(N, lightDir), 0.0);
 	vec3 diffuse = dif * u_LightCol;// add diffuse intensity
 
+    if (u_Lightingtoggle == 5)
+    {
 	//the banding effect for cel-shading
 	diffuse = floor(diffuse * bands)*scaleFactor;
-
+    }
+    else
+    {
+        diffuse = dif * u_LightCol;
+    }
 	//Attenuation
 	float dist = length(u_LightPos - inPos);
 	float attenuation = 1.0f / (
@@ -74,6 +83,43 @@ void main() {
 	vec4 textureColor1 = texture(s_Diffuse, inUV);
 	vec4 textureColor2 = texture(s_Diffuse2, inUV);
 	vec4 textureColor = mix(textureColor1, textureColor2, u_TextureMix);
+
+
+
+
+    if (u_Lightingtoggle == 1)
+    {
+     //do nothing since they are defined as 0 and should remain 0 for this
+     ambient = vec3(0,0,0);
+     diffuse = vec3(0,0,0);
+     specular = vec3(0,0,0);
+    }
+    if (u_Lightingtoggle == 2)
+    {
+         
+    ambient = u_AmbientLightStrength * u_LightCol;
+    diffuse = vec3(0,0,0);
+    specular = vec3(0,0,0);
+    }
+    if (u_Lightingtoggle == 3)
+    {
+         
+    ambient = vec3(0,0,0);
+    diffuse = dif * u_LightCol;
+    specular = vec3(0,0,0);
+    }
+    if (u_Lightingtoggle == 4)
+    {
+       
+    ambient =  u_AmbientLightStrength * u_LightCol;
+    diffuse = dif * u_LightCol;
+    specular = u_SpecularLightStrength * texSpec * spec * u_LightCol;
+    }
+    if (u_Lightingtoggle == 5)
+    {
+    ambient =  u_AmbientLightStrength * u_LightCol;
+    specular = u_SpecularLightStrength * texSpec * spec * u_LightCol;
+    }
 
 	vec3 result = (
 		(u_AmbientCol * u_AmbientStrength) + // global ambient light

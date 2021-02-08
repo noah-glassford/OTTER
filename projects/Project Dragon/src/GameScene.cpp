@@ -121,6 +121,8 @@ void MainGameScene::InitGameScene()
 		greyscaleEffect->SetIntensity(0.f);
 	}
 
+
+
 	//color grading effect
 	ColorCorrectionEffect* colorEffect;
 	GameObject colorEffectObject = scene->CreateEntity("ColorGrading Effect");
@@ -130,7 +132,14 @@ void MainGameScene::InitGameScene()
 		
 		colorEffect = &colorEffectObject.emplace<ColorCorrectionEffect>();
 		colorEffect->Init(width, height);
-		colorEffect->LoadLUT("cube/test.cube");
+		
+		
+		//number here doesn't matter
+		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
+		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		colorEffect->LoadLUT("cube/test.cube",0);
+		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 
 	

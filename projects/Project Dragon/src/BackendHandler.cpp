@@ -10,6 +10,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <BtToGlm.h>
 #include <ColorCorrection.h>
+
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
@@ -54,6 +55,9 @@ bool BackendHandler::InitAll()
 	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
 
+
+
+
 	InitImGui();
 }
 
@@ -82,12 +86,18 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 		});
 }
 
+
+
 void BackendHandler::UpdateInput()
 {
 	
 	//creates a single camera object to call
 	
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
+	GameObject ColCorrectObj = RenderingManager::activeScene->FindFirst("ColorGrading Effect");
+	//loads the LUTS to switch them
+
+
 
 	Camera cam = cameraObj.get<Camera>();
 	Transform t = cameraObj.get<Transform>();
@@ -96,6 +106,7 @@ void BackendHandler::UpdateInput()
 	glm::vec3 forward(0,1,0);
 	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
 	cam.SetForward(forward);
+
 
 	btVector3 movement = btVector3(0, 0, 0);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -107,12 +118,14 @@ void BackendHandler::UpdateInput()
 		movement -= BtToGlm::GLMTOBTV3(cam.GetForward());
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
 	{
 		glm::vec3 direction = glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
+	ColorCorrectionEffect& colCor = ColCorrectObj.get<ColorCorrectionEffect>();
+
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		glm::vec3 direction = -glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
@@ -120,7 +133,55 @@ void BackendHandler::UpdateInput()
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
 	
-	
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 1);
+		colCor._LUT = colCor._LUTS[0];
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 2);
+		colCor._LUT = colCor._LUTS[0];
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 3);
+		colCor._LUT = colCor._LUTS[0];
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 4);
+		colCor._LUT = colCor._LUTS[0];
+	}
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 5);
+		colCor._LUT = colCor._LUTS[0];
+
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+	{
+		colCor._LUT = colCor._LUTS[1];
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
+	{
+		//ColCorrectObj.get<ColorCorrectionEffect>()._LUT = cool;
+		colCor._LUT = colCor._LUTS[2];
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		//ColCorrectObj.get<ColorCorrectionEffect>()._LUT = custom;
+		colCor._LUT = colCor._LUTS[3];
+	}
+
+
 	phys.ApplyForce(movement);
 	
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
@@ -130,7 +191,8 @@ void BackendHandler::UpdateInput()
 				behaviour->Update(entt::handle(RenderingManager::activeScene->Registry(), entity));
 			}
 		}
-		});
+		}
+	);
 }
 
 bool BackendHandler::InitGLFW()

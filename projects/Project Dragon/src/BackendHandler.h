@@ -60,6 +60,6 @@ public:
 	static void SetupShaderForFrame(const Shader::sptr& shader, const glm::mat4& view, const glm::mat4& projection);
 
 	static GLFWwindow* window;
-	static std::vector<std::function<void()>> imGuiCallbacks;
+	static std::vector<std::function<void()>> imGuiCallbacks;	
 	
 };
