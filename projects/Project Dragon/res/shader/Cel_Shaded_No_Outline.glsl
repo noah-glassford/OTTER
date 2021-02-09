@@ -74,7 +74,7 @@ void main() {
 
 
 
-	float edge = (dot(viewDir, inNormal) < 0.6) ? 0.0 : 5.0;
+
 
 	vec3 result = (
 		(u_AmbientCol * u_AmbientStrength) + // global ambient light
@@ -87,5 +87,5 @@ void main() {
 
 
 
-	frag_color = vec4(result, textureColor.a)  * vec4(vec3(edge), 1.0);;
+	frag_color = vec4(result, textureColor.a);
 }

@@ -34,12 +34,12 @@ void MainGameScene::InitGameScene()
 	// Clear it with a white colour
 	texture2->Clear();
 	
-	ShaderMaterial::sptr grassMat = ShaderMaterial::Create();
-	grassMat->Shader = RenderingManager::BaseShader;
-	grassMat->Set("s_Diffuse", grass);
-	grassMat->Set("s_Specular", noSpec);
-	grassMat->Set("u_Shininess", 2.0f);
-	grassMat->Set("u_TextureMix", 0.0f);
+	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
+	Floor_Mat->Shader = RenderingManager::NoOutline;
+	Floor_Mat->Set("s_Diffuse", grass);
+	Floor_Mat->Set("s_Specular", noSpec);
+	Floor_Mat->Set("u_Shininess", 2.0f);
+	Floor_Mat->Set("u_TextureMix", 0.0f);
 
 	ShaderMaterial::sptr handMat = ShaderMaterial::Create();
 	handMat->Shader = RenderingManager::BaseShader;
@@ -59,17 +59,11 @@ void MainGameScene::InitGameScene()
 	{
 		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
-		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
+		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
 		obj1.emplace<PhysicsBody>();
 		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
 	}
-	GameObject obj2 = scene->CreateEntity("Hand");
-	{
-		obj2.get<Transform>().SetLocalPosition(0, -5, 3);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
-		
-	}
+	
 	GameObject obj3 = scene->CreateEntity("Enemy");
 	{
 		obj3.get<Transform>().SetLocalPosition(0, -5, 3);
@@ -81,7 +75,7 @@ void MainGameScene::InitGameScene()
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
-		cameraObject.get<Transform>().SetLocalPosition(0, 0, 0).LookAt(glm::vec3(0, 0, 0));
+		cameraObject.get<Transform>().SetLocalPosition(0, 0, 0).LookAt(glm::vec3(0, 1, 5));
 		//cameraObject.get<Transform>().setForward(glm::vec3(0, 0, -1));
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
@@ -95,6 +89,16 @@ void MainGameScene::InitGameScene()
 		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 1));
 	
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
+
+	}
+	GameObject obj2 = scene->CreateEntity("Hand");
+	{
+
+		
+		obj2.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
+		obj2.get<Transform>().SetParent(cameraObject);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 
 	}
 	//skybox
@@ -151,9 +155,9 @@ void MainGameScene::InitGameScene()
 		
 		
 		//number here doesn't matter
-		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
 		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
