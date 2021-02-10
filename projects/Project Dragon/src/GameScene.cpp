@@ -155,7 +155,7 @@ void MainGameScene::InitGameScene()
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(3, 0, 0), "node/Blank_Floor_Tile.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 	
 
 }

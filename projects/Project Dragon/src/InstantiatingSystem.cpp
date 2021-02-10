@@ -82,6 +82,10 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 			RenderingManager::activeScene->FindFirst(GOName).get<Transform>().SetLocalPosition(pos + origin).SetLocalScale(scale).SetLocalRotation(rot);
 
 		}
+		else if (prefix == "PHYS")
+		{
+
+		}
 		
 		
 	

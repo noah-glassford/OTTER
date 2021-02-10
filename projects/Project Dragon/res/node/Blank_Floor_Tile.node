@@ -3,4 +3,4 @@
 GO Floor
 #GO makes a new game object
 RC Floor
-TRNS 0 0 -1 10 10 10 90 0 0
+TRNS 0 0 0 10 10 10 90 0 0
