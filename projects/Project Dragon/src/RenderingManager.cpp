@@ -147,6 +147,9 @@ void RenderingManager::Render()
 	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 	glm::mat4 viewProjection = projection * view;
 
+
+	
+
 	entt::basic_group<entt::entity, entt::exclude_t<>, entt::get_t<Transform>, RendererComponent> renderGroup =
 		activeScene->Registry().group<RendererComponent>(entt::get_t<Transform>());
 
@@ -209,7 +212,7 @@ void RenderingManager::Render()
 	
 
 
-	Application::Instance().ActiveScene = nullptr;
+	
 
 
 }

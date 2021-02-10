@@ -60,7 +60,7 @@ void MainGameScene::InitGameScene()
 	GameObject obj1 = scene->CreateEntity("Ground");
 	{
 		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
 		obj1.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Floor");
 		obj1.emplace<PhysicsBody>();
 		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
@@ -93,6 +93,13 @@ void MainGameScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 
+	}
+
+	GameObject obj3 = scene->CreateEntity("cube");
+	{
+		obj3.get<Transform>().SetLocalPosition(0, 0, 0);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
+		obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Floor");
 	}
 	//skybox
 	{

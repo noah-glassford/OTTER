@@ -6,8 +6,7 @@
 #include <bullet/LinearMath/btVector3.h>
 #include <GreyscaleEffect.h>
 #include <PhysicsBody.h>
-#define GLM_ENABLE_EXPERIMENTAL 
-#include <glm/gtx/rotate_vector.hpp>
+
 #include <BtToGlm.h>
 #include <ColorCorrection.h>
 
@@ -16,6 +15,7 @@ std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
 
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 
 void BackendHandler::GlDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -90,9 +90,9 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 
 void BackendHandler::UpdateInput()
 {
-	
+
 	//creates a single camera object to call
-	
+
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
 	//loads the LUTS to switch them
 
@@ -102,9 +102,26 @@ void BackendHandler::UpdateInput()
 	Transform t = cameraObj.get<Transform>();
 	PhysicsBody phys = cameraObj.get<PhysicsBody>();
 	//get a forward vector using fancy maths
-	glm::vec3 forward(0,1,0);
-	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
-	cam.SetForward(forward);
+//	glm::vec3 forward(0,1,0);
+//	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
+	//glm::normalize(forward);
+
+	glm::mat4 tempView = glm::inverse(t.WorldTransform());
+	double dArray[16] = { 0.0 };
+
+	const float* pSource = (const float*)glm::value_ptr(tempView);
+	for (int i = 0; i < 16; ++i)
+		dArray[i] = pSource[i];
+
+	glm::vec3 f;
+	f.x = -dArray[2];
+	f.y = -dArray[6];
+	f.z = -dArray[10];
+
+
+	cam.SetForward(f);
+
+
 
 
 	btVector3 movement = btVector3(0, 0, 0);
@@ -164,6 +181,8 @@ bool BackendHandler::InitGLFW()
 
 	// Set our window resized callback
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
+
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// Store the window in the application singleton
 	Application::Instance().Window = window;
@@ -273,4 +292,44 @@ void BackendHandler::SetupShaderForFrame(const Shader::sptr& shader, const glm::
 	shader->SetUniformMatrix("u_SkyboxMatrix", projection * glm::mat4(glm::mat3(view)));
 	glm::vec3 camPos = glm::inverse(view) * glm::vec4(0, 0, 0, 1);
 	shader->SetUniform("u_CamPos", camPos);
+}
+
+//for camera forward
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 1280 / 2.0;
+float lastY = 720.0 / 2.0;
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.1f; // change this value to your liking
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = sin(glm::radians(yaw))* cos(glm::radians(pitch));
+	front.y = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.z = sin(glm::radians(pitch));
+	RenderingManager::activeScene->FindFirst("Camera").get<Camera>().SetForward(glm::normalize(front));
 }
