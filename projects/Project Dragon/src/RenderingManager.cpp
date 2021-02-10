@@ -191,6 +191,8 @@ void RenderingManager::Render()
 		});
 		
 
+
+
 		//greyscale->ApplyEffect(postEffect);
 		//greyscale->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
@@ -199,10 +201,12 @@ void RenderingManager::Render()
 
 		postEffect->UnBindBuffer();
 
+		BackendHandler::RenderImGui();
+
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
-
+	
 
 
 	Application::Instance().ActiveScene = nullptr;

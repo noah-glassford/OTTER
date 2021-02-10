@@ -5,6 +5,8 @@
 #include <PhysicsBody.h>
 #include <GreyscaleEffect.h>
 #include <ColorCorrection.h>
+#include <InstantiatingSystem.h>
+#include <AssetLoader.h>
 
 void MainGameScene::InitGameScene()
 {
@@ -59,18 +61,9 @@ void MainGameScene::InitGameScene()
 	{
 		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
-		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
+		obj1.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Floor");
 		obj1.emplace<PhysicsBody>();
 		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
-	}
-	
-	GameObject obj3 = scene->CreateEntity("Enemy");
-	{
-		obj3.get<Transform>().SetLocalPosition(0, -5, 3);
-		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Fire_Enemy.obj");
-		obj3.emplace<RendererComponent>().SetMesh(vao).SetMaterial(FE_Mat);
-
 	}
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -162,6 +155,7 @@ void MainGameScene::InitGameScene()
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(3, 0, 0), "node/Blank_Floor_Tile.node");
 	
 
 }

@@ -1,6 +1,7 @@
 #include <InstantiatingSystem.h>
 #include <AssetLoader.h>
 #include <BtToGlm.h>
+#include <RenderingManager.h>
 // Borrowed from https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 #pragma region String Trimming
 
@@ -28,10 +29,10 @@ static inline void trim(std::string& s) {
 
 
 
-void InstantiatingSystem::LoadPrefabFromFile(int index, glm::vec3 origin, std::string filename)
+void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filename)
 {
 
-	/*
+	
 	//similar to OBJ loader
 	std::stringstream ss;
 	std::ifstream file;
@@ -43,9 +44,11 @@ void InstantiatingSystem::LoadPrefabFromFile(int index, glm::vec3 origin, std::s
 	std::string line = "";
 	std::string prefix = "";
 	//will only get changed whenever a new entity is created from the file
-	int ENumb = 0;
+	std::string GOName;
 	while (std::getline(file, line))
 	{
+		
+
 		
 		trim(line);
 		ss = std::stringstream(line); 
@@ -54,61 +57,34 @@ void InstantiatingSystem::LoadPrefabFromFile(int index, glm::vec3 origin, std::s
 		{
 			//comment nothing happens
 		}
-		if (prefix == "E")
+		if (prefix == "GO")
 		{
-			//create a new entity
-			int fileIndex;
-			ss >> fileIndex;
-			ENumb = index + fileIndex;
-			ECS::Create(ENumb);
-			std::cout << "Created entity: "<< ENumb << '\n';
+			//create a new game object
+			
+			ss >> GOName;//this will only get updated upon a new game object
+			
+			GameObject Current = RenderingManager::activeScene->CreateEntity(GOName);
+			
 		}
-		else if (prefix == "STRNS")
+		else if (prefix == "RC")
 		{
-			if (!ECS::Has<Transform>(ENumb))
-				ECS::Add<Transform>(ENumb);
-
-			glm::vec3 tempPos, tempScale;
-			glm::vec4 tempRot;
-			ss >> tempPos.x >> tempPos.y >> tempPos.z >> tempScale.x >> tempScale.y >> tempScale.z >> tempRot.x >> tempRot.y >> tempRot.z >> tempRot.w; //Loads all the positions from the file into our vectors
-
-			//Then set the active entity with those positions
-			ECS::Get<Transform>(ENumb).SetPosition(tempPos);
-			ECS::Get<Transform>(ENumb).SetScale(tempScale);
-			ECS::Get<Transform>(ENumb).SetRotation(glm::vec3(tempRot.x, tempRot.y, tempRot.z), tempRot.w); 
+			std::string RendererName;
+			ss >> RendererName;
+			RenderingManager::activeScene->FindFirst(GOName).emplace<RendererComponent>();
+			RenderingManager::activeScene->FindFirst(GOName).get<RendererComponent>() = AssetLoader::GetRendererFromStr(RendererName);
 		}
-		else if (prefix == "SMAT")
+		else if (prefix == "TRNS")
 		{
-			if (!ECS::Has<Material>(ENumb))
-				ECS::Add<Material>(ENumb);
+			glm::vec3 pos, scale, rot;
+			//load data in order of pos scale rot
+			ss >> pos.x >> pos.y >> pos.z >> scale.x >> scale.y >> scale.z >> rot.x >> rot.y >> rot.z;
+			
+			RenderingManager::activeScene->FindFirst(GOName).get<Transform>().SetLocalPosition(pos + origin).SetLocalScale(scale).SetLocalRotation(rot);
 
-
-			std::string matName;
-			ss >> matName;
-			ECS::Get<Material>(ENumb) = AssetLoader::GetMatFromStr(matName);
+		}
 		
-		}
-		else if (prefix == "SMESH")
-		{
-			if (!ECS::Has<Mesh>(ENumb))
-				ECS::Add<Mesh>(ENumb);
-
-			std::string MeshName;
-			ss >> MeshName;
-			ECS::Get<Mesh>(ENumb).SetVAO(AssetLoader::GetMeshFromStr(MeshName).GetVAO()); 
 		
-		}
-		else if (prefix == "SPHYS")
-		{
-			if (!ECS::Has<PhysicsBody>(ENumb))
-				ECS::Add<PhysicsBody>(ENumb);
-
-			float mass, friction;
-			glm::vec3 position, size;
-			ss >> mass >> position.x >> position.y >> position.z >> size.x >> size.y >> size.z >> friction;
-			ECS::Get<PhysicsBody>(ENumb).AddBody(mass, BtToGlm::GLMTOBTV3(position), BtToGlm::GLMTOBTV3(size), friction);
-		}
 	
 	}
-*/
+
 }

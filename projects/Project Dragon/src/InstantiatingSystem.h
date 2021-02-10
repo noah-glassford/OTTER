@@ -13,7 +13,7 @@ public:
 
 
 	//to load a prefab from a file
-	static void LoadPrefabFromFile(int index, glm::vec3 origin, std::string filename);
+	static void LoadPrefabFromFile(glm::vec3 origin, std::string filename);
 
 private:
 };
