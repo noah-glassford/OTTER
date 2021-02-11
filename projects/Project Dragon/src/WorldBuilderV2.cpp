@@ -148,6 +148,7 @@ void WorldBuilderV2::GenerateTiles()
 				}
 
 				//Building
+				/*
 				if (top < 5) {
 					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) + 10, 0)
 						, "node/Blank_Wall_Y.node");
@@ -164,7 +165,7 @@ void WorldBuilderV2::GenerateTiles()
 					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) - 10, y * 20, 0)
 						, "node/Blank_Wall_X.node");
 				}
-
+				*/
 				std::cout << "\n[" << x << "][" << y << "]\n";
 				std::cout << "E & E Points[" << WorldDataEAndEPoints[x][y][0] << "]["
 					<< WorldDataEAndEPoints[x][y][1] << "]\n";
