@@ -35,15 +35,19 @@ void WorldBuilderV2::FillWorldData()
 	srand(time(NULL));
 
 	bool isBuilding = true;
-	int currentX = 15, currentY = 15;
-
 	bool canLeft, canRight, canUp, canDown;
+
+	int currentX = 15, currentY = 15;
+	int pastX, pastY;
+	int MovementData = 4;
 
 	while (isBuilding)
 	{
 		canLeft = false; canRight = false; canUp = false; canDown = false;
 		//Sets tile at start
 		WorldData[currentX][currentY] = 5;
+		WorldDataEAndEPoints[currentX][currentY][0] = MovementData;
+		pastX = currentX; pastY = currentY;
 
 		//Data check
 		if (WorldData[currentX + 1][currentY] < 1 && currentX < 24)
@@ -65,30 +69,35 @@ void WorldBuilderV2::FillWorldData()
 				case 0:
 					if (canLeft) {
 						currentX -= 1;
+						MovementData = 3;
 						temp = true;
 					}
 					break;
 				case 1:
 					if (canRight) {
 						currentX += 1;
+						MovementData = 2;
 						temp = true;
 					}
 					break;
 				case 2:
 					if (canUp) {
 						currentY += 1;
+						MovementData = 0;
 						temp = true;
 					}
 					break;
 				case 3:
 					if (canDown) {
 						currentY -= 1;
+						MovementData = 1;
 						temp = true;
 					}
 					break;
 				}
 			}
 		}
+		WorldDataEAndEPoints[pastX][pastY][1] = MovementData;
 	}
 }
 
@@ -103,6 +112,8 @@ void WorldBuilderV2::GenerateTiles()
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 25, y * 25, 0)
 					, "node/Blank_Floor_Tile.node");
 				std::cout << "\n[" << x << "][" << y << "]\n";
+				std::cout << "E & E Points[" << WorldDataEAndEPoints[x][y][0] << "]["
+					<< WorldDataEAndEPoints[x][y][1] << "]\n";
 			}
 		}
 	}

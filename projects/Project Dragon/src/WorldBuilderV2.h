@@ -18,6 +18,12 @@ public:
 	int WorldData[25][25];
 
 	//
+	// Entry and Exit Points:
+	//		0 = Top | 1 = Bottom | 2 = Right | 3 = Left | 4 = Null
+	//
+	int WorldDataEAndEPoints[25][25][1];
+
+	//
 	// -- Functions --
 	//
 
