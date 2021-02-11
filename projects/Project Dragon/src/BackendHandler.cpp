@@ -13,10 +13,7 @@
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
-
-
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
 
 void BackendHandler::GlDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -46,7 +43,6 @@ bool BackendHandler::InitAll()
 {
 	Logger::Init();
 	Util::Init();
-	
 
 	if (!InitGLFW())
 		return 1;
@@ -55,19 +51,16 @@ bool BackendHandler::InitAll()
 	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
 
-
-
-
 	InitImGui();
 }
 
 void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	RenderingManager::activeScene->Registry().view<Camera>().each([=](Camera& cam) 
-	{
-		cam.ResizeWindow(width, height);
-	});
+	RenderingManager::activeScene->Registry().view<Camera>().each([=](Camera& cam)
+		{
+			cam.ResizeWindow(width, height);
+		});
 	RenderingManager::activeScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
 		{
 			buf.Reshape(width, height);
@@ -86,17 +79,12 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 		});
 }
 
-
-
 void BackendHandler::UpdateInput()
 {
-
 	//creates a single camera object to call
 
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
 	//loads the LUTS to switch them
-
-
 
 	Camera cam = cameraObj.get<Camera>();
 	Transform t = cameraObj.get<Transform>();
@@ -118,11 +106,7 @@ void BackendHandler::UpdateInput()
 	f.y = -dArray[6];
 	f.z = -dArray[10];
 
-
 	cam.SetForward(f);
-
-
-
 
 	btVector3 movement = btVector3(0, 0, 0);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -134,13 +118,12 @@ void BackendHandler::UpdateInput()
 		movement -= BtToGlm::GLMTOBTV3(cam.GetForward());
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		glm::vec3 direction = glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
@@ -148,11 +131,14 @@ void BackendHandler::UpdateInput()
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-	
 
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		movement.setZ(1.0f);;
+	}
 
 	phys.ApplyForce(movement);
-	
+
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
 		for (const auto& behaviour : binding.Behaviours) {
@@ -203,7 +189,7 @@ void BackendHandler::InitImGui()
 {
 	// Creates a new ImGUI context
 	ImGui::CreateContext();
-	// Gets our ImGUI input/output 
+	// Gets our ImGUI input/output
 	ImGuiIO& io = ImGui::GetIO();
 	// Enable keyboard navigation
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -263,7 +249,7 @@ void BackendHandler::RenderImGui()
 
 	// Render all of our ImGui elements
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	// If we have multiple viewports enabled (can drag into a new window)
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -328,7 +314,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 		pitch = -89.0f;
 
 	glm::vec3 front;
-	front.x = sin(glm::radians(yaw))* cos(glm::radians(pitch));
+	front.x = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.z = sin(glm::radians(pitch));
 	RenderingManager::activeScene->FindFirst("Camera").get<Camera>().SetForward(glm::normalize(front));
