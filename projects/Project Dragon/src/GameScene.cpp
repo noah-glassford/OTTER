@@ -137,12 +137,15 @@ void MainGameScene::InitGameScene()
 
 		//number here doesn't matter
 		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
-		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
+		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
+
 	}
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Floor_Tile.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
+	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Wall_Y.node");
 }
