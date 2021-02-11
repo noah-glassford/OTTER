@@ -44,7 +44,6 @@ void WorldBuilderV2::FillWorldData()
 		canLeft = false; canRight = false; canUp = false; canDown = false;
 		//Sets tile at start
 		WorldData[currentX][currentY] = 5;
-		std::cout << "\n[" << currentX << "][" << currentY << "]\n";
 
 		//Data check
 		if (WorldData[currentX + 1][currentY] < 1 && currentX < 24)
@@ -103,6 +102,7 @@ void WorldBuilderV2::GenerateTiles()
 			if (WorldData[x][y] > 0) {
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 25, y * 25, 0)
 					, "node/Blank_Floor_Tile.node");
+				std::cout << "\n[" << x << "][" << y << "]\n";
 			}
 		}
 	}
