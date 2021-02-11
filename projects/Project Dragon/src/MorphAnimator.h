@@ -2,13 +2,7 @@
 //This is the ECS component that will handle animations, get updated through the AnimationSystem class
 #include <VertexArrayObject.h>
 #include <GLM/glm.hpp>
-struct Frame
-{
-	VertexBuffer::sptr m_Pos;
-	VertexBuffer::sptr m_Col;
-	VertexBuffer::sptr m_Normal;
-	VertexBuffer::sptr m_UV;
-};
+#include <ObjLoader.h>
 
 struct AData//animation data
 {
