@@ -64,6 +64,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 			ss >> GOName;//this will only get updated upon a new game object
 			
 			GameObject Current = RenderingManager::activeScene->CreateEntity(GOName);
+			m_Instantiated.push_back(Current);
 			
 		}
 		else if (prefix == "RC")
