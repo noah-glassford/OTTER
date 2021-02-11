@@ -1,4 +1,3 @@
-
 #include "GameScene.h"
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
@@ -8,6 +7,7 @@
 #include <InstantiatingSystem.h>
 #include <AssetLoader.h>
 #include <Player.h>
+#include <WorldBuilderV2.h>
 
 void MainGameScene::InitGameScene()
 {
@@ -27,7 +27,6 @@ void MainGameScene::InitGameScene()
 
 	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
 
-
 	// Creating an empty texture
 	Texture2DDescription desc = Texture2DDescription();
 	desc.Width = 1;
@@ -36,7 +35,7 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr texture2 = Texture2D::Create(desc);
 	// Clear it with a white colour
 	texture2->Clear();
-	
+
 	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
 	Floor_Mat->Shader = RenderingManager::NoOutline;
 	Floor_Mat->Set("s_Diffuse", grass);
@@ -82,19 +81,15 @@ void MainGameScene::InitGameScene()
 
 		cameraObject.emplace<PhysicsBody>();
 		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 1));
-	
-		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 
+		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
 	GameObject obj2 = scene->CreateEntity("Hand");
 	{
-
-		
 		obj2.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
 		obj2.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
-
 	}
 
 	GameObject obj3 = scene->CreateEntity("cube");
@@ -105,7 +100,6 @@ void MainGameScene::InitGameScene()
 	}
 	//skybox
 	{
-		
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
 		skyboxMat->Shader = RenderingManager::SkyBox;
 		skyboxMat->Set("s_Environment", environmentMap);
@@ -143,19 +137,16 @@ void MainGameScene::InitGameScene()
 		greyscaleEffect->SetIntensity(0.f);
 	}
 
-
-
 	//color grading effect
 	ColorCorrectionEffect* colorEffect;
 	GameObject colorEffectObject = scene->CreateEntity("ColorGrading Effect");
 	{
 		int width, height;
 		glfwGetWindowSize(BackendHandler::window, &width, &height);
-		
+
 		colorEffect = &colorEffectObject.emplace<ColorCorrectionEffect>();
 		colorEffect->Init(width, height);
-		
-		
+
 		//number here doesn't matter
 		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
 		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
@@ -163,8 +154,7 @@ void MainGameScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
-
+	WorldBuilderV2 builder;
+	builder.BuildNewWorld();
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-	
-
 }
