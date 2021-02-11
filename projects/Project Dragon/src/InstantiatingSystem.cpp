@@ -3,6 +3,9 @@
 #include <BtToGlm.h>
 #include <RenderingManager.h>
 #include <PhysicsBody.h>
+
+std::vector<GameObject> InstantiatingSystem::m_Instantiated;
+
 // Borrowed from https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 #pragma region String Trimming
 
@@ -86,6 +89,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 		}
 		else if (prefix == "PHYS")
 		{
+			
 			float mass, fric;
 			glm::vec3 Pos, Size;
 			ss >> mass >> Pos.x >> Pos.y >> Pos.z >> Size.x >> Size.y >> Size.z >> fric;
@@ -94,7 +98,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 
 			RenderingManager::activeScene->FindFirst(GOName).emplace<PhysicsBody>();
 			RenderingManager::activeScene->FindFirst(GOName).get<PhysicsBody>().AddBody(mass, physPos, physSize, fric);
-
+			
 
 		}
 		

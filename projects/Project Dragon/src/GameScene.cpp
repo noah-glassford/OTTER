@@ -57,14 +57,7 @@ void MainGameScene::InitGameScene()
 	FE_Mat->Set("u_Shininess", 3.0f);
 	FE_Mat->Set("u_TextureMix", 0.0f);
 
-	GameObject obj1 = scene->CreateEntity("Ground");
-	{
-		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
-		obj1.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Floor");
-		obj1.emplace<PhysicsBody>();
-		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
-	}
+	
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
