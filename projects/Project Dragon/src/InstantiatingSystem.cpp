@@ -93,7 +93,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 			float mass, fric;
 			glm::vec3 Pos, Size;
 			ss >> mass >> Pos.x >> Pos.y >> Pos.z >> Size.x >> Size.y >> Size.z >> fric;
-			btVector3 physPos = BtToGlm::GLMTOBTV3(Pos);
+			btVector3 physPos = BtToGlm::GLMTOBTV3(Pos + origin);
 			btVector3 physSize = BtToGlm::GLMTOBTV3(Size);
 
 			RenderingManager::activeScene->FindFirst(GOName).emplace<PhysicsBody>();

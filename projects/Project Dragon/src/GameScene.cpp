@@ -85,12 +85,7 @@ void MainGameScene::InitGameScene()
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 
-	GameObject obj3 = scene->CreateEntity("cube");
-	{
-		obj3.get<Transform>().SetLocalPosition(0, 0, 0);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
-		obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Floor");
-	}
+	
 	//skybox
 	{
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
@@ -149,5 +144,5 @@ void MainGameScene::InitGameScene()
 	}
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Floor_Tile.node");
 }
