@@ -57,7 +57,6 @@ void MainGameScene::InitGameScene()
 	FE_Mat->Set("u_Shininess", 3.0f);
 	FE_Mat->Set("u_TextureMix", 0.0f);
 
-	
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -85,7 +84,6 @@ void MainGameScene::InitGameScene()
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 
-	
 	//skybox
 	{
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
@@ -141,11 +139,10 @@ void MainGameScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
-
 	}
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
+	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
+	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
 	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Wall_Y.node");
 }
