@@ -14,6 +14,6 @@ public:
 
 	//to load a prefab from a file
 	static void LoadPrefabFromFile(glm::vec3 origin, std::string filename);
-
+	static std::vector<GameObject> m_Instantiated;
 private:
 };

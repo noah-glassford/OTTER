@@ -36,6 +36,21 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Renderers.push_back(Fire_Enemy);
 	RendererNames.push_back("Fire Enemy");
 
+	//Fire Enemy
+	VertexArrayObject::sptr Ice_Mesh = ObjLoader::LoadFromFile("model/Ice projectile.obj");
+	Texture2D::sptr Ice_Tex = Texture2D::LoadFromFile("image/icetexture.png");
+	//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+	ShaderMaterial::sptr Ice_Mat = ShaderMaterial::Create();
+	Ice_Mat->Shader = RenderingManager::BaseShader;
+	Ice_Mat->Set("s_Diffuse", Ice_Tex);
+	Ice_Mat->Set("s_Specular", noSpec);
+	Ice_Mat->Set("u_Shininess", 2.0f);
+	Ice_Mat->Set("u_TextureMix", 0.0f);
+	RendererComponent Ice_Proj;
+	Ice_Proj.SetMaterial(Ice_Mat).SetMesh(Ice_Mesh);
+	Renderers.push_back(Ice_Proj);
+	RendererNames.push_back("Water_Proj");
+
 
 }
 RendererComponent& AssetLoader::GetRendererFromStr(std::string name)

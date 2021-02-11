@@ -6,6 +6,7 @@
 #include <ColorCorrection.h>
 #include <InstantiatingSystem.h>
 #include <AssetLoader.h>
+#include <Player.h>
 #include <WorldBuilderV2.h>
 
 void MainGameScene::InitGameScene()
@@ -56,14 +57,7 @@ void MainGameScene::InitGameScene()
 	FE_Mat->Set("u_Shininess", 3.0f);
 	FE_Mat->Set("u_TextureMix", 0.0f);
 
-	GameObject obj1 = scene->CreateEntity("Ground");
-	{
-		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
-		obj1.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Floor");
-		obj1.emplace<PhysicsBody>();
-		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
-	}
+	
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -71,6 +65,7 @@ void MainGameScene::InitGameScene()
 		//cameraObject.get<Transform>().setForward(glm::vec3(0, 0, -1));
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
+		Player& player = cameraObject.emplace<Player>();
 		camera.SetPosition(glm::vec3(0, 3, 3));
 		camera.SetUp(glm::vec3(0, 0, 1));
 		camera.LookAt(glm::vec3(0));

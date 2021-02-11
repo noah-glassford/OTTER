@@ -5,6 +5,7 @@
 #include "BackendHandler.h"
 #include <GreyscaleEffect.h>
 #include <ColorCorrection.h>
+#include <Player.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -140,15 +141,17 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+
+
 	//get the camera mat4s
 	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+	activeScene->FindFirst("Camera").get<Player>().Update();
+
 	
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
 	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 	glm::mat4 viewProjection = projection * view;
 
-
-	
 
 	entt::basic_group<entt::entity, entt::exclude_t<>, entt::get_t<Transform>, RendererComponent> renderGroup =
 		activeScene->Registry().group<RendererComponent>(entt::get_t<Transform>());
@@ -192,6 +195,9 @@ void RenderingManager::Render()
 		}
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
+		
+
+		//update the player class
 		
 
 
