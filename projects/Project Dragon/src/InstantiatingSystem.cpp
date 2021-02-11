@@ -84,6 +84,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 		}
 		else if (prefix == "PHYS")
 		{
+			btVector3 Pos, Size;
 
 		}
 		

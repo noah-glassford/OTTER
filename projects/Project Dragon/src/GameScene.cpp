@@ -7,6 +7,7 @@
 #include <ColorCorrection.h>
 #include <InstantiatingSystem.h>
 #include <AssetLoader.h>
+#include <Player.h>
 
 void MainGameScene::InitGameScene()
 {
@@ -72,6 +73,7 @@ void MainGameScene::InitGameScene()
 		//cameraObject.get<Transform>().setForward(glm::vec3(0, 0, -1));
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
+		Player& player = cameraObject.emplace<Player>();
 		camera.SetPosition(glm::vec3(0, 3, 3));
 		camera.SetUp(glm::vec3(0, 0, 1));
 		camera.LookAt(glm::vec3(0));
