@@ -1,5 +1,5 @@
 #include <MorphAnimator.h>
-#include <OBJLoader.h>
+
 #include <Timer.h>
 #include <iostream>
 AData MorphAnimator::GetAnimData()
@@ -9,7 +9,7 @@ AData MorphAnimator::GetAnimData()
 
 void MorphAnimator::LoadFrame(std::string filePath, glm::vec4 color)
 {
-	m_AnimData.m_Frames.push_back(OBJLoader::LoadFrame(filePath, color));
+	m_AnimData.m_Frames.push_back(ObjLoader::LoadFrame(filePath, color));
 }
 
 void MorphAnimator::SendToVao()
