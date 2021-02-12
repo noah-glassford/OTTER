@@ -8,7 +8,7 @@
 #include <AssetLoader.h>
 #include <Player.h>
 #include <WorldBuilderV2.h>
-
+#include "Enemy.h"
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -82,6 +82,17 @@ void MainGameScene::InitGameScene()
 		obj2.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+	}
+
+	GameObject obj3 = scene->CreateEntity("Test Enemy");
+	{
+		obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire Enemy");
+		PhysicsBody& p = obj3.emplace<PhysicsBody>();
+		Enemy& e = obj3.emplace<Enemy>();
+		p.AddBody(1.f, btVector3(0.f, 3.f, 8.f), btVector3(2.f, 2.f, 2.f));
+		p.GetBody()->setUserIndex(5);
+		p.GetBody()->setUserPointer((void*)&e);
+		
 	}
 
 	//skybox

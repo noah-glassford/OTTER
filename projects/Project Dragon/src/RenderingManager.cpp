@@ -6,6 +6,7 @@
 #include <GreyscaleEffect.h>
 #include <ColorCorrection.h>
 #include <Player.h>
+#include <Enemy.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -141,6 +142,16 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	// Update all world enemies for this frame
+	activeScene->Registry().view<Enemy, PhysicsBody>().each([](entt::entity entity, Enemy& e, PhysicsBody& p) {
+		e.Update(p);
+		if (e.m_hp <= 0)
+		{
+			btTransform t;
+			t.setOrigin(btVector3(0, 0, -1000));
+			p.GetBody()->setCenterOfMassTransform(t);
+		}
+		});
 
 
 	//get the camera mat4s

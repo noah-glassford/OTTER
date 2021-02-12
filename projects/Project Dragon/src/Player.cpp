@@ -2,6 +2,8 @@
 #include <RenderingManager.h>
 #include <Timer.h>
 #include <InstantiatingSystem.h>
+#include <Enemy.h>
+
 bool Weapon::Shoot(float range)
 {
 	
@@ -17,6 +19,8 @@ bool Weapon::Shoot(float range)
 
 		double dArray[16] = { 0.0 };
 
+
+		//This here gives us a lookAt vector
 		const float* pSource = (const float*)glm::value_ptr(tempView);
 		for (int i = 0; i < 16; ++i)
 			dArray[i] = pSource[i];
@@ -26,30 +30,28 @@ bool Weapon::Shoot(float range)
 		lookDir.y = -dArray[6];
 		lookDir.z = -dArray[10];
 
-		//defaulting to 0 for player
+		//Grabs player position
 		btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
 		
-		std::cout << lookDir.x << " " << lookDir.y << " " << lookDir.z << " \n";
+		//construct our raycast vector for shooting
 		lookDir *= range;
 		btVector3 to = BtToGlm::GLMTOBTV3(lookDir);
 		to += playerPosition;
+
 		btCollisionWorld::ClosestRayResultCallback Results(playerPosition, to);
 
 		PhysicsSystem::GetWorld()->rayTest(playerPosition, to, Results);
 
-		//std::cout << "Raycast ended at point: " << to.getX() << ", " << to.getY() << ", " << to.getZ() << std::endl;
-
-		
-
-		
-
-		if (Results.hasHit()  && Results.m_collisionObject->getUserIndex() == 5)
+		if (Results.hasHit()  && Results.m_collisionObject->getUserIndex() == 5) //if this is run you hit an enemy
 		{
-			//std::cout << Results.m_collisionObject->getUserIndex2();
-			//ECS::Get<Enemy>(Results.m_collisionObject->getUserIndex2()).m_hp = ECS::Get<Enemy>(Results.m_collisionObject->getUserIndex2()).m_hp - m_Damage;
-			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin()) + BtToGlm::BTTOGLMV3(playerPosition) * 0.2f);
-			std::cout << "Hit Something\n";
+			//Instantiate projectile/marker of where you shot because hitscan
 			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())),"node/Water_Proj.node");
+
+			//does damage to enemy
+		
+			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
+			e->m_hp -= 1;
+
 			return true;
 		}
 		else

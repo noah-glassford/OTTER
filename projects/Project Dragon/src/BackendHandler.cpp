@@ -81,12 +81,13 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 }
 
 #include <Player.h>
+#include <Enemy.h>
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		if (RenderingManager::activeScene->FindFirst("Camera").get<Player>().FireWeapon(0))
-			std::cout << "Hit an enemy\n";
+		RenderingManager::activeScene->FindFirst("Camera").get<Player>().FireWeapon(0);
+			
 	}
 }
 
