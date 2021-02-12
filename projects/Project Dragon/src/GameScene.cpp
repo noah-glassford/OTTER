@@ -142,7 +142,7 @@ void MainGameScene::InitGameScene()
 	}
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
 	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Wall_Y.node");
 }

@@ -17,9 +17,8 @@ void WorldBuilderV2::BuildNewWorld()
 		if (i > 0)
 			temp += 1;
 	}
-
-	if (temp > 50)	GenerateTiles();
-	else BuildNewWorld();
+	std::cout << "\n\n\nWorld Size: " << temp << "\n\n\n";
+	GenerateTiles();
 }
 
 void WorldBuilderV2::ResetWorldData()
@@ -33,6 +32,7 @@ void WorldBuilderV2::ResetWorldData()
 void WorldBuilderV2::DestroyCurrentWorld()
 {
 	for each (GameObject node in currentWorldGOs) {
+		std::cout << "Destroying OBJ In: CurrentWorldGos.";
 		RenderingManager::activeScene->RemoveEntity(node);
 	}
 	currentWorldGOs.clear();
@@ -45,7 +45,7 @@ void WorldBuilderV2::FillWorldData()
 	bool isBuilding = true;
 	bool canLeft, canRight, canUp, canDown;
 
-	int currentX = 0, currentY = 0;
+	int currentX = 15, currentY = 15;
 	int pastX, pastY;
 	int MovementData = 4;
 
@@ -115,37 +115,40 @@ void WorldBuilderV2::GenerateTiles()
 	for (int x = 0; x < 25; x++) {
 		for (int y = 0; y < 25; y++) {
 			if (WorldData[x][y] > 0) {
+				//Floor
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0)
 					, "node/Blank_Floor_Tile.node");
-
-				//
-				//
-				//currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated.end());
-				//
-				//
+				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
+				//Roof
+				//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
+					//, "node/Blank_Floor_Tile.node");
 
 				//
 				// Exterior Walls
 				//
 
 				if (WorldData[x][y + 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) + 10, 0)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) + 10, 10)
 						, "node/Blank_Wall_Y.node");
+					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x][y - 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) - 10, 0)
-						, "node/Blank_Wall_Y.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) - 10, 10)
+						, "node/Blank_Wall_Y.node"); \
+						currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x + 1][y] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) + 10, y * 20, 0)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) + 10, y * 20, 10)
 						, "node/Blank_Wall_X.node");
+					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x - 1][y] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) - 10, y * 20, 0)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) - 10, y * 20, 10)
 						, "node/Blank_Wall_X.node");
+					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				std::cout << "\n[" << x << "][" << y << "]\n";
