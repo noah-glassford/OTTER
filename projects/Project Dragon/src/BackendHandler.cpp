@@ -10,6 +10,7 @@
 #include<glm/gtx/rotate_vector.hpp>
 #include <BtToGlm.h>
 #include <ColorCorrection.h>
+#include <WorldBuilderV2.h>
 
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
@@ -91,7 +92,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	}
 }
 
-
 void BackendHandler::UpdateInput()
 {
 	//creates a single camera object to call
@@ -103,11 +103,9 @@ void BackendHandler::UpdateInput()
 	Transform t = cameraObj.get<Transform>();
 	PhysicsBody phys = cameraObj.get<PhysicsBody>();
 	//get a forward vector using fancy maths
-	glm::vec3 forward(0,1,0);
+	glm::vec3 forward(0, 1, 0);
 	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
 	glm::normalize(forward);
-
-
 
 	btVector3 movement = btVector3(0, 0, 0);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -136,6 +134,11 @@ void BackendHandler::UpdateInput()
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		movement.setZ(1.0f);;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
+		WorldBuilderV2 build;
+		build.BuildNewWorld();
 	}
 
 	phys.ApplyForce(movement);
@@ -170,8 +173,6 @@ bool BackendHandler::InitGLFW()
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
 
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
-
-
 
 	// Store the window in the application singleton
 	Application::Instance().Window = window;
