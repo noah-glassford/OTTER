@@ -1,11 +1,14 @@
-
 #include "GameScene.h"
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
 #include <PhysicsBody.h>
 #include <GreyscaleEffect.h>
 #include <ColorCorrection.h>
-
+#include <InstantiatingSystem.h>
+#include <AssetLoader.h>
+#include <Player.h>
+#include <WorldBuilderV2.h>
+#include "Enemy.h"
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -19,10 +22,10 @@ void MainGameScene::InitGameScene()
 
 	Texture2D::sptr grass = Texture2D::LoadFromFile("image/grass.jpg");
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+	Texture2D::sptr FireEnemy = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
 	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
-
 
 	// Creating an empty texture
 	Texture2DDescription desc = Texture2DDescription();
@@ -32,13 +35,13 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr texture2 = Texture2D::Create(desc);
 	// Clear it with a white colour
 	texture2->Clear();
-	
-	ShaderMaterial::sptr grassMat = ShaderMaterial::Create();
-	grassMat->Shader = RenderingManager::BaseShader;
-	grassMat->Set("s_Diffuse", grass);
-	grassMat->Set("s_Specular", noSpec);
-	grassMat->Set("u_Shininess", 2.0f);
-	grassMat->Set("u_TextureMix", 0.0f);
+
+	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
+	Floor_Mat->Shader = RenderingManager::NoOutline;
+	Floor_Mat->Set("s_Diffuse", grass);
+	Floor_Mat->Set("s_Specular", noSpec);
+	Floor_Mat->Set("u_Shininess", 2.0f);
+	Floor_Mat->Set("u_TextureMix", 0.0f);
 
 	ShaderMaterial::sptr handMat = ShaderMaterial::Create();
 	handMat->Shader = RenderingManager::BaseShader;
@@ -47,28 +50,21 @@ void MainGameScene::InitGameScene()
 	handMat->Set("u_Shininess", 1.0f);
 	handMat->Set("u_TextureMix", 0.0f);
 
-	GameObject obj1 = scene->CreateEntity("Ground");
-	{
-		obj1.get<Transform>().SetLocalPosition(0, 0, 0);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
-		obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
-		obj1.emplace<PhysicsBody>();
-		obj1.get<PhysicsBody>().AddBody(0.f, btVector3(0, 0, 0), btVector3(30, 30, 1));
-	}
-	GameObject obj2 = scene->CreateEntity("Hand");
-	{
-		obj2.get<Transform>().SetLocalPosition(0, -5, 3);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
-		
-	}
+	ShaderMaterial::sptr FE_Mat = ShaderMaterial::Create();
+	FE_Mat->Shader = RenderingManager::BaseShader;
+	FE_Mat->Set("s_Diffuse", FireEnemy);
+	FE_Mat->Set("s_Specular", noSpec);
+	FE_Mat->Set("u_Shininess", 3.0f);
+	FE_Mat->Set("u_TextureMix", 0.0f);
+
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
-		cameraObject.get<Transform>().SetLocalPosition(0, 0, 0).LookAt(glm::vec3(0, 0, 0));
+		cameraObject.get<Transform>().SetLocalPosition(0, 0, 0).LookAt(glm::vec3(0, 1, 5));
 		//cameraObject.get<Transform>().setForward(glm::vec3(0, 0, -1));
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
+		Player& player = cameraObject.emplace<Player>();
 		camera.SetPosition(glm::vec3(0, 3, 3));
 		camera.SetUp(glm::vec3(0, 0, 1));
 		camera.LookAt(glm::vec3(0));
@@ -77,13 +73,30 @@ void MainGameScene::InitGameScene()
 
 		cameraObject.emplace<PhysicsBody>();
 		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 1));
-	
-		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 
+		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
+	GameObject obj2 = scene->CreateEntity("Hand");
+	{
+		obj2.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
+		obj2.get<Transform>().SetParent(cameraObject);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+	}
+
+	GameObject obj3 = scene->CreateEntity("Test Enemy");
+	{
+		obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire Enemy");
+		PhysicsBody& p = obj3.emplace<PhysicsBody>();
+		Enemy& e = obj3.emplace<Enemy>();
+		p.AddBody(1.f, btVector3(0.f, 3.f, 8.f), btVector3(2.f, 2.f, 2.f));
+		p.GetBody()->setUserIndex(5);
+		p.GetBody()->setUserPointer((void*)&e);
+		
+	}
+
 	//skybox
 	{
-		
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
 		skyboxMat->Shader = RenderingManager::SkyBox;
 		skyboxMat->Set("s_Environment", environmentMap);
@@ -121,27 +134,26 @@ void MainGameScene::InitGameScene()
 		greyscaleEffect->SetIntensity(0.f);
 	}
 
-
-
 	//color grading effect
 	ColorCorrectionEffect* colorEffect;
 	GameObject colorEffectObject = scene->CreateEntity("ColorGrading Effect");
 	{
 		int width, height;
 		glfwGetWindowSize(BackendHandler::window, &width, &height);
-		
+
 		colorEffect = &colorEffectObject.emplace<ColorCorrectionEffect>();
 		colorEffect->Init(width, height);
-		
-		
+
 		//number here doesn't matter
-		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
 		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
-		colorEffect->LoadLUT("cube/test.cube",0);
+		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
-
-	
-
+	WorldBuilderV2 builder;
+	builder.BuildNewWorld();
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
+	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
+	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Wall_Y.node");
 }

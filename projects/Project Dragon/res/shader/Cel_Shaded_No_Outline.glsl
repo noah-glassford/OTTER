@@ -23,11 +23,7 @@ uniform float u_LightAttenuationConstant;
 uniform float u_LightAttenuationLinear;
 uniform float u_LightAttenuationQuadratic;
 
-//cel shading & outline
-//https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Toon_Shading
-uniform vec4 _OutlineColor;
-uniform float _LitOutlineThickness;
-uniform float _UnlitOutlineThickness;
+
 
 uniform float u_TextureMix;
 
@@ -39,9 +35,8 @@ uniform int u_Lightingtoggle;
 out vec4 frag_color;
 
 //apply cel shading
-const int bands = 6;
-const float scaleFactor = 1.0 / 6;
-
+const int bands = 5;
+const float scaleFactor = 1.0 / 5;
 // https://learnopengl.com/Advanced-Lighting/Advanced-Lighting
 void main() {
 	// Lecture 5
@@ -50,19 +45,12 @@ void main() {
 	// Diffuse
 	vec3 N = normalize(inNormal);
 	vec3 lightDir = normalize(u_LightPos - inPos);
-
+	
 	float dif = max(dot(N, lightDir), 0.0);
-	vec3 diffuse = dif * u_LightCol;// add diffuse intensity
-
-    if (u_Lightingtoggle == 5)
-    {
+	vec3 diffuse = dif * u_LightCol;
 	//the banding effect for cel-shading
-	diffuse = floor(diffuse * bands)*scaleFactor;
-    }
-    else
-    {
-        diffuse = dif * u_LightCol;
-    }
+    diffuse = floor(diffuse * bands)*scaleFactor;
+
 	//Attenuation
 	float dist = length(u_LightPos - inPos);
 	float attenuation = 1.0f / (
@@ -87,43 +75,10 @@ void main() {
 
 
 
-    if (u_Lightingtoggle == 1)
-    {
-     //do nothing since they are defined as 0 and should remain 0 for this
-     ambient = vec3(0,0,0);
-     diffuse = vec3(0,0,0);
-     specular = vec3(0,0,0);
-    }
-    if (u_Lightingtoggle == 2)
-    {
-         
-    ambient = u_AmbientLightStrength * u_LightCol;
-    diffuse = vec3(0,0,0);
-    specular = vec3(0,0,0);
-    }
-    if (u_Lightingtoggle == 3)
-    {
-         
-    ambient = vec3(0,0,0);
-    diffuse = dif * u_LightCol;
-    specular = vec3(0,0,0);
-    }
-    if (u_Lightingtoggle == 4)
-    {
-       
-    ambient =  u_AmbientLightStrength * u_LightCol;
-    diffuse = dif * u_LightCol;
-    specular = u_SpecularLightStrength * texSpec * spec * u_LightCol;
-    }
-    if (u_Lightingtoggle == 5)
-    {
-    ambient =  u_AmbientLightStrength * u_LightCol;
-    specular = u_SpecularLightStrength * texSpec * spec * u_LightCol;
-    }
 
 	vec3 result = (
 		(u_AmbientCol * u_AmbientStrength) + // global ambient light
-		(ambient + diffuse + specular) * attenuation // light factors from our single light
+		(ambient + diffuse + specular)// * attenuation // light factors from our single light
 		) * inColor * textureColor.rgb; // Object color
 
 		

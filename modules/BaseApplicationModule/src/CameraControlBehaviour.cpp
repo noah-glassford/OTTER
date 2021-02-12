@@ -12,6 +12,7 @@ void CameraControlBehaviour::Update(entt::handle entity)
 {
 	float dt = Timing::Instance().DeltaTime;
 	GLFWwindow* window = Application::Instance().Window;
+	std::shared_ptr<GameScene> curScene = Application::Instance().ActiveScene;
 	double mx, my;
 	glfwGetCursorPos(window, &mx, &my);
 	Transform& transform = entity.get<Transform>();
@@ -25,6 +26,7 @@ void CameraControlBehaviour::Update(entt::handle entity)
 			_prevMouseY = my;
 		}
 
+
 		
 
 		_rotationX += static_cast<float>(mx - _prevMouseX) * 0.5f;
@@ -36,7 +38,8 @@ void CameraControlBehaviour::Update(entt::handle entity)
 		_prevMouseX = mx;
 		_prevMouseY = my;
 
-		
+
+
 
 	
 		

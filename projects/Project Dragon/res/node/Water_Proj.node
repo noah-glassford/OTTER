@@ -1,0 +1,7 @@
+# pound sign designates a comment
+#This is basically a blank node file in order to build world gen faster
+GO Proj
+#GO makes a new game object
+RC Water_Proj
+TRNS 0 0 0 1 1 1 0 0 0
+# PHYS 0 0 0 0 20 20 1 2

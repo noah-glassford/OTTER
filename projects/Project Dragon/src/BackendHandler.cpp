@@ -6,17 +6,16 @@
 #include <bullet/LinearMath/btVector3.h>
 #include <GreyscaleEffect.h>
 #include <PhysicsBody.h>
-#define GLM_ENABLE_EXPERIMENTAL 
-#include <glm/gtx/rotate_vector.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include<glm/gtx/rotate_vector.hpp>
 #include <BtToGlm.h>
 #include <ColorCorrection.h>
+#include <WorldBuilderV2.h>
 
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
-
-
-
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 void BackendHandler::GlDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -46,7 +45,6 @@ bool BackendHandler::InitAll()
 {
 	Logger::Init();
 	Util::Init();
-	
 
 	if (!InitGLFW())
 		return 1;
@@ -55,19 +53,16 @@ bool BackendHandler::InitAll()
 	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
 
-
-
-
 	InitImGui();
 }
 
 void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	RenderingManager::activeScene->Registry().view<Camera>().each([=](Camera& cam) 
-	{
-		cam.ResizeWindow(width, height);
-	});
+	RenderingManager::activeScene->Registry().view<Camera>().each([=](Camera& cam)
+		{
+			cam.ResizeWindow(width, height);
+		});
 	RenderingManager::activeScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
 		{
 			buf.Reshape(width, height);
@@ -86,104 +81,68 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 		});
 }
 
-
+#include <Player.h>
+#include <Enemy.h>
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		RenderingManager::activeScene->FindFirst("Camera").get<Player>().FireWeapon(0);
+			
+	}
+}
 
 void BackendHandler::UpdateInput()
 {
-	
 	//creates a single camera object to call
-	
+
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
-	GameObject ColCorrectObj = RenderingManager::activeScene->FindFirst("ColorGrading Effect");
 	//loads the LUTS to switch them
-
-
 
 	Camera cam = cameraObj.get<Camera>();
 	Transform t = cameraObj.get<Transform>();
 	PhysicsBody phys = cameraObj.get<PhysicsBody>();
 	//get a forward vector using fancy maths
-	glm::vec3 forward(0,1,0);
+	glm::vec3 forward(0, 1, 0);
 	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
-	cam.SetForward(forward);
-
+	glm::normalize(forward);
 
 	btVector3 movement = btVector3(0, 0, 0);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		movement += BtToGlm::GLMTOBTV3(cam.GetForward());
+		movement += BtToGlm::GLMTOBTV3(forward);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		movement -= BtToGlm::GLMTOBTV3(cam.GetForward());
+		movement -= BtToGlm::GLMTOBTV3(forward);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		glm::vec3 direction = glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
+		glm::vec3 direction = glm::normalize(glm::cross(forward, cam.GetUp()));
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-	ColorCorrectionEffect& colCor = ColCorrectObj.get<ColorCorrectionEffect>();
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		glm::vec3 direction = -glm::normalize(glm::cross(cam.GetForward(), cam.GetUp()));
+		glm::vec3 direction = -glm::normalize(glm::cross(forward, cam.GetUp()));
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-	
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 1);
-		colCor._LUT = colCor._LUTS[0];
-
+		movement.setZ(1.0f);;
 	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 2);
-		colCor._LUT = colCor._LUTS[0];
-
+		WorldBuilderV2 build;
+		build.BuildNewWorld();
 	}
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 3);
-		colCor._LUT = colCor._LUTS[0];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 4);
-		colCor._LUT = colCor._LUTS[0];
-	}
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-	{
-		RenderingManager::BaseShader->SetUniform("u_Lightingtoggle", 5);
-		colCor._LUT = colCor._LUTS[0];
-
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
-	{
-		colCor._LUT = colCor._LUTS[1];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
-	{
-		//ColCorrectObj.get<ColorCorrectionEffect>()._LUT = cool;
-		colCor._LUT = colCor._LUTS[2];
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-	{
-		//ColCorrectObj.get<ColorCorrectionEffect>()._LUT = custom;
-		colCor._LUT = colCor._LUTS[3];
-	}
-
 
 	phys.ApplyForce(movement);
-	
+
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
 		for (const auto& behaviour : binding.Behaviours) {
@@ -213,6 +172,8 @@ bool BackendHandler::InitGLFW()
 	// Set our window resized callback
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
 
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+
 	// Store the window in the application singleton
 	Application::Instance().Window = window;
 
@@ -232,7 +193,7 @@ void BackendHandler::InitImGui()
 {
 	// Creates a new ImGUI context
 	ImGui::CreateContext();
-	// Gets our ImGUI input/output 
+	// Gets our ImGUI input/output
 	ImGuiIO& io = ImGui::GetIO();
 	// Enable keyboard navigation
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -292,7 +253,7 @@ void BackendHandler::RenderImGui()
 
 	// Render all of our ImGui elements
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	// If we have multiple viewports enabled (can drag into a new window)
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -322,3 +283,10 @@ void BackendHandler::SetupShaderForFrame(const Shader::sptr& shader, const glm::
 	glm::vec3 camPos = glm::inverse(view) * glm::vec4(0, 0, 0, 1);
 	shader->SetUniform("u_CamPos", camPos);
 }
+
+//for camera forward
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 1280 / 2.0;
+float lastY = 720.0 / 2.0;
