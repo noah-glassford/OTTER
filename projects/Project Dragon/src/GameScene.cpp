@@ -72,7 +72,7 @@ void MainGameScene::InitGameScene()
 		camera.SetOrthoHeight(3.0f);
 
 		cameraObject.emplace<PhysicsBody>();
-		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 1));
+		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 2));
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}

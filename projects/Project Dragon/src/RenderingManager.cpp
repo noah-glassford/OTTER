@@ -17,7 +17,7 @@ void RenderingManager::Init()
 
 	// GL states
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL); // New 
 
 

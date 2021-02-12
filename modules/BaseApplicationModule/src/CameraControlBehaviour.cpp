@@ -20,7 +20,7 @@ void CameraControlBehaviour::Update(entt::handle entity)
 
 	if (true) {
 		if (!_isPressed) {
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			_isPressed = true;
 			_prevMouseX = mx;
 			_prevMouseY = my;

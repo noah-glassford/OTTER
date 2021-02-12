@@ -169,6 +169,8 @@ bool BackendHandler::InitGLFW()
 	window = glfwCreateWindow(1280, 720, "Project Dragon", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
 	// Set our window resized callback
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
 

@@ -1,5 +1,5 @@
 #include "AudioEngine.h"
-
+/*
 
 ////////////////////////////////////
 //			 AudioObject		  //
@@ -502,7 +502,7 @@ float AudioEngine::GetGlobalParameterValue(const char* name)
 	return value;
 }
 
-
+*/
 
 
 
