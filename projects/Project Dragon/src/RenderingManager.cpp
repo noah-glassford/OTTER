@@ -134,7 +134,7 @@ void RenderingManager::Render()
 	//greyscale->Clear();
 	postEffect->Clear();
 	colEffect->Clear();
-	//bloomEffect->Clear();
+	bloomEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
