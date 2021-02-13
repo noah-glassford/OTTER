@@ -2,6 +2,6 @@
 #This is basically a blank node file in order to build world gen faster
 GO Floor
 #GO makes a new game object
-RC Floor
+RC Wall
 TRNS 0 0 0 10 10 10 0 0 -180
 PHYS 0 0 0 0 10 1 10 1

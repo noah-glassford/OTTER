@@ -8,7 +8,8 @@
 #include <AssetLoader.h>
 #include <Player.h>
 #include <WorldBuilderV2.h>
-
+#include "Enemy.h"
+#include <Bloom.h>
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -72,7 +73,7 @@ void MainGameScene::InitGameScene()
 		camera.SetOrthoHeight(3.0f);
 
 		cameraObject.emplace<PhysicsBody>();
-		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 1));
+		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 2));
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
@@ -82,6 +83,17 @@ void MainGameScene::InitGameScene()
 		obj2.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+	}
+
+	GameObject obj3 = scene->CreateEntity("Test Enemy");
+	{
+		obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire Enemy");
+		PhysicsBody& p = obj3.emplace<PhysicsBody>();
+		Enemy& e = obj3.emplace<Enemy>();
+		p.AddBody(1.f, btVector3(0.f, 3.f, 8.f), btVector3(2.f, 2.f, 2.f));
+		p.GetBody()->setUserIndex(5);
+		p.GetBody()->setUserPointer((void*)&e);
+		
 	}
 
 	//skybox
@@ -140,9 +152,21 @@ void MainGameScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
+
+	BloomEffect* bloom;
+	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
+		bloom = &BloomEffectObject.emplace<BloomEffect>();
+		bloom->Init(width, height);
+		bloom->SetThreshold(0.1f);
+	}
+
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
-	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Wall_Y.node");
+
+
+	
 }

@@ -1,8 +1,14 @@
 #include <Enemy.h>
+#include <RenderingManager.h>
 
-void Enemy::Update()
+#include <BtToGlm.h>
+#include <Player.h>
+
+#include <iostream>
+void Enemy::Update(PhysicsBody m_This)
 {
-	/*
+	
+
 	mTimer += Timer::dt;
 
 	if (mTimer >= 0.5f)
@@ -11,16 +17,17 @@ void Enemy::Update()
 		movementDirection.x = 0;
 		movementDirection.z = 0;
 
-		thisPosition = ECS::Get<PhysicsBody>(entityNumber).GetBody()->getCenterOfMassTransform().getOrigin();
-		playerPosition = ECS::Get<PhysicsBody>(0).GetBody()->getCenterOfMassTransform().getOrigin();
+		thisPosition = m_This.GetBody()->getCenterOfMassTransform().getOrigin();
+		playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
 		distance.setX(powf(thisPosition.getX() - playerPosition.getX(), 2.0f));
 		distance.setY(powf(thisPosition.getY() - playerPosition.getY(), 2.0f));
 		distance.setZ(powf(thisPosition.getZ() - playerPosition.getZ(), 2.0f));
+	
 
 		//Chance behavior of enemy based on distance
 
 		//Red Zone
-		/*if (distanceNorm < lookRange * 3) {
+		if (distanceNorm < lookRange * 3) {
 			//	std::cout << "\nRetreating\n";
 			if (thisPosition.getX() < playerPosition.getX()) {
 				movementDirection.x = -1;
@@ -53,14 +60,9 @@ void Enemy::Update()
 		distanceNorm = sqrtf(distance.getX() + distance.getY() + distance.getZ());
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
-	ECS::Get<PhysicsBody>(entityNumber).SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, 0, movementDirection.z * m_MovementSpeed));
+	//uncomment this to make it move again
+	//m_This.get<PhysicsBody>().SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, 0, movementDirection.z * m_MovementSpeed));
 
-	//check for death
-	btTransform trns;
-	trns = ECS::Get<PhysicsBody>(entityNumber).GetBody()->getCenterOfMassTransform();
-	trns.setOrigin(btVector3(0, -100, 0));
-	if (m_hp == 0)
-		ECS::Get<PhysicsBody>(entityNumber).GetBody()->setWorldTransform(trns);
 
 	//check if player should take damage
 	btVector3 Pla_Enemy_Diff;
@@ -72,11 +74,11 @@ void Enemy::Update()
 	{
 		if (canBeHit)
 		{
-			
-			ECS::Get<Player>(0).SetHp(ECS::Get<Player>(0).GetPlayerData().m_HP - 1);
+			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
+			player.SetHp(player.GetPlayerData().m_HP - 1);
 			canBeHit = false;
 			HitTimer = 0.f;
-			ECS::Get<Player>(0).PlayDamageSound();
+			player.PlayDamageSound();
 		}
 	}
 
@@ -86,7 +88,6 @@ void Enemy::Update()
 	else
 		canBeHit = false;
 	
-	*/
 	
 
 }

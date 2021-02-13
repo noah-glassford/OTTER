@@ -3,12 +3,15 @@
 #include <GLM/glm.hpp>
 #include <bullet/btBulletCollisionCommon.h>
 #include <Timer.h>
+#include <PhysicsBody.h>
 //basically playerdata but for the enemy
 class Enemy
 {
 public:
 	//Enemy Stat Values
 	int m_hp = 3;
+
+	//Enemy(GameObject* ThisObj);
 
 	//Internal Values
 	glm::vec3 movementDirection = glm::vec3(0, 0, 0);
@@ -24,10 +27,13 @@ public:
 	float HitTimer = 0.f;
 	bool canBeHit = false;
 
+	//pass the gameobject into this entity on creation
+	//PhysicsBody* m_This = nullptr;
+
 	//External Values
 	btVector3 playerPosition;
 
-	void Update();
+	void Update(PhysicsBody m_This);
 
 	//to check if the player should take damage
 };

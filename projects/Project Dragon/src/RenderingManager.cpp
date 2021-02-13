@@ -6,6 +6,9 @@
 #include <GreyscaleEffect.h>
 #include <ColorCorrection.h>
 #include <Player.h>
+#include <Enemy.h>
+#include <AudioEngine.h>
+#include <Bloom.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -16,7 +19,7 @@ void RenderingManager::Init()
 
 	// GL states
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL); // New 
 
 
@@ -114,22 +117,24 @@ void RenderingManager::Init()
 	Passthrough->Link();
 
 }
-
+bool DeathSoundPlayed = false;
 void RenderingManager::Render()
 {
 	//gets frame buffer from the active scene
 	PostEffect* postEffect;
 	GreyscaleEffect* greyscale;
 	ColorCorrectionEffect* colEffect;
+	BloomEffect* bloomEffect;
 	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
 	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
-
+	bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	// Clear the screen
 	
 	//greyscale->Clear();
 	postEffect->Clear();
 	colEffect->Clear();
+	//bloomEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -141,6 +146,26 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	// Update all world enemies for this frame
+	activeScene->Registry().view<Enemy, PhysicsBody>().each([](entt::entity entity, Enemy& e, PhysicsBody& p) {
+		e.Update(p);
+		if (e.m_hp <= 0)
+		{
+			//play temp death sound
+			//Placeholder shoot sfx
+			AudioEngine& engine = AudioEngine::Instance();
+
+			AudioEvent& tempEnDeath = engine.GetEvent("Level Complete");
+			if (!DeathSoundPlayed)
+			{
+				DeathSoundPlayed = true;
+				tempEnDeath.Play();
+			}
+			btTransform t;
+			t.setOrigin(btVector3(0, 0, -1000));
+			p.GetBody()->setCenterOfMassTransform(t);
+		}
+		});
 
 
 	//get the camera mat4s
@@ -206,6 +231,9 @@ void RenderingManager::Render()
 		//greyscale->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
+
+		bloomEffect->ApplyEffect(postEffect);
+		bloomEffect->DrawToScreen();
 		
 
 		postEffect->UnBindBuffer();
