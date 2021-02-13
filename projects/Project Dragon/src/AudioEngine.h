@@ -1,5 +1,5 @@
 #pragma once
-/*
+
 // FMOD
 #include "fmod_studio.hpp"
 #include "fmod_errors.h"
@@ -187,7 +187,7 @@ public:
 	AudioListener& GetListener();
 
 	//// Events ////
-	AudioEvent& CreateEvent(const std::string& strEventName, const std::string& GUID);
+	AudioEvent& CreateNewEvent(const std::string& strEventName, const std::string& GUID);
 	AudioEvent& GetEvent(const std::string& strEventName);
 
 	//// Global Parameters ////
@@ -226,4 +226,3 @@ private:
 
 
 
-*/

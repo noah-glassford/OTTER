@@ -9,6 +9,7 @@
 #include <Player.h>
 #include <WorldBuilderV2.h>
 #include "Enemy.h"
+#include <Bloom.h>
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -151,9 +152,21 @@ void MainGameScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
+
+	BloomEffect* bloom;
+	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
+		bloom = &BloomEffectObject.emplace<BloomEffect>();
+		bloom->Init(width, height);
+		bloom->SetThreshold(0.1f);
+	}
+
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, -5, 0), "node/Blank_Wall_X.node");
-	//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 5, 0), "node/Blank_Wall_Y.node");
+
+
+	
 }
