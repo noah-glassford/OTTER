@@ -45,13 +45,6 @@ void BloomEffect::Init(unsigned width, unsigned height)
 	index++;
 	_shaders.push_back(Shader::Create());
 	_shaders[index]->LoadShaderPartFromFile("shader/passthrough_vert.glsl", GL_VERTEX_SHADER);
-	_shaders[index]->LoadShaderPartFromFile("shader/BlurVertical_frag.glsl", GL_FRAGMENT_SHADER);
-	_shaders[index]->Link();
-
-	//loads the shaders
-	index++;
-	_shaders.push_back(Shader::Create());
-	_shaders[index]->LoadShaderPartFromFile("shader/passthrough_vert.glsl", GL_VERTEX_SHADER);
 	_shaders[index]->LoadShaderPartFromFile("shader/BloomComposite_frag.glsl", GL_FRAGMENT_SHADER);
 	_shaders[index]->Link();
 	
@@ -89,7 +82,7 @@ void BloomEffect::ApplyEffect(PostEffect* buffer)
 	{
 		//Horizontal pass
 		BindShader(2);
-		_shaders[2]->SetUniform("uPixelSize", m_pixelSize.x);
+		_shaders[2]->SetUniform("horizontal", true);
 
 		BindColorAsTexture(1, 0, 0);
 
@@ -98,14 +91,13 @@ void BloomEffect::ApplyEffect(PostEffect* buffer)
 		UnbindTexture(0);
 
 		UnbindShader();
+		
+		BindShader(2);
+		_shaders[2]->SetUniform("horizontal", false);
 
-		//Vertical pass
-		BindShader(3);
-		_shaders[3]->SetUniform("uPixelSize", m_pixelSize.y);
+		BindColorAsTexture(1, 0, 0);
 
-		BindColorAsTexture(2, 0, 0);
-
-		_buffers[1]->RenderToFSQ();
+		_buffers[2]->RenderToFSQ();
 
 		UnbindTexture(0);
 
@@ -114,7 +106,7 @@ void BloomEffect::ApplyEffect(PostEffect* buffer)
 
 
 	//Composite the scene and the bloom
-	BindShader(4);
+	BindShader(3);
 
 	buffer->BindColorAsTexture(0, 0, 0);
 	BindColorAsTexture(1, 0, 1);

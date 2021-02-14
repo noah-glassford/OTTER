@@ -14,6 +14,12 @@ Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
 GameScene::sptr RenderingManager::activeScene;
+
+bool ShouldBloom;
+bool TextureToggle;
+int NumPasses;
+float Threshold;
+
 void RenderingManager::Init()
 {
 
@@ -70,36 +76,68 @@ void RenderingManager::Init()
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
-		if (ImGui::CollapsingHeader("Scene Level Lighting Settings"))
-		{
-			if (ImGui::ColorPicker3("Ambient Color", glm::value_ptr(ambientCol))) {
-				BaseShader->SetUniform("u_AmbientCol", ambientCol);
+		
+			if (ImGui::Button("No Lighting")) 
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 1);
+				NoOutline->SetUniform("u_Lightingtoggle", 1);
+				ShouldBloom = false;
 			}
-			if (ImGui::SliderFloat("Fixed Ambient Power", &ambientPow, 0.01f, 1.0f)) {
-				BaseShader->SetUniform("u_AmbientStrength", ambientPow);
+			if (ImGui::Button("Ambient Only"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 2);
+				NoOutline->SetUniform("u_Lightingtoggle", 2);
+				ShouldBloom = false;
 			}
-		}
-		if (ImGui::CollapsingHeader("Light Level Lighting Settings"))
-		{
-			if (ImGui::DragFloat3("Light Pos", glm::value_ptr(lightPos), 0.01f, -10.0f, 10.0f)) {
-				BaseShader->SetUniform("u_LightPos", lightPos);
+			if (ImGui::Button("Specular Only"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 3);
+				NoOutline->SetUniform("u_Lightingtoggle", 3);
+				ShouldBloom = false;
 			}
-			if (ImGui::ColorPicker3("Light Col", glm::value_ptr(lightCol))) {
-				BaseShader->SetUniform("u_LightCol", lightCol);
+			if (ImGui::Button("Ambient + Specular"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 4);
+				NoOutline->SetUniform("u_Lightingtoggle", 4);
+				ShouldBloom = false;
 			}
-			if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
+			if (ImGui::Button("Ambient + Spec + Bloom"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 5);
+				NoOutline->SetUniform("u_Lightingtoggle", 5);
+				ShouldBloom = true;
 			}
-			if (ImGui::SliderFloat("Light Specular Power", &lightSpecularPow, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
+			if (ImGui::Button("Texture Toggle"))
+			{
+				if (TextureToggle)
+				{
+					TextureToggle = 0;
+					NoOutline->SetUniform("u_TextureToggle", 0);
+					BaseShader->SetUniform("u_TextureToggle", 0);
+				}
+				else
+				{
+					TextureToggle = 1;
+					NoOutline->SetUniform("u_TextureToggle", 1);
+					BaseShader->SetUniform("u_TextureToggle", 1);
+				}
 			}
-			if (ImGui::DragFloat("Light Linear Falloff", &lightLinearFalloff, 0.01f, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
+			if (ImGui::DragInt("Blur Passes", &NumPasses, 1.f, 0, 100))
+			{
+				BloomEffect* bloomEffect;
+				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+				bloomEffect->SetPasses((unsigned)NumPasses);
 			}
-			if (ImGui::DragFloat("Light Quadratic Falloff", &lightQuadraticFalloff, 0.01f, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
+			if (ImGui::DragFloat("Threshold", &Threshold, 0.01f, 0, 1))
+			{
+				BloomEffect* bloomEffect;
+				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+				bloomEffect->SetThreshold(Threshold);
 			}
-		}
+
+			
+		
+		
 		});
 
 	SkyBox = std::make_shared<Shader>();
@@ -132,6 +170,7 @@ void RenderingManager::Render()
 	// Clear the screen
 	
 	//greyscale->Clear();
+
 	postEffect->Clear();
 	colEffect->Clear();
 	bloomEffect->Clear();
@@ -231,10 +270,11 @@ void RenderingManager::Render()
 		//greyscale->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
-
-		bloomEffect->ApplyEffect(postEffect);
-		bloomEffect->DrawToScreen();
-		
+		if (ShouldBloom)
+		{
+			bloomEffect->ApplyEffect(postEffect);
+			bloomEffect->DrawToScreen();
+		}
 
 		postEffect->UnBindBuffer();
 

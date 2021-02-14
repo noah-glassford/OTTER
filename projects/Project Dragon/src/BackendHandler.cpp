@@ -172,20 +172,22 @@ void BackendHandler::UpdateInput()
 		Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 		p.CheckJump();
 
-		if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
-		{
+		//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
+		//{
 			//Placeholder shoot sfx
 			AudioEngine& engine = AudioEngine::Instance();
-
 			AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
 			tempJump.Play();
-			movement.setZ(10.0f);
-		}
+			movement.setZ(1.0f);
+		//}
 	}
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
-		WorldBuilderV2 build;
-		build.BuildNewWorld();
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	phys.ApplyForce(movement);
