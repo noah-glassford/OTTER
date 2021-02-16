@@ -9,6 +9,7 @@ int main()
 	AssetLoader::Init();
 	MainGameScene maingame;
 	maingame.InitGameScene();
+
 	
 
 	///// Game loop /////
@@ -16,6 +17,7 @@ int main()
 		glfwPollEvents();
 		Timer::Tick();
 		BackendHandler::UpdateInput();
+		BackendHandler::UpdateAudio();
 		PhysicsSystem::Update();
 		
 		RenderingManager::Render();

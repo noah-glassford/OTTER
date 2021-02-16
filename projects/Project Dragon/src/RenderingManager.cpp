@@ -7,11 +7,19 @@
 #include <ColorCorrection.h>
 #include <Player.h>
 #include <Enemy.h>
+#include <AudioEngine.h>
+#include <Bloom.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
 GameScene::sptr RenderingManager::activeScene;
+
+bool ShouldBloom;
+bool TextureToggle;
+int NumPasses;
+float Threshold;
+
 void RenderingManager::Init()
 {
 
@@ -68,36 +76,68 @@ void RenderingManager::Init()
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
-		if (ImGui::CollapsingHeader("Scene Level Lighting Settings"))
-		{
-			if (ImGui::ColorPicker3("Ambient Color", glm::value_ptr(ambientCol))) {
-				BaseShader->SetUniform("u_AmbientCol", ambientCol);
+		
+			if (ImGui::Button("No Lighting")) 
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 1);
+				NoOutline->SetUniform("u_Lightingtoggle", 1);
+				ShouldBloom = false;
 			}
-			if (ImGui::SliderFloat("Fixed Ambient Power", &ambientPow, 0.01f, 1.0f)) {
-				BaseShader->SetUniform("u_AmbientStrength", ambientPow);
+			if (ImGui::Button("Ambient Only"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 2);
+				NoOutline->SetUniform("u_Lightingtoggle", 2);
+				ShouldBloom = false;
 			}
-		}
-		if (ImGui::CollapsingHeader("Light Level Lighting Settings"))
-		{
-			if (ImGui::DragFloat3("Light Pos", glm::value_ptr(lightPos), 0.01f, -10.0f, 10.0f)) {
-				BaseShader->SetUniform("u_LightPos", lightPos);
+			if (ImGui::Button("Specular Only"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 3);
+				NoOutline->SetUniform("u_Lightingtoggle", 3);
+				ShouldBloom = false;
 			}
-			if (ImGui::ColorPicker3("Light Col", glm::value_ptr(lightCol))) {
-				BaseShader->SetUniform("u_LightCol", lightCol);
+			if (ImGui::Button("Ambient + Specular"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 4);
+				NoOutline->SetUniform("u_Lightingtoggle", 4);
+				ShouldBloom = false;
 			}
-			if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
+			if (ImGui::Button("Ambient + Spec + Bloom"))
+			{
+				BaseShader->SetUniform("u_Lightingtoggle", 5);
+				NoOutline->SetUniform("u_Lightingtoggle", 5);
+				ShouldBloom = true;
 			}
-			if (ImGui::SliderFloat("Light Specular Power", &lightSpecularPow, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
+			if (ImGui::Button("Texture Toggle"))
+			{
+				if (TextureToggle)
+				{
+					TextureToggle = 0;
+					NoOutline->SetUniform("u_TextureToggle", 0);
+					BaseShader->SetUniform("u_TextureToggle", 0);
+				}
+				else
+				{
+					TextureToggle = 1;
+					NoOutline->SetUniform("u_TextureToggle", 1);
+					BaseShader->SetUniform("u_TextureToggle", 1);
+				}
 			}
-			if (ImGui::DragFloat("Light Linear Falloff", &lightLinearFalloff, 0.01f, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
+			if (ImGui::DragInt("Blur Passes", &NumPasses, 1.f, 0, 100))
+			{
+				BloomEffect* bloomEffect;
+				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+				bloomEffect->SetPasses((unsigned)NumPasses);
 			}
-			if (ImGui::DragFloat("Light Quadratic Falloff", &lightQuadraticFalloff, 0.01f, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
+			if (ImGui::DragFloat("Threshold", &Threshold, 0.01f, 0, 1))
+			{
+				BloomEffect* bloomEffect;
+				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+				bloomEffect->SetThreshold(Threshold);
 			}
-		}
+
+			
+		
+		
 		});
 
 	SkyBox = std::make_shared<Shader>();
@@ -115,22 +155,25 @@ void RenderingManager::Init()
 	Passthrough->Link();
 
 }
-
+bool DeathSoundPlayed = false;
 void RenderingManager::Render()
 {
 	//gets frame buffer from the active scene
 	PostEffect* postEffect;
 	GreyscaleEffect* greyscale;
 	ColorCorrectionEffect* colEffect;
+	BloomEffect* bloomEffect;
 	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
 	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
-
+	bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	// Clear the screen
 	
 	//greyscale->Clear();
+
 	postEffect->Clear();
 	colEffect->Clear();
+	bloomEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -147,6 +190,16 @@ void RenderingManager::Render()
 		e.Update(p);
 		if (e.m_hp <= 0)
 		{
+			//play temp death sound
+			//Placeholder shoot sfx
+			AudioEngine& engine = AudioEngine::Instance();
+
+			AudioEvent& tempEnDeath = engine.GetEvent("Level Complete");
+			if (!DeathSoundPlayed)
+			{
+				DeathSoundPlayed = true;
+				tempEnDeath.Play();
+			}
 			btTransform t;
 			t.setOrigin(btVector3(0, 0, -1000));
 			p.GetBody()->setCenterOfMassTransform(t);
@@ -217,7 +270,11 @@ void RenderingManager::Render()
 		//greyscale->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
-		
+		if (ShouldBloom)
+		{
+			bloomEffect->ApplyEffect(postEffect);
+			bloomEffect->DrawToScreen();
+		}
 
 		postEffect->UnBindBuffer();
 

@@ -38,6 +38,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	RendererNames.push_back("Wall");
 
 	//Fire Enemy
+	/*
 	VertexArrayObject::sptr FE_Mesh = ObjLoader::LoadFromFile("model/Fire_Enemy.obj");
 	Texture2D::sptr FE_Tex = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 //	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
@@ -51,6 +52,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Fire_Enemy.SetMaterial(FE_MAT).SetMesh(FE_Mesh);
 	Renderers.push_back(Fire_Enemy);
 	RendererNames.push_back("Fire Enemy");
+	*/
 
 	//Fire Enemy
 	VertexArrayObject::sptr Ice_Mesh = ObjLoader::LoadFromFile("model/Ice projectile.obj");

@@ -91,7 +91,7 @@ void Player::CheckJump()
 
 	btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
 	btVector3 to = playerPosition;
-	to.setY(to.getY() - 2.f);
+	to.setZ(to.getZ() - 2.f);
 	//to += playerPosition;
 	btCollisionWorld::ClosestRayResultCallback Results(playerPosition, to);
 
