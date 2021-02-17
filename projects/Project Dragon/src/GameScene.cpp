@@ -209,6 +209,8 @@ void MainGameScene::InitGameScene()
 	//builder.BuildNewWorld();
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 
+	
+
 
 	
 }
