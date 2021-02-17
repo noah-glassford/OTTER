@@ -33,6 +33,13 @@ static inline void trim(std::string& s) {
 
 
 
+GameObject InstantiatingSystem::InstantiateEmpty( std::string go_Name)
+{
+
+
+	return RenderingManager::activeScene->CreateEntity(go_Name);
+}
+
 void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filename)
 {
 

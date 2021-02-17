@@ -11,7 +11,8 @@
 #include <BtToGlm.h>
 #include <ColorCorrection.h>
 #include <WorldBuilderV2.h>
-
+#include <AudioEngine.h>
+#include <Bloom.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 
@@ -41,6 +42,12 @@ void BackendHandler::GlDebugMessage(GLenum source, GLenum type, GLuint id, GLenu
 	}
 }
 
+void BackendHandler::UpdateAudio()
+{
+	AudioEngine& engine = AudioEngine::Instance();
+	engine.Update();
+}
+
 bool BackendHandler::InitAll()
 {
 	Logger::Init();
@@ -52,6 +59,22 @@ bool BackendHandler::InitAll()
 		return 1;
 	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
+
+	//Init Audio
+	AudioEngine& engine = AudioEngine::Instance();
+	engine.Init();
+	//start the music
+	
+	engine.LoadBank("sound/music");
+	engine.LoadBank("sound/Sound Effects");
+	engine.LoadBank("sound/Music.strings");
+	engine.LoadBus("MusicBus", "{137cb40e-93aa-4837-8626-c2445824f974}");
+	AudioEvent& music = engine.CreateNewEvent("Ambient Music 1", "{eac6c8f2-dc46-4acb-96a2-d4271dbe8072}");
+	engine.CreateNewEvent("Element Swap", "{aa3a7bc0-fe97-48a1-8ce7-4680087fe66d}");
+	engine.CreateNewEvent("Enemy Jump", "{8ef856c1-a3f5-4313-8266-74b56a655319}");
+	engine.CreateNewEvent("Level Complete", "{7148fbe2-c4ee-4e3a-a254-5bb351cbcbf8}");
+	
+	music.Play();
 
 	InitImGui();
 }
@@ -79,15 +102,28 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 		{
 			buf.Reshape(width, height);
 		});
+	RenderingManager::activeScene->Registry().view<BloomEffect>().each([=](BloomEffect& buf)
+		{
+			buf.Reshape(width, height);
+		});
 }
+
+
 
 #include <Player.h>
 #include <Enemy.h>
+bool AudioInit = 0;
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
+	//Placeholder shoot sfx
+	AudioEngine& engine = AudioEngine::Instance();
+	
+	AudioEvent& tempShoot = engine.GetEvent("Element Swap");
+	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
 		RenderingManager::activeScene->FindFirst("Camera").get<Player>().FireWeapon(0);
+		tempShoot.Play();
 			
 	}
 }
@@ -133,12 +169,25 @@ void BackendHandler::UpdateInput()
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		movement.setZ(1.0f);;
+		Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
+		p.CheckJump();
+
+		//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
+		//{
+			//Placeholder shoot sfx
+			AudioEngine& engine = AudioEngine::Instance();
+			AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
+			tempJump.Play();
+			movement.setZ(1.0f);
+		//}
 	}
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
-		WorldBuilderV2 build;
-		build.BuildNewWorld();
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	phys.ApplyForce(movement);
@@ -168,6 +217,8 @@ bool BackendHandler::InitGLFW()
 	//Create a new GLFW window
 	window = glfwCreateWindow(1280, 720, "Project Dragon", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	// Set our window resized callback
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
