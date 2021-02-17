@@ -11,7 +11,6 @@
 #include "Enemy.h"
 #include <Bloom.h>
 
-
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -61,7 +60,6 @@ void MainGameScene::InitGameScene()
 	EE_MAT->Set("u_Shininess", 3.0f);
 	EE_MAT->Set("u_TextureMix", 0.0f);
 
-
 	ShaderMaterial::sptr BarrelMat = ShaderMaterial::Create();
 	BarrelMat->Shader = RenderingManager::NoOutline;
 	BarrelMat->Set("s_Diffuse", Barrel);
@@ -98,24 +96,20 @@ void MainGameScene::InitGameScene()
 
 	//
 
-
 	GameObject obj3 = scene->CreateEntity("Test Enemy");
 	{
 		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
 
-		RendererComponent& RC =obj3.emplace<RendererComponent>();
+		RendererComponent& RC = obj3.emplace<RendererComponent>();
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Earth_En.obj");
 		RC.SetMesh(vao);
 		RC.SetMaterial(EE_MAT);
-	
 
-		
 		PhysicsBody& p = obj3.emplace<PhysicsBody>();
 		Enemy& e = obj3.emplace<Enemy>();
 		p.AddBody(1.f, btVector3(0.f, 3.f, 8.f), btVector3(2.f, 2.f, 2.f));
 		p.GetBody()->setUserIndex(5);
 		p.GetBody()->setUserPointer((void*)&e);
-		
 	}
 
 	GameObject obj4 = scene->CreateEntity("Barrel");
@@ -127,14 +121,11 @@ void MainGameScene::InitGameScene()
 		RC.SetMesh(vao);
 		RC.SetMaterial(BarrelMat);
 
-
-
 		PhysicsBody& p = obj4.emplace<PhysicsBody>();
 		//Enemy& e = obj4.emplace<Enemy>();
-		p.AddBody(0.f, btVector3(2.f, 3.f,1.f), btVector3(2.f, 2.f, 2.f));
+		p.AddBody(0.f, btVector3(2.f, 3.f, 1.f), btVector3(2.f, 2.f, 2.f));
 		//p.GetBody()->setUserIndex(5);
 		//p.GetBody()->setUserPointer((void*)&e);
-
 	}
 
 	//skybox
@@ -204,11 +195,6 @@ void MainGameScene::InitGameScene()
 		bloom->SetThreshold(0.1f);
 	}
 
-
-	//WorldBuilderV2 builder;
-	//builder.BuildNewWorld();
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-
-
-	
+	WorldBuilderV2 builder;
+	builder.BuildNewWorld();
 }
