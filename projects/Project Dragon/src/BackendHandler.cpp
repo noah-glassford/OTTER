@@ -64,7 +64,7 @@ bool BackendHandler::InitAll()
 	AudioEngine& engine = AudioEngine::Instance();
 	engine.Init();
 	//start the music
-	
+
 	engine.LoadBank("sound/music");
 	engine.LoadBank("sound/Sound Effects");
 	engine.LoadBank("sound/Music.strings");
@@ -73,7 +73,7 @@ bool BackendHandler::InitAll()
 	engine.CreateNewEvent("Element Swap", "{aa3a7bc0-fe97-48a1-8ce7-4680087fe66d}");
 	engine.CreateNewEvent("Enemy Jump", "{8ef856c1-a3f5-4313-8266-74b56a655319}");
 	engine.CreateNewEvent("Level Complete", "{7148fbe2-c4ee-4e3a-a254-5bb351cbcbf8}");
-	
+
 	music.Play();
 
 	InitImGui();
@@ -107,8 +107,6 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 			buf.Reshape(width, height);
 		});
 }
-
-
 
 #include <Player.h>
 #include <Enemy.h>

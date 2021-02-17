@@ -49,7 +49,7 @@ void WorldBuilderV2::FillWorldData()
 	bool isBuilding = true;
 	bool canLeft, canRight, canUp, canDown;
 
-	int currentX = 15, currentY = 15;
+	int currentX = 0, currentY = 0;
 	int pastX, pastY;
 	int MovementData = 4;
 

@@ -12,7 +12,6 @@
 #include <Bloom.h>
 #include <LightSource.h>
 
-
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -62,7 +61,6 @@ void MainGameScene::InitGameScene()
 	EE_MAT->Set("s_Specular", noSpec);
 	EE_MAT->Set("u_Shininess", 3.0f);
 	EE_MAT->Set("u_TextureMix", 0.0f);
-
 
 	ShaderMaterial::sptr BarrelMat = ShaderMaterial::Create();
 	BarrelMat->Shader = RenderingManager::NoOutline;
