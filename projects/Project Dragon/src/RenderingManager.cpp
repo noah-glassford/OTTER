@@ -53,81 +53,20 @@ void RenderingManager::Init()
 
 
 	//initialize primary fragment shader DirLight & spotlight
-	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -1.0f, -0.0f));
+	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
 	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
 	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
 	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 
 	//initialize primary fragment shader DirLight & spotlight
-	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
+	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
 	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
 	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 	
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
-		
-			if (ImGui::Button("No Lighting")) 
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 1);
-				NoOutline->SetUniform("u_Lightingtoggle", 1);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Ambient Only"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 2);
-				NoOutline->SetUniform("u_Lightingtoggle", 2);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Specular Only"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 3);
-				NoOutline->SetUniform("u_Lightingtoggle", 3);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Ambient + Specular"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 4);
-				NoOutline->SetUniform("u_Lightingtoggle", 4);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Ambient + Spec + Bloom"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 5);
-				NoOutline->SetUniform("u_Lightingtoggle", 5);
-				ShouldBloom = true;
-			}
-			if (ImGui::Button("Texture Toggle"))
-			{
-				if (TextureToggle)
-				{
-					TextureToggle = 0;
-					NoOutline->SetUniform("u_TextureToggle", 0);
-					BaseShader->SetUniform("u_TextureToggle", 0);
-				}
-				else
-				{
-					TextureToggle = 1;
-					NoOutline->SetUniform("u_TextureToggle", 1);
-					BaseShader->SetUniform("u_TextureToggle", 1);
-				}
-			}
-			if (ImGui::DragInt("Blur Passes", &NumPasses, 1.f, 0, 100))
-			{
-				BloomEffect* bloomEffect;
-				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-				bloomEffect->SetPasses((unsigned)NumPasses);
-			}
-			if (ImGui::DragFloat("Threshold", &Threshold, 0.01f, 0, 1))
-			{
-				BloomEffect* bloomEffect;
-				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-				bloomEffect->SetThreshold(Threshold);
-			}
-
-			
-		
 		
 		});
 
@@ -152,22 +91,10 @@ void RenderingManager::Render()
 {
 	
 
-	//gets frame buffer from the active scene
-	PostEffect* postEffect;
-	GreyscaleEffect* greyscale;
-	ColorCorrectionEffect* colEffect;
-	BloomEffect* bloomEffect;
-	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
-	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
-	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
-	bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-	// Clear the screen
-	
+
 	//greyscale->Clear();
 
-	postEffect->Clear();
-	colEffect->Clear();
-	bloomEffect->Clear();
+
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -263,7 +190,7 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
-	postEffect->BindBuffer(0);
+	
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -285,17 +212,7 @@ void RenderingManager::Render()
 
 
 
-		//greyscale->ApplyEffect(postEffect);
-		//greyscale->DrawToScreen();
-		colEffect->ApplyEffect(postEffect);
-		colEffect->DrawToScreen();
-		if (ShouldBloom)
-		{
-			bloomEffect->ApplyEffect(postEffect);
-			bloomEffect->DrawToScreen();
-		}
-
-		postEffect->UnBindBuffer();
+		
 
 		BackendHandler::RenderImGui();
 

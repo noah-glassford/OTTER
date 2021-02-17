@@ -155,55 +155,6 @@ void MainGameScene::InitGameScene()
 		skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
 	}
 
-	//Blank post processing effect
-	PostEffect* basicEffect;
-	GameObject framebufferObject = scene->CreateEntity("Basic Effect");
-	{
-		int width, height;
-		glfwGetWindowSize(BackendHandler::window, &width, &height);
-
-		basicEffect = &framebufferObject.emplace<PostEffect>();
-		basicEffect->Init(width, height);
-	}
-
-	//greyscale effect
-	GreyscaleEffect* greyscaleEffect;
-	GameObject greyScaleEffectObject = scene->CreateEntity("Greyscale Effect");
-	{
-		int width, height;
-		glfwGetWindowSize(BackendHandler::window, &width, &height);
-		greyscaleEffect = &greyScaleEffectObject.emplace<GreyscaleEffect>();
-		greyscaleEffect->Init(width, height);
-		greyscaleEffect->SetIntensity(0.f);
-	}
-
-	//color grading effect
-	ColorCorrectionEffect* colorEffect;
-	GameObject colorEffectObject = scene->CreateEntity("ColorGrading Effect");
-	{
-		int width, height;
-		glfwGetWindowSize(BackendHandler::window, &width, &height);
-
-		colorEffect = &colorEffectObject.emplace<ColorCorrectionEffect>();
-		colorEffect->Init(width, height);
-
-		//number here doesn't matter
-		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
-		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
-		//colorEffect->LoadLUT("cube/test.cube",0);
-		colorEffect->_LUT = colorEffect->_LUTS[0];
-	}
-
-	BloomEffect* bloom;
-	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
-	{
-		int width, height;
-		glfwGetWindowSize(BackendHandler::window, &width, &height);
-		bloom = &BloomEffectObject.emplace<BloomEffect>();
-		bloom->Init(width, height);
-		bloom->SetThreshold(0.1f);
-	}
 
 
 
@@ -212,12 +163,12 @@ void MainGameScene::InitGameScene()
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 
 	GameObject temp = InstantiatingSystem::InstantiateEmpty("Barrel");
-	temp.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Barrel");
+	
 	temp.get<Transform>().SetLocalPosition(1,1,1);
 	temp.emplace<LightSource>();
 
 	GameObject temp2 = InstantiatingSystem::InstantiateEmpty("Barrel");
-	temp2.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Barrel");
+	
 	temp2.get<Transform>().SetLocalPosition(10, 4, 1);
 	temp2.emplace<LightSource>();
 

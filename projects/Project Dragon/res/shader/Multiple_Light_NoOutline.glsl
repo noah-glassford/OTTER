@@ -95,7 +95,7 @@ void main()
     // phase 3: spot light
   //  result += CalcSpotLight(spotLight, norm, inPos, viewDir);    
     
-      // result = floor(result * bands)*scaleFactor;
+      //result 
 
     frag_color = vec4(result, 1.0);
 
@@ -106,6 +106,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
+       float level = floor(diff * bands);
+    diff = level / bands;
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Shininess);
@@ -114,52 +116,13 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 diffuse;
     vec3 specular;
 
-    if (u_Lightingtoggle == 1)
-    {
-     //do nothing since they are defined as 0 and should remain 0 for this
-     ambient = vec3(0,0,0);
-     diffuse = vec3(0,0,0);
-     specular = vec3(0,0,0);
-    }
-    if (u_Lightingtoggle == 2)
-    {
-         
-   ambient = dirLight.ambient * vec3(texture(s_Diffuse, inUV));
-    diffuse = vec3(0,0,0);
-    specular = vec3(0,0,0);
-    }
-    if (u_Lightingtoggle == 3)
-    {
-         
-    ambient = vec3(0,0,0);
-    diffuse = dirLight.diffuse * diff * vec3(texture(s_Diffuse, inUV));
-    specular = vec3(0,0,0);
-    }
-    if (u_Lightingtoggle == 4)
-    {
+   
        
     ambient = dirLight.ambient * vec3(texture(s_Diffuse, inUV));
     diffuse = dirLight.diffuse * diff * vec3(texture(s_Diffuse, inUV));
     specular = dirLight.specular * spec * vec3(texture(s_Specular, inUV));
-    }
-    if (u_Lightingtoggle == 5)
-    {
-    }
-    if (u_Lightingtoggle == 6)
-    {
-    }
-    if (u_Lightingtoggle == 7)
-    {
-    }
-    if (u_Lightingtoggle == 8)
-    {
-    }
-    if (u_Lightingtoggle == 9)
-    {
-    }
-    if (u_Lightingtoggle == 0)
-    {
-    }
+
+   
     return (ambient + diffuse + specular);
 }
 
@@ -169,6 +132,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
+       float level = floor(diff * bands);
+    diff = level / bands;
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Shininess);
@@ -182,6 +147,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
+
     return (ambient + diffuse + specular);
 }
 
@@ -194,6 +160,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
+       float level = floor(diff * bands);
+    diff = level / bands;
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
@@ -211,6 +179,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
+    diffuse = floor(diffuse * bands)*scaleFactor;
+
     return (ambient + diffuse + specular);
 }
 */
