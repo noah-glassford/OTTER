@@ -10,6 +10,7 @@
 #include <WorldBuilderV2.h>
 #include "Enemy.h"
 #include <Bloom.h>
+#include <LightSource.h>
 
 
 void MainGameScene::InitGameScene()
@@ -205,12 +206,20 @@ void MainGameScene::InitGameScene()
 	}
 
 
+
 	//WorldBuilderV2 builder;
 	//builder.BuildNewWorld();
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 
-	
+	GameObject temp = InstantiatingSystem::InstantiateEmpty("Barrel");
+	temp.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Barrel");
+	temp.get<Transform>().SetLocalPosition(1,1,1);
+	temp.emplace<LightSource>();
 
+	GameObject temp2 = InstantiatingSystem::InstantiateEmpty("Barrel");
+	temp2.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Barrel");
+	temp2.get<Transform>().SetLocalPosition(10, 4, 1);
+	temp2.emplace<LightSource>();
 
 	
 }

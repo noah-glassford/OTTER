@@ -9,6 +9,7 @@
 #include <Enemy.h>
 #include <AudioEngine.h>
 #include <Bloom.h>
+#include <LightSource.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -32,47 +33,37 @@ void RenderingManager::Init()
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/Cel_Shaded_Outline.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/Multiple_Light_Outline.glsl", GL_FRAGMENT_SHADER);
 	BaseShader->Link();
 
 	NoOutline = Shader::Create();
 	//First we initialize our shaders
 	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	NoOutline->LoadShaderPartFromFile("shader/Cel_Shaded_No_Outline.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/Multiple_Light_NoOutline.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
 
+	BaseShader->SetUniform("u_LightAttenuationConstant", 1.f);
+	BaseShader->SetUniform("u_LightAttenuationLinear", 0.08f);
+	BaseShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
 
-	//then we set some base values
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 5.0f);
-	glm::vec3 lightCol = glm::vec3(0.9f, 0.85f, 0.5f);
-	float     lightAmbientPow = 0.05f;
-	float     lightSpecularPow = 1.0f;
-	glm::vec3 ambientCol = glm::vec3(1.0f);
-	float     ambientPow = 0.6f;
-	float     lightLinearFalloff = 0.09f;
-	float     lightQuadraticFalloff = 0.032f;
+	//init attenuation
+	NoOutline->SetUniform("u_LightAttenuationConstant", 1.f);
+	NoOutline->SetUniform("u_LightAttenuationLinear", 0.08f);
+	NoOutline->SetUniform("u_LightAttenuationQuadratic", 0.032f);
 
-	// every frame
-	BaseShader->SetUniform("u_LightPos", lightPos);
-	BaseShader->SetUniform("u_LightCol", lightCol);
-	BaseShader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-	BaseShader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-	BaseShader->SetUniform("u_AmbientCol", ambientCol);
-	BaseShader->SetUniform("u_AmbientStrength", ambientPow);
-	BaseShader->SetUniform("u_LightAttenuationConstant", 1.0f);
-	BaseShader->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
-	BaseShader->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
 
-	// every frame
-	NoOutline->SetUniform("u_LightPos", lightPos);
-	NoOutline->SetUniform("u_LightCol", lightCol);
-	NoOutline->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-	NoOutline->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-	NoOutline->SetUniform("u_AmbientCol", ambientCol);
-	NoOutline->SetUniform("u_AmbientStrength", ambientPow);
-	NoOutline->SetUniform("u_LightAttenuationConstant", 1.0f);
-	NoOutline->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
-	NoOutline->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
+	//initialize primary fragment shader DirLight & spotlight
+	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -1.0f, -0.0f));
+	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
+	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+	//initialize primary fragment shader DirLight & spotlight
+	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
@@ -156,8 +147,11 @@ void RenderingManager::Init()
 
 }
 bool DeathSoundPlayed = false;
+int LightCount;
 void RenderingManager::Render()
 {
+	
+
 	//gets frame buffer from the active scene
 	PostEffect* postEffect;
 	GreyscaleEffect* greyscale;
@@ -205,6 +199,33 @@ void RenderingManager::Render()
 			p.GetBody()->setCenterOfMassTransform(t);
 		}
 		});
+	LightCount = 0;
+	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
+		
+		if (LightCount <= 50)
+		{
+			//create the string to send to the shader
+			std::string uniformName;
+			uniformName = "pointLights[";
+			uniformName += std::to_string(LightCount);
+			uniformName += "].";
+			//this will be the begining, now we just need to add the part of the struct we want to set
+			BaseShader->SetUniform(uniformName + "position", t.GetLocalPosition());
+			BaseShader->SetUniform(uniformName + "ambient", l.m_Ambient);
+			BaseShader->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			BaseShader->SetUniform(uniformName + "specular", l.m_Specular);
+			
+			NoOutline->SetUniform(uniformName + "position", t.GetLocalPosition());
+			NoOutline->SetUniform(uniformName + "ambient", l.m_Ambient);
+			NoOutline->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			NoOutline->SetUniform(uniformName + "specular", l.m_Specular);
+		
+		}
+		LightCount++;
+	
+		});
+	NoOutline->SetUniform("u_LightCount", LightCount);
+	BaseShader->SetUniform("u_LightCount", LightCount);
 
 
 	//get the camera mat4s
@@ -260,8 +281,6 @@ void RenderingManager::Render()
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
 		
-
-		//update the player class
 		
 
 

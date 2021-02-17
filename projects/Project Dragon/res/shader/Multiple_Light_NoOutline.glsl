@@ -46,7 +46,7 @@ struct SpotLight {
     vec3 specular;       
 };
 //Set max number of lights to 50, required to be a constant
-#define NR_POINT_LIGHTS 50
+#define NR_POINT_LIGHTS 99
 
 
 uniform DirLight dirLight;
@@ -69,12 +69,16 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 //vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 
+const int bands = 5;
+const float scaleFactor = 1.0 / 5;
+
+
 void main()
 {
     vec3 norm = normalize(inNormal);
     vec3 viewDir = normalize(u_CamPos - inPos);
 
-
+    vec3 N = normalize(inNormal);
 
 
     // == =====================================================
@@ -91,6 +95,8 @@ void main()
     // phase 3: spot light
   //  result += CalcSpotLight(spotLight, norm, inPos, viewDir);    
     
+      // result = floor(result * bands)*scaleFactor;
+
     frag_color = vec4(result, 1.0);
 
 }
