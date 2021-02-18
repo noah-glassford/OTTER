@@ -74,11 +74,13 @@ void Enemy::Update(PhysicsBody m_This)
 	{
 		if (canBeHit)
 		{
+			/*
 			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 			player.SetHp(player.GetPlayerData().m_HP - 1);
 			canBeHit = false;
 			HitTimer = 0.f;
 			player.PlayDamageSound();
+			*/
 		}
 	}
 

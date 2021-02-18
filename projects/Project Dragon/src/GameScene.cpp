@@ -97,7 +97,6 @@ void MainGameScene::InitGameScene()
 		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 
-	//
 
 
 	GameObject obj3 = scene->CreateEntity("Test Enemy");

@@ -122,8 +122,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		RenderingManager::activeScene->FindFirst("Camera").get<Player>().FireWeapon(0);
-		tempShoot.Play();
+		std::cout << "jej\n";
+		//tempShoot.Play();
 			
 	}
 }
@@ -169,8 +169,8 @@ void BackendHandler::UpdateInput()
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
-		p.CheckJump();
+	//	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
+		//p.CheckJump();
 
 		//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
 		//{

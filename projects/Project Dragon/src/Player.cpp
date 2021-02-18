@@ -1,9 +1,6 @@
 #include <Player.h>
-#include <RenderingManager.h>
-#include <Timer.h>
-#include <InstantiatingSystem.h>
-#include <Enemy.h>
 
+/*
 bool Weapon::Shoot(float range)
 {
 	
@@ -137,4 +134,19 @@ void Player::SetActiveWeapon(int activeweapon)
 int Player::GetActiveWeapon()
 {
 	return m_ActiveWeapon;
+}
+*/
+
+bool FireWeapon::Fire()
+{
+	return false;
+}
+
+void Player::InitWeapons()
+{
+	m_RightHandWeapons.push_back(new FireWeapon());
+	m_RightHandWeapons.push_back(new WaterWeapon());
+	m_LeftHandWeapons.push_back(new AirWeapon());
+	m_LeftHandWeapons.push_back(new EarthWeapon());
+
 }

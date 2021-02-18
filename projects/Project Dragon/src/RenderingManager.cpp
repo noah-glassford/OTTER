@@ -157,7 +157,7 @@ void RenderingManager::Render()
 
 	//get the camera mat4s
 	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
-	activeScene->FindFirst("Camera").get<Player>().Update();
+	//activeScene->FindFirst("Camera").get<Player>().Update();
 
 	
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
