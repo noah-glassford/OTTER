@@ -85,8 +85,69 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Barrel.SetMaterial(Barrel_Mat).SetMesh(Barrel_Mesh);
 	Renderers.push_back(Barrel);
 	RendererNames.push_back("Barrel");
-
-
+	//box
+	{
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/box.obj");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/BARREL.png");
+		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
+		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Set("s_Diffuse", box_tex);
+		box_Mat->Set("s_Specular", noSpec);
+		box_Mat->Set("u_Shininess", 2.0f);
+		box_Mat->Set("u_TextureMix", 0.0f);
+		RendererComponent Box;
+		Box.SetMaterial(box_Mat).SetMesh(box_Mesh);
+		Renderers.push_back(Box);
+		RendererNames.push_back("Box");
+	}
+	//Torch
+	{
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/torch.obj");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/TORCH.png");
+		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
+		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Set("s_Diffuse", box_tex);
+		box_Mat->Set("s_Specular", noSpec);
+		box_Mat->Set("u_Shininess", 2.0f);
+		box_Mat->Set("u_TextureMix", 0.0f);
+		RendererComponent Box;
+		Box.SetMaterial(box_Mat).SetMesh(box_Mesh);
+		Renderers.push_back(Box);
+		RendererNames.push_back("Torch");
+	}
+	//Pillar
+	{
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/pillar.obj");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
+		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
+		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Set("s_Diffuse", box_tex);
+		box_Mat->Set("s_Specular", noSpec);
+		box_Mat->Set("u_Shininess", 2.0f);
+		box_Mat->Set("u_TextureMix", 0.0f);
+		RendererComponent Box;
+		Box.SetMaterial(box_Mat).SetMesh(box_Mesh);
+		Renderers.push_back(Box);
+		RendererNames.push_back("Pillar");
+	}
+	{
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/pillar broken.obj");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
+		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
+		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Set("s_Diffuse", box_tex);
+		box_Mat->Set("s_Specular", noSpec);
+		box_Mat->Set("u_Shininess", 2.0f);
+		box_Mat->Set("u_TextureMix", 0.0f);
+		RendererComponent Box;
+		Box.SetMaterial(box_Mat).SetMesh(box_Mesh);
+		Renderers.push_back(Box);
+		RendererNames.push_back("Broken_Pillar");
+	}
 }
 RendererComponent& AssetLoader::GetRendererFromStr(std::string name)
 {
