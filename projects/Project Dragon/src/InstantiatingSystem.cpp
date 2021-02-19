@@ -3,7 +3,7 @@
 #include <BtToGlm.h>
 #include <RenderingManager.h>
 #include <PhysicsBody.h>
-
+#include <LightSource.h>
 std::vector<GameObject> InstantiatingSystem::m_Instantiated;
 
 // Borrowed from https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
@@ -114,6 +114,16 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 			RenderingManager::activeScene->FindFirst(GOName).get<PhysicsBody>().AddBody(mass, physPos, physSize, fric);
 			
 
+		}
+		else if (prefix == "LS")
+		{
+			glm::vec3 ambient, diffuse, specular;
+			ss >> ambient.x >> ambient.y >> ambient.z >> diffuse.x >> diffuse.y >> diffuse.z >> specular.x >> specular.y >> specular.z;
+			LightSource& l = RenderingManager::activeScene->FindFirst(GOName).emplace<LightSource>();
+			l.m_Ambient = ambient;
+			l.m_Diffuse = diffuse;
+			l.m_Specular = specular;
+			
 		}
 		
 		

@@ -99,33 +99,33 @@ void MainGameScene::InitGameScene()
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
-	/*
+	
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
-		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
+		RightHand.get<Transform>().SetLocalPosition(2, -1, 0).SetLocalRotation(-90, 0, 0);
 		RightHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		RightHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
-		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
+		LeftHand.get<Transform>().SetLocalPosition(-2, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
 		
 
 		LeftHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
-	*/
 	
+	/*
 	GameObject TestNumberPlane = scene->CreateEntity("NumberPlane");
 	{
 		TestNumberPlane.get<Transform>().SetLocalPosition(0, 0, 1).SetLocalScale(10,10,10);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		TestNumberPlane.emplace<RendererComponent>().SetMesh(vao).SetMaterial(NumMat);
 	}
-	
-
+	*/
+	/*
 	GameObject obj3 = scene->CreateEntity("Test Enemy");
 	{
 		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
@@ -144,7 +144,7 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserPointer((void*)&e);
 		
 	}
-
+	*/
 	GameObject obj4 = scene->CreateEntity("Barrel");
 	{
 		obj4.get<Transform>().SetLocalRotation(90, 0, 0);
@@ -186,17 +186,9 @@ void MainGameScene::InitGameScene()
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
+
+	//Mitcheeeeeel test it here
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-
-	GameObject temp = InstantiatingSystem::InstantiateEmpty("Barrel");
-	
-	temp.get<Transform>().SetLocalPosition(1,1,1);
-	temp.emplace<LightSource>();
-
-	GameObject temp2 = InstantiatingSystem::InstantiateEmpty("Barrel");
-	
-	temp2.get<Transform>().SetLocalPosition(10, 4, 1);
-	temp2.emplace<LightSource>();
 
 	
 }
