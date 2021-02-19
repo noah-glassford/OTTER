@@ -4,6 +4,8 @@
 #include <Texture2D.h>
 std::vector<std::string> AssetLoader::RendererNames;
 std::vector<RendererComponent> AssetLoader::Renderers;
+std::vector<std::string> AssetLoader::GameObjectNames;
+std::vector<GameObject> AssetLoader::GameObjects;
 void AssetLoader::Init() //doing it manually because, actually I don't know why
 {
 	//basic floor tile
@@ -96,6 +98,17 @@ RendererComponent& AssetLoader::GetRendererFromStr(std::string name)
 		}
 	}
 	return Renderers[0]; //backup
+}
+GameObject& AssetLoader::GetGameObjectFromStr(std::string name)
+{
+	for (int i = 0; i < GameObjectNames.size(); i++)
+	{
+		if (name == GameObjectNames[i])
+		{
+			return GameObjects[i];
+		}
+	}
+	return GameObjects[0]; //backup
 }
 /*
 Mesh& AssetLoader::GetMeshFromStr(std::string name)

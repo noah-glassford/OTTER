@@ -92,6 +92,7 @@ ProjIncludes = {
 	"dependencies/tinyGLTF",
 	"dependencies/json",
 	"dependencies/bullet3/include",
+	"dependencies/freetype/include"
 }
 
 -- These are all the default dependencies that require linking
@@ -115,6 +116,7 @@ DependenciesDebug = {
 	"dependencies/bullet3/lib/LinearMath_Debug.lib",
 	"dependencies/fmod/lib/fmodstudioL_vc.lib",
 	"dependencies/fmod/lib/fmodL_vc.lib",
+	"dependencies/freetype/freetype.lib"
 }
 
 DependenciesRelease = {
@@ -126,6 +128,7 @@ DependenciesRelease = {
 	"dependencies/bullet3/lib/LinearMath.lib",
 	"dependencies/fmod/lib/fmodstudio_vc.lib",
 	"dependencies/fmod/lib/fmod_vc.lib",
+	"dependencies/freetype/freetype.lib"
 }
 
 -- These are what we are linking to (mostly other projects)

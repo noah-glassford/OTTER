@@ -119,13 +119,18 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	AudioEngine& engine = AudioEngine::Instance();
 	
 	AudioEvent& tempShoot = engine.GetEvent("Element Swap");
+
+	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		std::cout << "jej\n";
-		//tempShoot.Play();
-			
+		p.LeftHandShoot();
 	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+		p.RightHandShoot();
+	}
+	
 }
 
 void BackendHandler::UpdateInput()
@@ -166,10 +171,10 @@ void BackendHandler::UpdateInput()
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
-
+	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-	//	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
+	//	
 		//p.CheckJump();
 
 		//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
@@ -181,6 +186,8 @@ void BackendHandler::UpdateInput()
 			movement.setZ(1.0f);
 		//}
 	}
+
+	//temporary
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -190,6 +197,16 @@ void BackendHandler::UpdateInput()
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
+
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		p.SwitchLeftHand();
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		p.SwitchRightHand();
+	}
 	phys.ApplyForce(movement);
 
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {

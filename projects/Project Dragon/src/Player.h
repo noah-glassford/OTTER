@@ -40,10 +40,16 @@ class Player
 {
 public:
 	void InitWeapons();
+	void Update();
+	void SwitchLeftHand();
+	void SwitchRightHand();
+	void LeftHandShoot();
+	void RightHandShoot();
 	int m_Hp;
 	std::vector<Weapon*> m_LeftHandWeapons;
 	std::vector<Weapon*> m_RightHandWeapons;
 	bool m_LeftEquiped;
 	bool m_RightEquiped;
+	bool m_CanJump;
 
 };

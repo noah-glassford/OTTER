@@ -40,6 +40,13 @@ GameObject InstantiatingSystem::InstantiateEmpty( std::string go_Name)
 	return RenderingManager::activeScene->CreateEntity(go_Name);
 }
 
+GameObject InstantiatingSystem::InstatiateGameObject(std::string Name)
+{
+	//
+	
+	return RenderingManager::activeScene->CreateEntity(Name) = AssetLoader::GetGameObjectFromStr(Name);
+}
+
 void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filename)
 {
 

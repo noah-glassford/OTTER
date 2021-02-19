@@ -137,10 +137,6 @@ int Player::GetActiveWeapon()
 }
 */
 
-bool FireWeapon::Fire()
-{
-	return false;
-}
 
 void Player::InitWeapons()
 {
@@ -149,4 +145,66 @@ void Player::InitWeapons()
 	m_LeftHandWeapons.push_back(new AirWeapon());
 	m_LeftHandWeapons.push_back(new EarthWeapon());
 
+}
+
+
+bool FireWeapon::Fire()
+{
+
+	std::cout << "Shot FireWeapon\n";
+	return false;
+}
+
+bool WaterWeapon::Fire()
+{
+	std::cout << "Shot WaterWeapon\n";
+	return false;
+}
+
+bool AirWeapon::Fire()
+{
+	std::cout << "Shot AirWeapon\n";
+	return false;
+}
+
+bool EarthWeapon::Fire()
+{
+	std::cout << "Shot EarthWeapon\n";
+	return false;
+}
+
+bool hasInit = false;
+void Player::Update()
+{
+	if (!hasInit)
+	{
+		InitWeapons();
+		hasInit = 1;
+	}
+
+}
+
+void Player::SwitchLeftHand()
+{
+	m_LeftEquiped = !m_LeftEquiped;
+}
+
+void Player::SwitchRightHand()
+{
+	m_RightEquiped = !m_RightEquiped;
+}
+
+void Player::LeftHandShoot()
+{
+	m_LeftHandWeapons[m_LeftEquiped]->Fire();
+}
+
+void Player::RightHandShoot()
+{
+	m_RightHandWeapons[m_RightEquiped]->Fire();
+}
+
+bool Weapon::Fire()
+{
+	return false;
 }

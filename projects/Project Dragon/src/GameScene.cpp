@@ -28,6 +28,7 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	Texture2D::sptr EarthEnemy = Texture2D::LoadFromFile("image/earthenemytexture.png");
 	Texture2D::sptr Barrel = Texture2D::LoadFromFile("image/BARREL.png");
+	Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
 	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
 	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
@@ -70,6 +71,13 @@ void MainGameScene::InitGameScene()
 	BarrelMat->Set("u_Shininess", 3.0f);
 	BarrelMat->Set("u_TextureMix", 0.0f);
 
+	ShaderMaterial::sptr NumMat = ShaderMaterial::Create();
+	NumMat->Shader = RenderingManager::NoOutline;
+	NumMat->Set("s_Diffuse", nine);
+	NumMat->Set("s_Specular", noSpec);
+	NumMat->Set("u_Shininess", 3.0f);
+	NumMat->Set("u_TextureMix", 0.0f);
+
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -84,20 +92,39 @@ void MainGameScene::InitGameScene()
 		camera.SetFovDegrees(90.0f); // Set an initial FOV
 		camera.SetOrthoHeight(3.0f);
 
-		cameraObject.emplace<PhysicsBody>();
-		cameraObject.get<PhysicsBody>().AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 2));
+		PhysicsBody& p = cameraObject.emplace<PhysicsBody>();
+		p.AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 2));
+		p.GetBody()->setCollisionFlags(p.GetBody()->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
-	GameObject obj2 = scene->CreateEntity("Hand");
+	/*
+	GameObject RightHand = scene->CreateEntity("RHand");
 	{
-		obj2.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
-		obj2.get<Transform>().SetParent(cameraObject);
+		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
+		RightHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+		RightHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
+	GameObject LeftHand = scene->CreateEntity("LHand");
+	{
+		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
+		
 
-
+		LeftHand.get<Transform>().SetParent(cameraObject);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+	}
+	*/
+	
+	GameObject TestNumberPlane = scene->CreateEntity("NumberPlane");
+	{
+		TestNumberPlane.get<Transform>().SetLocalPosition(0, 0, 1).SetLocalScale(10,10,10);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		TestNumberPlane.emplace<RendererComponent>().SetMesh(vao).SetMaterial(NumMat);
+	}
+	
 
 	GameObject obj3 = scene->CreateEntity("Test Enemy");
 	{
@@ -157,8 +184,8 @@ void MainGameScene::InitGameScene()
 
 
 
-	//WorldBuilderV2 builder;
-	//builder.BuildNewWorld();
+	WorldBuilderV2 builder;
+	builder.BuildNewWorld();
 	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 
 	GameObject temp = InstantiatingSystem::InstantiateEmpty("Barrel");
