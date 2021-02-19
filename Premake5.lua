@@ -84,7 +84,7 @@ ProjIncludes = {
 	"dependencies/imgui",
 	"dependencies/GLM/include",
 	"dependencies/stbs",
-	"dependencies/fmod",
+	"dependencies/fmod/include",
 	"dependencies/spdlog/include",
 	"dependencies/entt",
 	"dependencies/cereal",
@@ -92,6 +92,7 @@ ProjIncludes = {
 	"dependencies/tinyGLTF",
 	"dependencies/json",
 	"dependencies/bullet3/include",
+	"dependencies/freetype/include"
 }
 
 -- These are all the default dependencies that require linking
@@ -102,7 +103,6 @@ Dependencies = {
 	"ImGui",
 	"opengl32.lib",
 	"imagehlp.lib",
-	"dependencies/fmod/fmod64.lib",
 	"dependencies/gzip/zlib.lib",
 	"tinyGLTF",
 }
@@ -114,6 +114,9 @@ DependenciesDebug = {
 	"dependencies/bullet3/lib/BulletInverseDynamics_Debug.lib",
 	"dependencies/bullet3/lib/BulletSoftBody_Debug.lib",
 	"dependencies/bullet3/lib/LinearMath_Debug.lib",
+	"dependencies/fmod/lib/fmodstudioL_vc.lib",
+	"dependencies/fmod/lib/fmodL_vc.lib",
+	"dependencies/freetype/freetype.lib"
 }
 
 DependenciesRelease = {
@@ -123,6 +126,9 @@ DependenciesRelease = {
 	"dependencies/bullet3/lib/BulletInverseDynamics.lib",
 	"dependencies/bullet3/lib/BulletSoftBody.lib",
 	"dependencies/bullet3/lib/LinearMath.lib",
+	"dependencies/fmod/lib/fmodstudio_vc.lib",
+	"dependencies/fmod/lib/fmod_vc.lib",
+	"dependencies/freetype/freetype.lib"
 }
 
 -- These are what we are linking to (mostly other projects)

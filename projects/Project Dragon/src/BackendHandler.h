@@ -37,6 +37,9 @@ public:
 	@param userParam The pointer we set with glDebugMessageCallback (should be the game pointer)
 */
 	static void GlDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+	
+	//Update FMOD
+	static void UpdateAudio();
 
 	//Initialize everything
 	static bool InitAll();
@@ -60,6 +63,6 @@ public:
 	static void SetupShaderForFrame(const Shader::sptr& shader, const glm::mat4& view, const glm::mat4& projection);
 
 	static GLFWwindow* window;
-	static std::vector<std::function<void()>> imGuiCallbacks;
+	static std::vector<std::function<void()>> imGuiCallbacks;	
 	
 };

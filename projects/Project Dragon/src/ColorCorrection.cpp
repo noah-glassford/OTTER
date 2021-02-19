@@ -41,3 +41,9 @@ void ColorCorrectionEffect::LoadLUT(std::string path)
 	LUT3D temp(path);
 	_LUT = temp;
 }
+
+void ColorCorrectionEffect::LoadLUT(std::string path, int index)
+{
+	LUT3D temp(path);
+	_LUTS.push_back(temp);
+}

@@ -11,6 +11,8 @@ public:
 
 	static void ClearWorld();
 
+
+
 	static btDiscreteDynamicsWorld* GetWorld();
 
 	static std::vector<btRigidBody*> GetBodies();

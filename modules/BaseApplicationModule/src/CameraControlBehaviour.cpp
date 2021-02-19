@@ -12,6 +12,7 @@ void CameraControlBehaviour::Update(entt::handle entity)
 {
 	float dt = Timing::Instance().DeltaTime;
 	GLFWwindow* window = Application::Instance().Window;
+	std::shared_ptr<GameScene> curScene = Application::Instance().ActiveScene;
 	double mx, my;
 	glfwGetCursorPos(window, &mx, &my);
 	Transform& transform = entity.get<Transform>();
@@ -19,11 +20,12 @@ void CameraControlBehaviour::Update(entt::handle entity)
 
 	if (true) {
 		if (!_isPressed) {
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			_isPressed = true;
 			_prevMouseX = mx;
 			_prevMouseY = my;
 		}
+
 
 		
 
@@ -36,7 +38,8 @@ void CameraControlBehaviour::Update(entt::handle entity)
 		_prevMouseX = mx;
 		_prevMouseY = my;
 
-		
+
+
 
 	
 		

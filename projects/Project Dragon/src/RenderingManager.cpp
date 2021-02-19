@@ -5,78 +5,69 @@
 #include "BackendHandler.h"
 #include <GreyscaleEffect.h>
 #include <ColorCorrection.h>
+#include <Player.h>
+#include <Enemy.h>
+#include <AudioEngine.h>
+#include <Bloom.h>
+#include <LightSource.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
+Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
 GameScene::sptr RenderingManager::activeScene;
+
+bool ShouldBloom;
+bool TextureToggle;
+int NumPasses;
+float Threshold;
+
 void RenderingManager::Init()
 {
 
 	// GL states
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL); // New 
 
 
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/frag_blinn_phong_textured.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/Multiple_Light_Outline.glsl", GL_FRAGMENT_SHADER);
 	BaseShader->Link();
 
-	//then we set some base values
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 5.0f);
-	glm::vec3 lightCol = glm::vec3(0.9f, 0.85f, 0.5f);
-	float     lightAmbientPow = 0.05f;
-	float     lightSpecularPow = 1.0f;
-	glm::vec3 ambientCol = glm::vec3(1.0f);
-	float     ambientPow = 0.1f;
-	float     lightLinearFalloff = 0.09f;
-	float     lightQuadraticFalloff = 0.032f;
+	NoOutline = Shader::Create();
+	//First we initialize our shaders
+	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/Multiple_Light_NoOutline.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->Link();
 
-	// every frame
-	BaseShader->SetUniform("u_LightPos", lightPos);
-	BaseShader->SetUniform("u_LightCol", lightCol);
-	BaseShader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-	BaseShader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-	BaseShader->SetUniform("u_AmbientCol", ambientCol);
-	BaseShader->SetUniform("u_AmbientStrength", ambientPow);
-	BaseShader->SetUniform("u_LightAttenuationConstant", 1.0f);
-	BaseShader->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
-	BaseShader->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
+	BaseShader->SetUniform("u_LightAttenuationConstant", 1.f);
+	BaseShader->SetUniform("u_LightAttenuationLinear", 0.08f);
+	BaseShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+	//init attenuation
+	NoOutline->SetUniform("u_LightAttenuationConstant", 1.f);
+	NoOutline->SetUniform("u_LightAttenuationLinear", 0.08f);
+	NoOutline->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+
+	//initialize primary fragment shader DirLight & spotlight
+	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
+	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
+	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+	//initialize primary fragment shader DirLight & spotlight
+	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
+	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
+	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
-		if (ImGui::CollapsingHeader("Scene Level Lighting Settings"))
-		{
-			if (ImGui::ColorPicker3("Ambient Color", glm::value_ptr(ambientCol))) {
-				BaseShader->SetUniform("u_AmbientCol", ambientCol);
-			}
-			if (ImGui::SliderFloat("Fixed Ambient Power", &ambientPow, 0.01f, 1.0f)) {
-				BaseShader->SetUniform("u_AmbientStrength", ambientPow);
-			}
-		}
-		if (ImGui::CollapsingHeader("Light Level Lighting Settings"))
-		{
-			if (ImGui::DragFloat3("Light Pos", glm::value_ptr(lightPos), 0.01f, -10.0f, 10.0f)) {
-				BaseShader->SetUniform("u_LightPos", lightPos);
-			}
-			if (ImGui::ColorPicker3("Light Col", glm::value_ptr(lightCol))) {
-				BaseShader->SetUniform("u_LightCol", lightCol);
-			}
-			if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-			}
-			if (ImGui::SliderFloat("Light Specular Power", &lightSpecularPow, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-			}
-			if (ImGui::DragFloat("Light Linear Falloff", &lightLinearFalloff, 0.01f, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
-			}
-			if (ImGui::DragFloat("Light Quadratic Falloff", &lightQuadraticFalloff, 0.01f, 0.0f, 1.0f)) {
-				BaseShader->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
-			}
-		}
+		
 		});
 
 	SkyBox = std::make_shared<Shader>();
@@ -94,22 +85,16 @@ void RenderingManager::Init()
 	Passthrough->Link();
 
 }
-
+bool DeathSoundPlayed = false;
+int LightCount;
 void RenderingManager::Render()
 {
-	//gets frame buffer from the active scene
-	PostEffect* postEffect;
-	GreyscaleEffect* greyscale;
-	ColorCorrectionEffect* colEffect;
-	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
-	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
-	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
-
-	// Clear the screen
 	
+	
+
 	//greyscale->Clear();
-	postEffect->Clear();
-	colEffect->Clear();
+
+
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -121,12 +106,66 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	// Update all world enemies for this frame
+	activeScene->Registry().view<Enemy, PhysicsBody>().each([](entt::entity entity, Enemy& e, PhysicsBody& p) {
+		e.Update(p);
+		if (e.m_hp <= 0)
+		{
+			//play temp death sound
+			//Placeholder shoot sfx
+			AudioEngine& engine = AudioEngine::Instance();
+
+			AudioEvent& tempEnDeath = engine.GetEvent("Level Complete");
+			if (!DeathSoundPlayed)
+			{
+				DeathSoundPlayed = true;
+				tempEnDeath.Play();
+			}
+			btTransform t;
+			t.setOrigin(btVector3(0, 0, -1000));
+			p.GetBody()->setCenterOfMassTransform(t);
+		}
+		});
+	LightCount = 0;
+	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
+		
+		if (LightCount <= 50)
+		{
+			//create the string to send to the shader
+			std::string uniformName;
+			uniformName = "pointLights[";
+			uniformName += std::to_string(LightCount);
+			uniformName += "].";
+			//this will be the begining, now we just need to add the part of the struct we want to set
+			BaseShader->SetUniform(uniformName + "position", t.GetLocalPosition());
+			BaseShader->SetUniform(uniformName + "ambient", l.m_Ambient);
+			BaseShader->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			BaseShader->SetUniform(uniformName + "specular", l.m_Specular);
+			
+			NoOutline->SetUniform(uniformName + "position", t.GetLocalPosition());
+			NoOutline->SetUniform(uniformName + "ambient", l.m_Ambient);
+			NoOutline->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			NoOutline->SetUniform(uniformName + "specular", l.m_Specular);
+		
+		}
+		LightCount++;
+	
+		});
+	NoOutline->SetUniform("u_LightCount", LightCount);
+	BaseShader->SetUniform("u_LightCount", LightCount);
+
+
 	//get the camera mat4s
 	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+	activeScene->FindFirst("Camera").get<Player>().Update();
+	//temp
+	//activeScene->FindFirst("NumberPlane").get<Transform>().LookAt(camTransform.GetLocalPosition());
+
 	
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
 	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 	glm::mat4 viewProjection = projection * view;
+
 
 	entt::basic_group<entt::entity, entt::exclude_t<>, entt::get_t<Transform>, RendererComponent> renderGroup =
 		activeScene->Registry().group<RendererComponent>(entt::get_t<Transform>());
@@ -153,7 +192,7 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
-	postEffect->BindBuffer(0);
+	
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -171,22 +210,21 @@ void RenderingManager::Render()
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
 		
-
-		//greyscale->ApplyEffect(postEffect);
-		//greyscale->DrawToScreen();
-		colEffect->ApplyEffect(postEffect);
-		colEffect->DrawToScreen();
 		
 
-		postEffect->UnBindBuffer();
+
+
+		
+
+		BackendHandler::RenderImGui();
 
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
+	
 
 
-
-	Application::Instance().ActiveScene = nullptr;
+	
 
 
 }
