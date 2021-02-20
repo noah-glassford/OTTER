@@ -1,5 +1,7 @@
 #include <Player.h>
-
+#include <BtToGlm.h>
+#include <PhysicsSystem.h>
+#include <Enemy.h>
 /*
 bool Weapon::Shoot(float range)
 {
@@ -157,7 +159,70 @@ bool FireWeapon::Fire()
 
 bool WaterWeapon::Fire()
 {
-	std::cout << "Shot WaterWeapon\n";
+	
+	if (m_CanShoot)
+	{
+		std::cout << "Shot WaterWeapon\n";
+		m_Timer = 0.f;
+
+
+		GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
+		Transform t = cameraObj.get<Transform>();
+		glm::mat4 tempView = glm::inverse(t.WorldTransform());
+
+		double dArray[16] = { 0.0 };
+
+
+		//This here gives us a lookAt vector
+		const float* pSource = (const float*)glm::value_ptr(tempView);
+		for (int i = 0; i < 16; ++i)
+			dArray[i] = pSource[i];
+
+		glm::vec3 lookDir;
+		lookDir.x = -dArray[2];
+		lookDir.y = -dArray[6];
+		lookDir.z = -dArray[10];
+
+		//Grabs player position
+		btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
+
+		//construct our raycast vector for shooting
+		lookDir *= 50;
+		btVector3 to = BtToGlm::GLMTOBTV3(lookDir);
+		to += playerPosition;
+
+		btCollisionWorld::ClosestRayResultCallback Results(playerPosition, to);
+
+		PhysicsSystem::GetWorld()->rayTest(playerPosition, to, Results);
+
+		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
+		{
+			//Instantiate projectile/marker of where you shot because hitscan
+			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+
+			//does damage to enemy
+
+			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
+			e->m_hp -= 1;
+			std::cout << e->m_hp;
+
+			return true;
+		}
+		else
+		{
+			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
+			return false;
+		}
+	}
+	else
+	{
+		//	std::cout << "Not Shot\n";
+		return false;
+
+	}
+
+	return false;
 	return false;
 }
 

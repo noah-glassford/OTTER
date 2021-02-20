@@ -179,6 +179,27 @@ void MainGameScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
 		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
 	}
+
+	GameObject obj3 = scene->CreateEntity("Test Enemy");
+	{
+		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
+
+		RendererComponent& RC = obj3.emplace<RendererComponent>();
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
+		RC.SetMesh(vao);
+		RC.SetMaterial(EE_MAT);
+
+
+
+		PhysicsBody& p = obj3.emplace<PhysicsBody>();
+		Enemy& e = obj3.emplace<Enemy>();
+		p.AddBody(1.f, btVector3(0.f, 0.f, 3.f), btVector3(2.f, 2.f, 2.f));
+		p.GetBody()->setUserIndex(2);
+		p.GetBody()->setUserPointer((void*)&e);
+
+	}
+
+
 	//skybox
 	{
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
@@ -204,7 +225,7 @@ void MainGameScene::InitGameScene()
 
 	//Mitcheeeeeel test it here
 	//suck pp no ah
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Node_3.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
 
 	
 }

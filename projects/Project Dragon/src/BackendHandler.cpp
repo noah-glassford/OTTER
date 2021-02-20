@@ -153,26 +153,26 @@ void BackendHandler::UpdateInput()
 	btVector3 movement = btVector3(0, 0, 0);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		movement += BtToGlm::GLMTOBTV3(forward * 10.f * Timer::dt);
+		movement += BtToGlm::GLMTOBTV3(forward);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		movement -= BtToGlm::GLMTOBTV3(forward * 10.f * Timer::dt);
+		movement -= BtToGlm::GLMTOBTV3(forward);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		glm::vec3 direction = glm::normalize(glm::cross(forward, cam.GetUp()));
-		movement.setX(movement.getX() - direction.x * 1.8);
-		movement.setY(movement.getY() - direction.y * 1.8);
+		movement.setX(movement.getX() - direction.x);
+		movement.setY(movement.getY() - direction.y);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		glm::vec3 direction = -glm::normalize(glm::cross(forward, cam.GetUp()));
 
-		movement.setX(movement.getX() - direction.x * 1.8);
-		movement.setY(movement.getY() - direction.y * 1.8);
+		movement.setX(movement.getX() - direction.x );
+		movement.setY(movement.getY() - direction.y);
 	}
 	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
@@ -189,6 +189,7 @@ void BackendHandler::UpdateInput()
 		movement.setZ(1.0f);
 		//}
 	}
+	phys.ApplyForce(movement * 100.f * Timer::dt);
 
 	//temporary
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
@@ -245,7 +246,7 @@ void BackendHandler::UpdateInput()
 		{
 			shouldSwitchWeaponL = true;
 		}
-		phys.ApplyForce(movement);
+		
 
 		RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 			// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
