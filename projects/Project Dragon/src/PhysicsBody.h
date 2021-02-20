@@ -20,6 +20,7 @@ public:
 	void ApplyForce(btVector3 direction);
 	void AddBody(float mass, btVector3 origin, btVector3 size);
 	void AddBody(float mass, btVector3 origin, btVector3 size, float friction);
+	void AddSphereBody(float mass, float radius, btVector3 origin);
 
 	void SetUserData(int data);
 	void SetUserData2(int data);
