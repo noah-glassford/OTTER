@@ -203,7 +203,8 @@ void MainGameScene::InitGameScene()
 	builder.BuildNewWorld();
 
 	//Mitcheeeeeel test it here
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Node_2.node");
+	//suck pp no ah
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Node_3.node");
 
 	
 }
