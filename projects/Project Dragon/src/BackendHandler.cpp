@@ -113,25 +113,7 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 #include <Player.h>
 #include <Enemy.h>
 bool AudioInit = 0;
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-	//Placeholder shoot sfx
-	AudioEngine& engine = AudioEngine::Instance();
-	
-	AudioEvent& tempShoot = engine.GetEvent("Element Swap");
 
-	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
-	
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	{
-		p.LeftHandShoot();
-	}
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-	{
-		p.RightHandShoot();
-	}
-	
-}
 
 bool shouldSwitchWeaponL, shouldSwitchWeaponR;
 
@@ -247,6 +229,15 @@ void BackendHandler::UpdateInput()
 			shouldSwitchWeaponL = true;
 		}
 		
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+		{
+			p.LeftHandShoot();
+		}
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+		{
+			p.RightHandShoot();
+		}
+		
 
 		RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 			// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
@@ -276,11 +267,11 @@ bool BackendHandler::InitGLFW()
 	glfwMakeContextCurrent(window);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
 	// Set our window resized callback
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
 
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// Store the window in the application singleton
 	Application::Instance().Window = window;

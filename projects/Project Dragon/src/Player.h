@@ -6,7 +6,7 @@
 class Weapon
 {
 public:
-	void Update() { m_Timer += Timer::dt; if (m_Timer > m_FireDelay) m_CanShoot = true; else m_CanShoot = false; };
+	virtual void Update() { m_Timer += Timer::dt; if (m_Timer > m_FireDelay) m_CanShoot = true; else m_CanShoot = false; };
 	virtual bool Fire();
 	bool m_FireDelay;
 	float m_Timer;
