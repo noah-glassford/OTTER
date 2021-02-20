@@ -78,6 +78,15 @@ void MainGameScene::InitGameScene()
 	NumMat->Set("u_Shininess", 3.0f);
 	NumMat->Set("u_TextureMix", 0.0f);
 
+	ShaderMaterial::sptr Elm_Cube = ShaderMaterial::Create();
+	Elm_Cube->Shader = RenderingManager::NoOutline;
+	Elm_Cube->Set("s_Diffuse", noSpec);
+	Elm_Cube->Set("s_Specular", noSpec);
+	Elm_Cube->Set("u_Shininess", 3.0f);
+	Elm_Cube->Set("u_TextureMix", 0.0f);
+
+
+
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -102,14 +111,14 @@ void MainGameScene::InitGameScene()
 	
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
-		RightHand.get<Transform>().SetLocalPosition(2, -1, 0).SetLocalRotation(-90, 0, 0);
+		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
 		RightHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		RightHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
-		LeftHand.get<Transform>().SetLocalPosition(-2, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
+		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
 		
 
 		LeftHand.get<Transform>().SetParent(cameraObject);
@@ -117,34 +126,6 @@ void MainGameScene::InitGameScene()
 		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 	
-	/*
-	GameObject TestNumberPlane = scene->CreateEntity("NumberPlane");
-	{
-		TestNumberPlane.get<Transform>().SetLocalPosition(0, 0, 1).SetLocalScale(10,10,10);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
-		TestNumberPlane.emplace<RendererComponent>().SetMesh(vao).SetMaterial(NumMat);
-	}
-	*/
-	/*
-	GameObject obj3 = scene->CreateEntity("Test Enemy");
-	{
-		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
-
-		RendererComponent& RC =obj3.emplace<RendererComponent>();
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Earth_En.obj");
-		RC.SetMesh(vao);
-		RC.SetMaterial(EE_MAT);
-	
-
-		
-		PhysicsBody& p = obj3.emplace<PhysicsBody>();
-		Enemy& e = obj3.emplace<Enemy>();
-		p.AddBody(1.f, btVector3(0.f, 3.f, 8.f), btVector3(2.f, 2.f, 2.f));
-		p.GetBody()->setUserIndex(5);
-		p.GetBody()->setUserPointer((void*)&e);
-		
-	}
-	*/
 	GameObject obj4 = scene->CreateEntity("Barrel");
 	{
 		obj4.get<Transform>().SetLocalRotation(90, 0, 0);
@@ -164,6 +145,40 @@ void MainGameScene::InitGameScene()
 
 	}
 
+	//test cubes
+	GameObject FireCubeVisual = scene->CreateEntity("FireCube");
+	{
+		FireCubeVisual.get<Transform>().SetParent(RightHand);
+		FireCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
+
+		//FireCubeVisual.get<Transform>().SetParent(RightHand);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(1,0,0,1));
+		FireCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(BarrelMat);
+	}
+
+	GameObject WaterCubevisual = scene->CreateEntity("WaterCube");
+	{
+		WaterCubevisual.get<Transform>().SetParent(RightHand);
+		WaterCubevisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
+		WaterCubevisual.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Proj");
+	}
+	GameObject AirCubeVisual = scene->CreateEntity("AirCube");
+	{
+		AirCubeVisual.get<Transform>().SetParent(LeftHand);
+		AirCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
+
+		//FireCubeVisual.get<Transform>().SetParent(RightHand);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(1, 0, 0, 1));
+		AirCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(EE_MAT);
+	}
+
+	GameObject EarthCubeVisual = scene->CreateEntity("EarthCube");
+	{
+		EarthCubeVisual.get<Transform>().SetParent(LeftHand);
+		EarthCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
+		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
+	}
 	//skybox
 	{
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
@@ -188,7 +203,7 @@ void MainGameScene::InitGameScene()
 	builder.BuildNewWorld();
 
 	//Mitcheeeeeel test it here
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
+	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Node_2.node");
 
 	
 }

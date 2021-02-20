@@ -133,6 +133,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(Box);
 		RendererNames.push_back("Pillar");
 	}
+	//pillar broken
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/pillar broken.obj");
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");

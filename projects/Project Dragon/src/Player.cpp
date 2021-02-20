@@ -181,6 +181,8 @@ void Player::Update()
 		InitWeapons();
 		hasInit = 1;
 	}
+	m_LeftHandWeapons[m_LeftEquiped]->Update();
+	m_RightHandWeapons[m_RightEquiped]->Update();
 
 }
 

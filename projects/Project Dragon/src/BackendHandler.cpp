@@ -133,6 +133,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	
 }
 
+bool shouldSwitchWeaponL, shouldSwitchWeaponR;
+
 void BackendHandler::UpdateInput()
 {
 	//creates a single camera object to call
@@ -151,11 +153,11 @@ void BackendHandler::UpdateInput()
 	btVector3 movement = btVector3(0, 0, 0);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		movement += BtToGlm::GLMTOBTV3(forward);
+		movement += BtToGlm::GLMTOBTV3(forward * 10.f * Timer::dt);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		movement -= BtToGlm::GLMTOBTV3(forward);
+		movement -= BtToGlm::GLMTOBTV3(forward * 10.f * Timer::dt);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -168,22 +170,23 @@ void BackendHandler::UpdateInput()
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		glm::vec3 direction = -glm::normalize(glm::cross(forward, cam.GetUp()));
+
 		movement.setX(movement.getX() - direction.x * 1.8);
 		movement.setY(movement.getY() - direction.y * 1.8);
 	}
 	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-	//	
-		//p.CheckJump();
+		//	
+			//p.CheckJump();
 
-		//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
-		//{
-			//Placeholder shoot sfx
-			AudioEngine& engine = AudioEngine::Instance();
-			AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
-			tempJump.Play();
-			movement.setZ(1.0f);
+			//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
+			//{
+				//Placeholder shoot sfx
+		AudioEngine& engine = AudioEngine::Instance();
+		AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
+		tempJump.Play();
+		movement.setZ(1.0f);
 		//}
 	}
 
@@ -200,24 +203,60 @@ void BackendHandler::UpdateInput()
 
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		p.SwitchLeftHand();
+		if (shouldSwitchWeaponL)
+		{
+			p.SwitchLeftHand();
+			if (p.m_LeftEquiped)
+			{
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, 3, 0);
+			}
+			else
+			{
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, 3, 0);
+			}
+			shouldSwitchWeaponL = false;
+		}
 	}
-
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-	{
-		p.SwitchRightHand();
-	}
-	phys.ApplyForce(movement);
-
-	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
-		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
-		for (const auto& behaviour : binding.Behaviours) {
-			if (behaviour->Enabled) {
-				behaviour->Update(entt::handle(RenderingManager::activeScene->Registry(), entity));
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		{
+			if (shouldSwitchWeaponR)
+			{
+				p.SwitchRightHand();
+				if (p.m_RightEquiped)
+				{
+					RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, 3, 0);
+					RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				}
+				else
+				{
+					RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -3, 0);
+					RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, 3, 0);
+				}
+				shouldSwitchWeaponR = false;
 			}
 		}
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE)
+		{
+			shouldSwitchWeaponR = true;
 		}
-	);
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE)
+		{
+			shouldSwitchWeaponL = true;
+		}
+		phys.ApplyForce(movement);
+
+		RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
+			// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
+			for (const auto& behaviour : binding.Behaviours) {
+				if (behaviour->Enabled) {
+					behaviour->Update(entt::handle(RenderingManager::activeScene->Registry(), entity));
+				}
+			}
+			}
+		);
+	
 }
 
 bool BackendHandler::InitGLFW()
