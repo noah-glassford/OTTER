@@ -2,6 +2,7 @@
 #include <BtToGlm.h>
 #include <PhysicsSystem.h>
 #include <Enemy.h>
+#include <random>
 /*
 bool Weapon::Shoot(float range)
 {
@@ -223,12 +224,91 @@ bool WaterWeapon::Fire()
 	}
 
 	return false;
-	return false;
 }
 
 bool AirWeapon::Fire()
 {
-	std::cout << "Shot AirWeapon\n";
+	if (m_CanShoot)
+	{
+		std::cout << "Shot AirWeapon\n";
+		m_Timer = 0.f;
+
+
+		GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
+		Transform t = cameraObj.get<Transform>();
+		glm::mat4 tempView = glm::inverse(t.WorldTransform());
+
+		double dArray[16] = { 0.0 };
+
+
+		//This here gives us a lookAt vector
+		const float* pSource = (const float*)glm::value_ptr(tempView);
+		for (int i = 0; i < 16; ++i)
+			dArray[i] = pSource[i];
+
+		glm::vec3 lookDir;
+		lookDir.x = -dArray[2];
+		lookDir.y = -dArray[6];
+		lookDir.z = -dArray[10];
+
+		//Grabs player position
+		btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
+
+		//construct our raycast vector for shooting
+		lookDir *= 10;
+		btVector3 to = BtToGlm::GLMTOBTV3(lookDir);
+		to += playerPosition;
+
+		//since a shotgun shoots multiple pellets in a spread, this loop will run a set number of raytests and use rand to make the trajectory spread
+		int i = 0;
+		while (i < 10)
+		{
+			btVector3 tempVec = to;
+			std::cout << i;
+			float PathDeviation = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); //this returns a random float between 0 and 1
+			//lets pretend this is something fancy
+			
+			if (i % 1 == 0)
+			tempVec.setX(tempVec.getX() + PathDeviation * 2);
+			if (i % 2 == 0)
+			tempVec.setY(tempVec.getY() + PathDeviation * 2);
+			if (i % 3 == 0)
+			tempVec.setZ(tempVec.getZ() + PathDeviation * 2);
+
+
+			btCollisionWorld::ClosestRayResultCallback Results(playerPosition, tempVec);
+
+			PhysicsSystem::GetWorld()->rayTest(playerPosition, tempVec, Results);
+
+			if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
+			{
+				//Instantiate projectile/marker of where you shot because hitscan
+				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+
+				//does damage to enemy
+
+				Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
+				e->m_hp -= 1;
+				std::cout << e->m_hp;
+
+				//return true;
+			}
+			else
+			{
+				InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
+				//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
+				//return false;
+			}
+			i++;
+		}
+	}
+	else
+	{
+		//	std::cout << "Not Shot\n";
+		return false;
+
+	}
+
 	return false;
 }
 
