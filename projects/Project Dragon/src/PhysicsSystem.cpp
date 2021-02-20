@@ -13,9 +13,15 @@ std::vector<btRigidBody*> PhysicsSystem::m_bodies;
 
 std::vector<btCollisionShape*> colShapes;
 
+bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2);
+
+
+
 void PhysicsSystem::Init()
 {
-	//I STOLE THIS FROM BULLET GITHUB PAGE GOD THIS IS SO TEMPORARY
+	
+
+	//code sourced from bullet github page
 
 	///-----includes_end-----
 
@@ -37,6 +43,9 @@ void PhysicsSystem::Init()
 	m_World = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
 	m_World->setGravity(btVector3(0, 0, -30));
+
+	gContactAddedCallback = callbackFunc;
+
 }
 
 void PhysicsSystem::Update()
@@ -75,6 +84,8 @@ void PhysicsSystem::Update()
 
 		
 	}
+
+
 	
 }
 
@@ -82,6 +93,14 @@ void PhysicsSystem::ClearWorld()
 {
 	for (int i = 0; i < m_bodies.size(); i++)
 		m_World->removeRigidBody(m_bodies[i]);
+}
+
+bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
+{
+	//std::cout << "Collision\n";
+
+	
+	return false;
 }
 
 btDiscreteDynamicsWorld* PhysicsSystem::GetWorld()

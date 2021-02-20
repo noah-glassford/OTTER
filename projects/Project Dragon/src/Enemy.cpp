@@ -61,7 +61,7 @@ void Enemy::Update(PhysicsBody m_This)
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
 	//uncomment this to make it move again
-	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, 0, movementDirection.z * m_MovementSpeed));
+	//m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, 0, movementDirection.z * m_MovementSpeed));
 
 
 	//check if player should take damage
@@ -74,11 +74,13 @@ void Enemy::Update(PhysicsBody m_This)
 	{
 		if (canBeHit)
 		{
+			/*
 			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 			player.SetHp(player.GetPlayerData().m_HP - 1);
 			canBeHit = false;
 			HitTimer = 0.f;
 			player.PlayDamageSound();
+			*/
 		}
 	}
 

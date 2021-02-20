@@ -81,6 +81,24 @@ void PhysicsBody::AddBody(float mass, btVector3 origin, btVector3 size, float fr
 
 }
 
+void PhysicsBody::AddSphereBody(float mass, float radius, btVector3 origin)
+{
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(origin);
+	btSphereShape* sphere = new btSphereShape(radius);
+	btMotionState* motion = new btDefaultMotionState(t);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere);
+	btRigidBody* m_Body = new btRigidBody(info);
+
+	m_Body->setAngularFactor(btVector3(0.0f, 0.0f, 0.0f));
+
+	PhysicsSystem::m_World->addRigidBody(m_Body);
+	PhysicsSystem::m_bodies.push_back(m_Body);
+	m_BodyId = PhysicsSystem::m_bodies.size() - 1;
+	
+}
+
 void PhysicsBody::SetUserData(int data)
 {
 	m_Body->setUserIndex(data);
