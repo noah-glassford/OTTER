@@ -34,6 +34,7 @@ public:
 class EarthWeapon : public Weapon
 {
 public:
+	void Update() override;
 	bool Fire() override;
 };
 class Player

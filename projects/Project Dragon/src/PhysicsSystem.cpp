@@ -5,6 +5,7 @@
 #include <BtToGlm.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <Enemy.h>
 
 btDiscreteDynamicsWorld* PhysicsSystem::m_World;
 
@@ -95,11 +96,20 @@ void PhysicsSystem::ClearWorld()
 		m_World->removeRigidBody(m_bodies[i]);
 }
 
-bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
+bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1,  const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-	//std::cout << "Collision\n";
-
-	
+	if (obj1->getCollisionObject()->getUserIndex() == 3 && obj2->getCollisionObject()->getUserIndex() == 2)
+	{	
+		PhysicsSystem::GetWorld()->removeCollisionObject(const_cast<btCollisionObject*>(obj1->getCollisionObject()));
+		Enemy* e = reinterpret_cast<Enemy*>(obj2->m_collisionObject->getUserPointer());
+		e->m_hp -= 1;
+	}
+	if (obj2->getCollisionObject()->getUserIndex() == 3 && obj1->getCollisionObject()->getUserIndex() == 2)
+	{
+		PhysicsSystem::GetWorld()->removeCollisionObject(const_cast<btCollisionObject*>(obj2->getCollisionObject()));
+		Enemy* e = reinterpret_cast<Enemy*>(obj1->m_collisionObject->getUserPointer());
+		e->m_hp -= 1;
+	}
 	return false;
 }
 
