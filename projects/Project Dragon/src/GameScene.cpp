@@ -120,6 +120,25 @@ void MainGameScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
+<<<<<<< HEAD
+=======
+	
+	GameObject obj4 = scene->CreateEntity("Barrel");
+	{
+		obj4.get<Transform>().SetLocalRotation(90, 0, 0);
+
+		RendererComponent& RC = obj4.emplace<RendererComponent>();
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Barrel.obj");
+		RC.SetMesh(vao);
+		RC.SetMaterial(BarrelMat);
+
+		PhysicsBody& p = obj4.emplace<PhysicsBody>();
+		//Enemy& e = obj4.emplace<Enemy>();
+		p.AddBody(0.f, btVector3(2.f, 3.f, 1.f), btVector3(2.f, 2.f, 2.f));
+		//p.GetBody()->setUserIndex(5);
+		//p.GetBody()->setUserPointer((void*)&e);
+	}
+>>>>>>> Clark_Gamer_Fuck
 
 	//test cubes
 	GameObject FireCubeVisual = scene->CreateEntity("FireCube");
