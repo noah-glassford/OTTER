@@ -120,8 +120,21 @@ void WorldBuilderV2::GenerateTiles()
 		for (int y = 0; y < 25; y++) {
 			if (WorldData[x][y] > 0) {
 				//Floor
-				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0)
-					, "node/Blank_Floor_Tile.node");
+
+				//god so so temporary
+				int RandTile = rand() % 4;
+
+				if(RandTile == 0)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Blank_Floor_Tile.node");
+				else if(RandTile == 1)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_1.node");
+				else if (RandTile == 2)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_2.node");
+				else if (RandTile == 3)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_3.node");
+
+
+
 				//places the camera properly
 				btTransform t;
 				t.setIdentity();
@@ -130,20 +143,8 @@ void WorldBuilderV2::GenerateTiles()
 
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				
-				//enemy
-				if ((x % 3) == 0)
-				{
-					GameObject FireEn = InstantiatingSystem::InstantiateEmpty("Fire_Enemy");
-					FireEn.get<Transform>().SetLocalRotation(90, 0, 0);
-					FireEn.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire Enemy");
-					PhysicsBody& p = FireEn.emplace<PhysicsBody>();
-					FireEn.get<PhysicsBody>().AddBody(1.f, btVector3(x * 20.f, y * 20.f, 2.f), btVector3(2,2,2));
-					Enemy& e = FireEn.emplace<Enemy>();
-					p.GetBody()->setUserIndex(2);
-					p.GetBody()->setUserPointer((void*)&e);
-					FireEn.emplace<LightSource>();
-				}
 				
+			
 				//Roof
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
 					, "node/Blank_Floor_Tile.node");

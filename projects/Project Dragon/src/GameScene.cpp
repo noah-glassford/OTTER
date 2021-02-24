@@ -232,9 +232,5 @@ void MainGameScene::InitGameScene()
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
 
-	//Mitcheeeeeel test it here
-	//suck pp no ah
-	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(0, 0, 0), "node/Blank_Floor_Tile.node");
-
 	
 }
