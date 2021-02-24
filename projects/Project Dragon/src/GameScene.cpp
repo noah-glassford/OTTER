@@ -91,6 +91,7 @@ void MainGameScene::InitGameScene()
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
 		cameraObject.get<Transform>().SetLocalPosition(0, 0, 0).LookAt(glm::vec3(0, 1, 5));
+		cameraObject.emplace<LightSource>();
 		//cameraObject.get<Transform>().setForward(glm::vec3(0, 0, -1));
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
@@ -100,11 +101,9 @@ void MainGameScene::InitGameScene()
 		camera.LookAt(glm::vec3(0));
 		camera.SetFovDegrees(90.0f); // Set an initial FOV
 		camera.SetOrthoHeight(3.0f);
-
 		PhysicsBody& p = cameraObject.emplace<PhysicsBody>();
-		p.AddBody(1.f, btVector3(0, 0, 5), btVector3(1, 1, 2));
+		p.AddBody(100.f, btVector3(15, 15, 5), btVector3(1, 1, 2), 3.f);
 		p.GetBody()->setCollisionFlags(p.GetBody()->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-		
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
@@ -119,30 +118,9 @@ void MainGameScene::InitGameScene()
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
 		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
-		
-
 		LeftHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
-	}
-	
-	GameObject obj4 = scene->CreateEntity("Barrel");
-	{
-		obj4.get<Transform>().SetLocalRotation(90, 0, 0);
-
-		RendererComponent& RC = obj4.emplace<RendererComponent>();
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Barrel.obj");
-		RC.SetMesh(vao);
-		RC.SetMaterial(BarrelMat);
-
-
-
-		PhysicsBody& p = obj4.emplace<PhysicsBody>();
-		//Enemy& e = obj4.emplace<Enemy>();
-		p.AddBody(0.f, btVector3(2.f, 3.f,1.f), btVector3(2.f, 2.f, 2.f));
-		//p.GetBody()->setUserIndex(5);
-		//p.GetBody()->setUserPointer((void*)&e);
-
 	}
 
 	//test cubes
@@ -178,16 +156,15 @@ void MainGameScene::InitGameScene()
 		EarthCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
 		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
+		
 	}
 
 	GameObject obj3 = scene->CreateEntity("Test Enemy");
 	{
 		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
 
-		RendererComponent& RC = obj3.emplace<RendererComponent>();
+		RendererComponent& RC = obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
-		RC.SetMesh(vao);
-		RC.SetMaterial(EE_MAT);
 
 
 
@@ -198,7 +175,6 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserPointer((void*)&e);
 
 	}
-
 
 	//skybox
 	{
@@ -217,8 +193,41 @@ void MainGameScene::InitGameScene()
 		skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
 	}
 
+	BloomEffect* bloom;
+	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
+		bloom = &BloomEffectObject.emplace<BloomEffect>();
+		bloom->Init(width, height);
+		bloom->SetThreshold(0.1f);
+	}
+	PostEffect* basicEffect;
+	GameObject framebufferObject = scene->CreateEntity("Basic Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
 
+		basicEffect = &framebufferObject.emplace<PostEffect>();
+		basicEffect->Init(width, height);
+	}
+	//color grading effect
+	ColorCorrectionEffect* colorEffect;
+	GameObject colorEffectObject = scene->CreateEntity("ColorGrading Effect");
+	{
+		int width, height;
+		glfwGetWindowSize(BackendHandler::window, &width, &height);
 
+		colorEffect = &colorEffectObject.emplace<ColorCorrectionEffect>();
+		colorEffect->Init(width, height);
+
+		//number here doesn't matter
+		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
+		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		//colorEffect->LoadLUT("cube/test.cube",0);
+		colorEffect->_LUT = colorEffect->_LUTS[0];
+	}
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();

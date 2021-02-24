@@ -51,9 +51,10 @@ bool FireWeapon::Fire()
 		GameObject projectile = InstantiatingSystem::InstantiateEmpty("FW_Projectile");
 		RendererComponent& rc = projectile.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Proj");
 		PhysicsBody& p = projectile.emplace<PhysicsBody>();
-		p.AddBody(1.f, cameraObj.get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin() + BtToGlm::GLMTOBTV3(lookDir) * 2.f, btVector3(0.5,0.5,0.5), 1.f);
+		p.AddBody(1.f, cameraObj.get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin() + BtToGlm::GLMTOBTV3(lookDir) * 5.f, btVector3(0.5,0.5,0.5), 0.f);
 		p.GetBody()->setCollisionFlags(btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 		p.GetBody()->setUserIndex(3);
+		p.GetBody()->setUserPointer((void*)&p);//points to itself to delete it later
 
 		
 
@@ -111,8 +112,7 @@ bool WaterWeapon::Fire()
 			//does damage to enemy
 
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
-			e->m_hp -= 1;
-			std::cout << e->m_hp;
+			e->m_hp -= 120;
 
 			return true;
 		}
@@ -139,7 +139,7 @@ bool AirWeapon::Fire()
 	{
 		m_CanShoot = false;
 		m_Timer = 0.f;
-		std::cout << "Shot AirWeapon\n";
+	
 
 
 		GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
@@ -196,14 +196,13 @@ bool AirWeapon::Fire()
 				//does damage to enemy
 
 				Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
-				e->m_hp -= 1;
-				std::cout << e->m_hp;
-
+				e->m_hp -= 5;
+				
 				//return true;
 			}
 			else
 			{
-				InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
+				//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
 				//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 				//return false;
 			}
@@ -270,13 +269,14 @@ bool EarthWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			//does damage to enemy
 
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
-			e->m_hp -= 1;
-			std::cout << e->m_hp;
+			e->m_hp = e->m_hp - 15;
+
+			std::cout << "hit";
 
 			return true;
 		}

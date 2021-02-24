@@ -97,9 +97,9 @@ void main()
     
     //result = floor(result * bands)*scaleFactor;
 
-    //float edge = (dot(viewDir, N) < 0.3) ? 0.0 : 1.0;
+    float edge = (dot(viewDir, N) < 0.3) ? 0.0 : 1.0;
 
-    frag_color = vec4(result, 1.0) ;//* vec4(vec3(edge), 1.0);
+    frag_color = vec4(result, 1.0) * vec4(vec3(edge), 1.0);
 
 }
 

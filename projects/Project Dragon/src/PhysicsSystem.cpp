@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <Enemy.h>
+#include <InstantiatingSystem.h>
 
 btDiscreteDynamicsWorld* PhysicsSystem::m_World;
 
@@ -96,20 +97,96 @@ void PhysicsSystem::ClearWorld()
 		m_World->removeRigidBody(m_bodies[i]);
 }
 
+//idk this probably works or smth
+bool hitByFireProj = false;
+
 bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1,  const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
+
+	//for direct hit with fire attack
 	if (obj1->getCollisionObject()->getUserIndex() == 3 && obj2->getCollisionObject()->getUserIndex() == 2)
 	{	
-		PhysicsSystem::GetWorld()->removeCollisionObject(const_cast<btCollisionObject*>(obj1->getCollisionObject()));
-		Enemy* e = reinterpret_cast<Enemy*>(obj2->m_collisionObject->getUserPointer());
-		e->m_hp -= 1;
+			PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj1->getCollisionObject()->getUserPointer());
+		
+			Enemy* e = reinterpret_cast<Enemy*>(obj2->m_collisionObject->getUserPointer()); //direct hit damage
+			e->m_hp -= 1;
+
+			
+
+
+		
 	}
 	if (obj2->getCollisionObject()->getUserIndex() == 3 && obj1->getCollisionObject()->getUserIndex() == 2)
 	{
-		PhysicsSystem::GetWorld()->removeCollisionObject(const_cast<btCollisionObject*>(obj2->getCollisionObject()));
-		Enemy* e = reinterpret_cast<Enemy*>(obj1->m_collisionObject->getUserPointer());
-		e->m_hp -= 1;
+		PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj2->getCollisionObject()->getUserPointer());
+		PhysicsSystem::m_World->removeRigidBody(p->GetBody());
+	
+			Enemy* e = reinterpret_cast<Enemy*>(obj1->m_collisionObject->getUserPointer());
+			e->m_hp -= 1;
 	}
+
+	//Fire attack explosion
+	//this gets called whenever the fire attack projectile hits anything
+	if (obj1->getCollisionObject()->getUserIndex() == 3)
+	{
+		//loop through all the bodies in the world
+		for (int i = 0; i < PhysicsSystem::m_bodies.size(); i++)
+		{
+			//we are only interested in bodies that are enemies
+			if (PhysicsSystem::m_bodies[i]->getUserIndex() == 2)
+			{
+				//now that we have it narrowed down to our enemies we can do more computationally expensive stuff
+				//set the positions
+				btVector3 ProjectilePosition, enemyPosition;
+				//due to the way collision call backs work we have to run this twice because it is equally likely the projectile is obj1 or obj2
+				ProjectilePosition = obj1->getWorldTransform().getOrigin();
+				enemyPosition = PhysicsSystem::m_bodies[i]->getCenterOfMassTransform().getOrigin();
+				PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj1->getCollisionObject()->getUserPointer());
+				PhysicsSystem::m_World->removeRigidBody(p->GetBody());
+				btVector3 Diff;
+				Diff = ProjectilePosition - enemyPosition;
+				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
+				if (length < 10.f)
+				{
+					Enemy* e = reinterpret_cast<Enemy*>(PhysicsSystem::m_bodies[i]->getUserPointer());
+					e->m_hp -= 3;
+					std::cout << e->m_hp;
+				}
+			}
+			
+		}
+	}
+	if (obj2->getCollisionObject()->getUserIndex() == 3)
+	{
+		//loop through all the bodies in the world
+		for (int i = 0; i < PhysicsSystem::m_bodies.size(); i++)
+		{
+			//we are only interested in bodies that are enemies
+			if (PhysicsSystem::m_bodies[i]->getUserIndex() == 2)
+			{
+				//now that we have it narrowed down to our enemies we can do more computationally expensive stuff
+				//set the positions
+				btVector3 ProjectilePosition, enemyPosition;
+				//due to the way collision call backs work we have to run this twice because it is equally likely the projectile is obj1 or obj2
+				ProjectilePosition = obj2->getWorldTransform().getOrigin();
+				enemyPosition = PhysicsSystem::m_bodies[i]->getCenterOfMassTransform().getOrigin();
+				PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj2->getCollisionObject()->getUserPointer());
+				PhysicsSystem::m_World->removeRigidBody(p->GetBody());
+
+				btVector3 Diff;
+				Diff = ProjectilePosition - enemyPosition;
+				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
+				if (length < 10.f)
+				{
+					Enemy* e = reinterpret_cast<Enemy*>(PhysicsSystem::m_bodies[i]->getUserPointer());
+					e->m_hp -= 1;
+					std::cout << e->m_hp;
+				}
+			}
+			
+		}
+	}
+
 	return false;
 }
 

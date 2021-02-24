@@ -119,6 +119,8 @@ bool shouldSwitchWeaponL, shouldSwitchWeaponR;
 
 void BackendHandler::UpdateInput()
 {
+
+
 	//creates a single camera object to call
 
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
@@ -127,6 +129,7 @@ void BackendHandler::UpdateInput()
 	Camera cam = cameraObj.get<Camera>();
 	Transform t = cameraObj.get<Transform>();
 	PhysicsBody phys = cameraObj.get<PhysicsBody>();
+	float verticalVelo = phys.GetBody()->getVelocityInLocalPoint(btVector3(0, 0, 0)).getZ();
 	//get a forward vector using fancy maths
 	glm::vec3 forward(0, 1, 0);
 	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
@@ -159,19 +162,18 @@ void BackendHandler::UpdateInput()
 	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		//	
-			//p.CheckJump();
-
-			//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
-			//{
-				//Placeholder shoot sfx
+		
 		AudioEngine& engine = AudioEngine::Instance();
 		AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
+		
+		if(p.m_CanJump)
+		{ 
 		tempJump.Play();
-		movement.setZ(1.0f);
-		//}
+		
+		verticalVelo = 12.f;
+		}
 	}
-	phys.ApplyForce(movement * 100.f * Timer::dt);
+	phys.SetLinearVelocity(btVector3(movement.getX() * 17.f,movement.getY() * 17.f, verticalVelo ));
 
 	//temporary
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)

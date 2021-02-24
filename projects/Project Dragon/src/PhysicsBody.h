@@ -28,10 +28,14 @@ public:
 	int m_BodyId;//this for da world thing
 	int m_Entity;//attach this entitys id to itself so I can call the appropriate transform in update.
 
+	void* m_userObjectPointer;
+
 private:
 	//pass this to this components transform in the update
 
 	btRigidBody* m_Body = nullptr;
+
+
 	
 
 };

@@ -54,13 +54,13 @@ void RenderingManager::Init()
 
 	//initialize primary fragment shader DirLight & spotlight
 	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
-	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
+	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
 	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
 	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 
 	//initialize primary fragment shader DirLight & spotlight
 	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
-	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
+	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
 	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
 	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 	
@@ -89,12 +89,14 @@ bool DeathSoundPlayed = false;
 int LightCount;
 void RenderingManager::Render()
 {
+	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
+	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
 	
 	
-
-	//greyscale->Clear();
-
-
+	postEffect->Clear();
+	bloomEffect->Clear();
+	colEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -107,10 +109,11 @@ void RenderingManager::Render()
 		});
 
 	// Update all world enemies for this frame
-	activeScene->Registry().view<Enemy, PhysicsBody>().each([](entt::entity entity, Enemy& e, PhysicsBody& p) {
+	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
 		e.Update(p);
 		if (e.m_hp <= 0)
 		{
+			t.SetLocalPosition(0,0,-1000);
 			//play temp death sound
 			//Placeholder shoot sfx
 			AudioEngine& engine = AudioEngine::Instance();
@@ -194,6 +197,8 @@ void RenderingManager::Render()
 
 	
 
+	postEffect->BindBuffer(0);
+
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
@@ -210,18 +215,19 @@ void RenderingManager::Render()
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
 		
-		
+		bloomEffect->ApplyEffect(postEffect);
+		bloomEffect->DrawToScreen();
+		colEffect->ApplyEffect(postEffect);
+		colEffect->DrawToScreen();
 
-
-
-		
+		postEffect->UnBindBuffer();
 
 		BackendHandler::RenderImGui();
 
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
-	
+		
 
 
 	

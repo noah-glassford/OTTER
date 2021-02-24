@@ -7,7 +7,13 @@
 #include <iostream>
 void Enemy::Update(PhysicsBody m_This)
 {
-	
+	if (m_hp <= 0)
+	{
+		btTransform t;
+		t.setIdentity();
+		t.setOrigin(btVector3(0, 0, -1000));
+		m_This.GetBody()->setCenterOfMassTransform(t);
+	}
 
 	mTimer += Timer::dt;
 
@@ -51,17 +57,17 @@ void Enemy::Update(PhysicsBody m_This)
 				movementDirection.x = 1;
 			}
 			else movementDirection.x = -1;
-			if (thisPosition.getZ() < playerPosition.getZ()) {
-				movementDirection.z = 1;
+			if (thisPosition.getY() < playerPosition.getY()) {
+				movementDirection.y = 1;
 			}
-			else movementDirection.z = -1;
+			else movementDirection.y = -1;
 		}
 		//std::cout << "\nX: " << distance.getX() << "\nY: " << distance.getY() << "\nZ: " << distance.getZ() << "\n\n";
 		distanceNorm = sqrtf(distance.getX() + distance.getY() + distance.getZ());
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
 	//uncomment this to make it move again
-	//m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, 0, movementDirection.z * m_MovementSpeed));
+	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,0));
 
 
 	//check if player should take damage

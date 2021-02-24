@@ -11,7 +11,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	//basic floor tile
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
-	//Texture2D::sptr wall = Texture2D::LoadFromFile("image/wall.png"); broken I have no ide why
+	Texture2D::sptr test = Texture2D::LoadFromFile("image/test.png"); 
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
 	Floor_Mat->Shader = RenderingManager::NoOutline;
@@ -26,12 +26,12 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 
 	
 
-	Texture2D::sptr WallSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+
 	
 	ShaderMaterial::sptr Wall_Mat = ShaderMaterial::Create();
 	Wall_Mat->Shader = RenderingManager::NoOutline;
-	Wall_Mat->Set("s_Diffuse", floor);
-	Wall_Mat->Set("s_Specular", WallSpec);
+	Wall_Mat->Set("s_Diffuse", test);
+	Wall_Mat->Set("s_Specular", noSpec);
 	Wall_Mat->Set("u_Shininess", 2.0f);
 	Wall_Mat->Set("u_TextureMix", 0.0f);
 	RendererComponent Wall_Tile;
@@ -40,7 +40,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	RendererNames.push_back("Wall");
 
 	//Fire Enemy
-	/*
+	
 	VertexArrayObject::sptr FE_Mesh = ObjLoader::LoadFromFile("model/Fire_Enemy.obj");
 	Texture2D::sptr FE_Tex = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 //	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
@@ -54,7 +54,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Fire_Enemy.SetMaterial(FE_MAT).SetMesh(FE_Mesh);
 	Renderers.push_back(Fire_Enemy);
 	RendererNames.push_back("Fire Enemy");
-	*/
+	
 
 	//Water Proj
 	VertexArrayObject::sptr Ice_Mesh = ObjLoader::LoadFromFile("model/Ice projectile.obj");
