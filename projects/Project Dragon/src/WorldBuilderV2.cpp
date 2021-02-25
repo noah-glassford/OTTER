@@ -185,12 +185,12 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 	for (int x = 0; x < 25; x++) {
 		for (int y = 0; y < 25; y++) {	//Read through the world data Array
 			if (WorldData[x][y] > 0) {	//Find spawned floors and spawn eneies in them
-				int RandEnemyType = rand() % 4;
+				int RandEnemyType = rand() % 16;
 				if (RandEnemyType == 0) {
-					for (int i = 0; i < dificulty * 4; i++) { // Fire Enemy
+					for (int i = 0; i < dificulty * 1; i++) { // Fire Enemy
 						int randX = (rand() % 20) - 10;
 						int randY = (rand() % 20) - 10;
-						
+
 						GameObject fe = InstantiatingSystem::InstantiateEmpty("FE");
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
@@ -200,7 +200,6 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						p.GetBody()->setUserPointer((void*)&e);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(0);
-
 					}
 				}
 				if (RandEnemyType == 1) {
@@ -220,7 +219,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 					}
 				}
 				if (RandEnemyType == 2) {
-					for (int i = 0; i < dificulty * 2; i++) { // Water Enemy
+					for (int i = 0; i < dificulty * 1; i++) { // Water Enemy
 						int randX = (rand() % 20) - 10;
 						int randY = (rand() % 20) - 10;
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
@@ -236,7 +235,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 					}
 				}
 				if (RandEnemyType == 3) {
-					for (int i = 0; i < dificulty * 2; i++) { // Air Enemy
+					for (int i = 0; i < dificulty * 1; i++) { // Air Enemy
 						int randX = (rand() % 20) - 10;
 						int randY = (rand() % 20) - 10;
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
