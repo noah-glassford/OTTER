@@ -23,6 +23,7 @@ void WorldBuilderV2::BuildNewWorld()
 	}
 	std::cout << "\n\n\nWorld Size: " << temp << "\n\n\n";
 	GenerateTiles();
+	PopulateWorld(1);
 }
 
 void WorldBuilderV2::ResetWorldData()
@@ -49,7 +50,7 @@ void WorldBuilderV2::FillWorldData()
 	bool isBuilding = true;
 	bool canLeft, canRight, canUp, canDown;
 
-	int currentX = 0, currentY = 0;
+	int currentX = 15, currentY = 15;
 	int pastX, pastY;
 	int MovementData = 4;
 
@@ -124,16 +125,14 @@ void WorldBuilderV2::GenerateTiles()
 				//god so so temporary
 				int RandTile = rand() % 4;
 
-				if(RandTile == 0)
+				if (RandTile == 0)
 					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Blank_Floor_Tile.node");
-				else if(RandTile == 1)
+				else if (RandTile == 1)
 					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_1.node");
 				else if (RandTile == 2)
 					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_2.node");
 				else if (RandTile == 3)
 					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_3.node");
-
-
 
 				//places the camera properly
 				btTransform t;
@@ -142,9 +141,7 @@ void WorldBuilderV2::GenerateTiles()
 				RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->setWorldTransform(t);
 
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
-				
-				
-			
+
 				//Roof
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
 					, "node/Blank_Floor_Tile.node");
@@ -178,6 +175,45 @@ void WorldBuilderV2::GenerateTiles()
 				}
 
 				std::cout << "\n[" << x << "][" << y << "]\n";
+			}
+		}
+	}
+}
+
+void WorldBuilderV2::PopulateWorld(int dificulty)
+{
+	for (int x = 0; x < 25; x++) {
+		for (int y = 0; y < 25; y++) {	//Read through the world data Array
+			if (WorldData[x][y] > 0) {	//Find spawned floors and spawn eneies in them
+				int RandEnemyType = rand() % 4;
+				if (RandEnemyType == 0) {
+					for (int i = 0; i < dificulty * 4; i++) { // Fire Enemy
+						int randX = (rand() % 20) - 10;
+						int randY = (rand() % 20) - 10;
+						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
+					}
+				}
+				if (RandEnemyType == 1) {
+					for (int i = 0; i < dificulty; i++) { // Rock Enemy
+						int randX = (rand() % 20) - 10;
+						int randY = (rand() % 20) - 10;
+						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
+					}
+				}
+				if (RandEnemyType == 2) {
+					for (int i = 0; i < dificulty * 2; i++) { // Water Enemy
+						int randX = (rand() % 20) - 10;
+						int randY = (rand() % 20) - 10;
+						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
+					}
+				}
+				if (RandEnemyType == 3) {
+					for (int i = 0; i < dificulty * 2; i++) { // Air Enemy
+						int randX = (rand() % 20) - 10;
+						int randY = (rand() % 20) - 10;
+						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
+					}
+				}
 			}
 		}
 	}

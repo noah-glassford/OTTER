@@ -37,4 +37,9 @@ public:
 	void FillWorldData();
 	//Fills the world reletive to the data collected in FillWorldData()
 	void GenerateTiles();
+	//	WIP
+	//		Populate the world with enemies (fills the currentEnemy variable)
+	//  WIP
+	void PopulateWorld(int dificulty);
+	//Dificualy - 1 is normal, scale off of that
 };
