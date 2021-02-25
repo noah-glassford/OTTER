@@ -107,7 +107,7 @@ bool WaterWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			//does damage to enemy
 
@@ -123,7 +123,7 @@ bool WaterWeapon::Fire()
 		}
 		else
 		{
-			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
@@ -196,7 +196,7 @@ bool AirWeapon::Fire()
 			if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 			{
 				//Instantiate projectile/marker of where you shot because hitscan
-				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+				//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 				//does damage to enemy
 
@@ -278,7 +278,7 @@ bool EarthWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			//does damage to enemy
 
@@ -295,7 +295,7 @@ bool EarthWeapon::Fire()
 		}
 		else
 		{
-			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
