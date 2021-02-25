@@ -13,7 +13,6 @@
 #include <LightSource.h>
 #include <MorphAnimator.h>
 
-
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -64,7 +63,6 @@ void MainGameScene::InitGameScene()
 	EE_MAT->Set("u_Shininess", 3.0f);
 	EE_MAT->Set("u_TextureMix", 0.0f);
 
-
 	ShaderMaterial::sptr BarrelMat = ShaderMaterial::Create();
 	BarrelMat->Shader = RenderingManager::NoOutline;
 	BarrelMat->Set("s_Diffuse", Barrel);
@@ -85,8 +83,6 @@ void MainGameScene::InitGameScene()
 	Elm_Cube->Set("s_Specular", noSpec);
 	Elm_Cube->Set("u_Shininess", 3.0f);
 	Elm_Cube->Set("u_TextureMix", 0.0f);
-
-
 
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -109,22 +105,38 @@ void MainGameScene::InitGameScene()
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
-	
+
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
 		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
 		RightHand.get<Transform>().SetParent(cameraObject);
-	
+
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		
+
 		RightHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
-		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1,1,1);
+		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
 		LeftHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+	}
+
+	GameObject obj4 = scene->CreateEntity("Barrel");
+	{
+		obj4.get<Transform>().SetLocalRotation(90, 0, 0);
+
+		RendererComponent& RC = obj4.emplace<RendererComponent>();
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Barrel.obj");
+		RC.SetMesh(vao);
+		RC.SetMaterial(BarrelMat);
+
+		PhysicsBody& p = obj4.emplace<PhysicsBody>();
+		//Enemy& e = obj4.emplace<Enemy>();
+		p.AddBody(0.f, btVector3(2.f, 3.f, 1.f), btVector3(2.f, 2.f, 2.f));
+		//p.GetBody()->setUserIndex(5);
+		//p.GetBody()->setUserPointer((void*)&e);
 	}
 
 	//test cubes
@@ -134,7 +146,7 @@ void MainGameScene::InitGameScene()
 		FireCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 
 		//FireCubeVisual.get<Transform>().SetParent(RightHand);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(1,0,0,1));
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(1, 0, 0, 1));
 		FireCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(BarrelMat);
 	}
 
@@ -160,7 +172,6 @@ void MainGameScene::InitGameScene()
 		EarthCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
 		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
-		
 	}
 
 	GameObject obj3 = scene->CreateEntity("Test Enemy");
@@ -170,14 +181,11 @@ void MainGameScene::InitGameScene()
 		RendererComponent& RC = obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
 
-
-
 		PhysicsBody& p = obj3.emplace<PhysicsBody>();
 		Enemy& e = obj3.emplace<Enemy>();
 		p.AddBody(1.f, btVector3(0.f, 0.f, 3.f), btVector3(2.f, 2.f, 2.f));
 		p.GetBody()->setUserIndex(2);
 		p.GetBody()->setUserPointer((void*)&e);
-
 	}
 	/*
 	//skybox
@@ -235,6 +243,4 @@ void MainGameScene::InitGameScene()
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-
-	
 }
