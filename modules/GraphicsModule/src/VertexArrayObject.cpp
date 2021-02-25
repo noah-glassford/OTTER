@@ -36,7 +36,7 @@ void VertexArrayObject::AddVertexBuffer(const VertexBuffer::sptr& buffer, const 
 	if (_vertexCount == 0) {
 		_vertexCount = buffer->GetElementCount();
 	} else {
-		LOG_ASSERT(buffer->GetElementCount() == _vertexCount, "All buffers bound to a VAO should be of the same size in our implementation!");
+		// sure hope this doesn't break anything trolled LOG_ASSERT(buffer->GetElementCount() == _vertexCount, "All buffers bound to a VAO should be of the same size in our implementation!");
 	}
 	VertexBufferBinding binding;
 	binding.Buffer = buffer;

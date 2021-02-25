@@ -112,7 +112,12 @@ bool WaterWeapon::Fire()
 			//does damage to enemy
 
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
-			e->m_hp -= 120;
+			if (Results.m_collisionObject->getUserIndex2() == 0)
+			{
+				e->m_hp -= 100;
+			}
+			else
+				e->m_hp -= 70;
 
 			return true;
 		}
@@ -172,7 +177,7 @@ bool AirWeapon::Fire()
 		while (i < 10)
 		{
 			btVector3 tempVec = to;
-			std::cout << i;
+			//std::cout << i;
 			float PathDeviation = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); //this returns a random float between 0 and 1
 			//lets pretend this is something fancy
 			
@@ -196,8 +201,12 @@ bool AirWeapon::Fire()
 				//does damage to enemy
 
 				Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
-				e->m_hp -= 5;
-				
+				if (Results.m_collisionObject->getUserIndex2() == 1)
+				{
+					e->m_hp -= 5;
+				}
+				else
+					e->m_hp -= 3;
 				//return true;
 			}
 			else
@@ -274,9 +283,13 @@ bool EarthWeapon::Fire()
 			//does damage to enemy
 
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
-			e->m_hp = e->m_hp - 15;
-
-			std::cout << "hit";
+			
+			if (Results.m_collisionObject->getUserIndex2() == 3)
+			{
+				e->m_hp -= 5;
+			}
+			else
+				e->m_hp -= 3;
 
 			return true;
 		}
@@ -295,17 +308,12 @@ bool EarthWeapon::Fire()
 	}
 
 	return false;
-	return false;
+
 }
 
-bool hasInit = false;
+
 void Player::Update()
 {
-	if (!hasInit)
-	{
-		InitWeapons();
-		hasInit = 1;
-	}
 
 
 	btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();

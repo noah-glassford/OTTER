@@ -149,8 +149,10 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 				if (length < 10.f)
 				{
 					Enemy* e = reinterpret_cast<Enemy*>(PhysicsSystem::m_bodies[i]->getUserPointer());
-					e->m_hp -= 3;
-					std::cout << e->m_hp;
+					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
+						e->m_hp -= 10;
+					else
+						e->m_hp -= 7;
 				}
 			}
 			
@@ -179,8 +181,10 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 				if (length < 10.f)
 				{
 					Enemy* e = reinterpret_cast<Enemy*>(PhysicsSystem::m_bodies[i]->getUserPointer());
-					e->m_hp -= 1;
-					std::cout << e->m_hp;
+					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
+						e->m_hp -= 10;
+					else
+						e->m_hp -= 7;
 				}
 			}
 			

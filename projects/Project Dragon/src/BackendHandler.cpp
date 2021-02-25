@@ -15,6 +15,8 @@
 #include <Bloom.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
+std::vector<SceneBase*> BackendHandler::m_Scenes;
+int BackendHandler::m_ActiveScene = 0;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
@@ -238,6 +240,16 @@ void BackendHandler::UpdateInput()
 			p.RightHandShoot();
 		}
 		
+		//for scene switch
+		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && m_ActiveScene == 0)
+		{
+			m_ActiveScene = 1;
+			m_Scenes[0]->scene->DeleteAllEnts();
+			m_Scenes[m_ActiveScene]->InitGameScene();
+		}
+
+
+
 
 		RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 			// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
@@ -263,7 +275,7 @@ bool BackendHandler::InitGLFW()
 #endif
 
 	//Create a new GLFW window
-	window = glfwCreateWindow(1280, 720, "Project Dragon", nullptr, nullptr);
+	window = glfwCreateWindow(1920, 1080, "Project Dragon", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
