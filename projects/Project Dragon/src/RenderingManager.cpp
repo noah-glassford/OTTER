@@ -10,10 +10,14 @@
 #include <AudioEngine.h>
 #include <Bloom.h>
 #include <LightSource.h>
+#include <MorphAnimator.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
+Shader::sptr RenderingManager::AnimationShader = NULL;
+Shader::sptr RenderingManager::UIShader = NULL;
+	
 GameScene::sptr RenderingManager::activeScene;
 
 bool ShouldBloom;
@@ -42,9 +46,20 @@ void RenderingManager::Init()
 	NoOutline->LoadShaderPartFromFile("shader/Multiple_Light_NoOutline.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
 
+	
+
+	UIShader = Shader::Create();
+	UIShader->LoadShaderPartFromFile("shader/ui_vert.glsl", GL_VERTEX_SHADER);
+	UIShader->LoadShaderPartFromFile("shader/ui_frag.glsl", GL_FRAGMENT_SHADER);
+	UIShader->Link();
+	UIShader->SetUniform("u_Scale", glm::vec2(1, 0.1));
+	UIShader->SetUniform("u_Offset", glm::vec2(0, 0));
+
 	BaseShader->SetUniform("u_LightAttenuationConstant", 1.f);
 	BaseShader->SetUniform("u_LightAttenuationLinear", 0.08f);
 	BaseShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+
 
 	//init attenuation
 	NoOutline->SetUniform("u_LightAttenuationConstant", 1.f);
@@ -63,6 +78,8 @@ void RenderingManager::Init()
 	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
 	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
 	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+
 	
 
 	//creates some IMGUI sliders
@@ -89,6 +106,7 @@ bool DeathSoundPlayed = false;
 int LightCount;
 void RenderingManager::Render()
 {
+	/*
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
@@ -97,7 +115,7 @@ void RenderingManager::Render()
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
-
+	*/
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
@@ -197,7 +215,7 @@ void RenderingManager::Render()
 
 	
 
-	postEffect->BindBuffer(0);
+	//postEffect->BindBuffer(0);
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -215,13 +233,14 @@ void RenderingManager::Render()
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
 		
+		/*
 		bloomEffect->ApplyEffect(postEffect);
 		bloomEffect->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
 
 		postEffect->UnBindBuffer();
-
+		*/
 		BackendHandler::RenderImGui();
 
 		activeScene->Poll();

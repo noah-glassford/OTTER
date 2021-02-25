@@ -2,6 +2,7 @@
 #include <ObjLoader.h>
 #include <RenderingManager.h>
 #include <Texture2D.h>
+#include <MorphAnimator.h>
 std::vector<std::string> AssetLoader::RendererNames;
 std::vector<RendererComponent> AssetLoader::Renderers;
 std::vector<std::string> AssetLoader::GameObjectNames;
@@ -24,10 +25,6 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Renderers.push_back(FloorTile);
 	RendererNames.push_back("Floor");
 
-	
-
-
-	
 	ShaderMaterial::sptr Wall_Mat = ShaderMaterial::Create();
 	Wall_Mat->Shader = RenderingManager::NoOutline;
 	Wall_Mat->Set("s_Diffuse", test);
@@ -37,24 +34,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	RendererComponent Wall_Tile;
 	Wall_Tile.SetMaterial(Wall_Mat).SetMesh(plane);
 	Renderers.push_back(Wall_Tile);
-	RendererNames.push_back("Wall");
-
-	//Fire Enemy
-	
-	VertexArrayObject::sptr FE_Mesh = ObjLoader::LoadFromFile("model/Fire_Enemy.obj");
-	Texture2D::sptr FE_Tex = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
-//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
-	ShaderMaterial::sptr FE_MAT = ShaderMaterial::Create();
-	FE_MAT->Shader = RenderingManager::BaseShader;
-	FE_MAT->Set("s_Diffuse", FE_Tex);
-	FE_MAT->Set("s_Specular", noSpec);
-	FE_MAT->Set("u_Shininess", 2.0f);
-	FE_MAT->Set("u_TextureMix", 0.0f);
-	RendererComponent Fire_Enemy;
-	Fire_Enemy.SetMaterial(FE_MAT).SetMesh(FE_Mesh);
-	Renderers.push_back(Fire_Enemy);
-	RendererNames.push_back("Fire Enemy");
-	
+	RendererNames.push_back("Wall");	
 
 	//Water Proj
 	VertexArrayObject::sptr Ice_Mesh = ObjLoader::LoadFromFile("model/Ice projectile.obj");
@@ -70,7 +50,6 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Ice_Proj.SetMaterial(Ice_Mat).SetMesh(Ice_Mesh);
 	Renderers.push_back(Ice_Proj);
 	RendererNames.push_back("Water_Proj");
-
 
 	VertexArrayObject::sptr Barrel_Mesh = ObjLoader::LoadFromFile("model/barrel.obj");
 	Texture2D::sptr Barrel_Tex = Texture2D::LoadFromFile("image/BARREL.png");

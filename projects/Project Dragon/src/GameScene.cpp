@@ -11,6 +11,7 @@
 #include "Enemy.h"
 #include <Bloom.h>
 #include <LightSource.h>
+#include <MorphAnimator.h>
 
 
 void MainGameScene::InitGameScene()
@@ -29,7 +30,7 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr EarthEnemy = Texture2D::LoadFromFile("image/earthenemytexture.png");
 	Texture2D::sptr Barrel = Texture2D::LoadFromFile("image/BARREL.png");
 	Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
-	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
+	//TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
 	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
 
@@ -96,6 +97,7 @@ void MainGameScene::InitGameScene()
 		// We'll make our camera a component of the camera object
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
 		Player& player = cameraObject.emplace<Player>();
+		player.InitWeapons();
 		camera.SetPosition(glm::vec3(0, 3, 3));
 		camera.SetUp(glm::vec3(0, 0, 1));
 		camera.LookAt(glm::vec3(0));
@@ -112,7 +114,9 @@ void MainGameScene::InitGameScene()
 	{
 		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
 		RightHand.get<Transform>().SetParent(cameraObject);
+	
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		
 		RightHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
@@ -175,7 +179,7 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserPointer((void*)&e);
 
 	}
-
+	/*
 	//skybox
 	{
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
@@ -192,7 +196,7 @@ void MainGameScene::InitGameScene()
 		skyboxObj.get<Transform>().SetLocalPosition(0.0f, 0.0f, 0.0f);
 		skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
 	}
-
+	*/
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
 	{
@@ -222,8 +226,8 @@ void MainGameScene::InitGameScene()
 		colorEffect->Init(width, height);
 
 		//number here doesn't matter
-		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
-		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
+		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
 		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];

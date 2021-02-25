@@ -10,9 +10,10 @@
 #include <RendererComponent.h>
 #include "BackendHandler.h"
 #include <TextureCubeMap.h>
-class MainGameScene
+#include "SceneBaseClass.h"
+class MainGameScene :public SceneBase
 {
 public:
-	void InitGameScene();
-	GameScene::sptr scene;
+	void InitGameScene() override;
+	
 };
