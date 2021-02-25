@@ -128,24 +128,8 @@ void RenderingManager::Render()
 
 	// Update all world enemies for this frame
 	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
-		e.Update(p);
-		if (e.m_hp <= 0)
-		{
-			t.SetLocalPosition(0,0,-1000);
-			//play temp death sound
-			//Placeholder shoot sfx
-			AudioEngine& engine = AudioEngine::Instance();
-
-			AudioEvent& tempEnDeath = engine.GetEvent("Level Complete");
-			if (!DeathSoundPlayed)
-			{
-				DeathSoundPlayed = true;
-				tempEnDeath.Play();
-			}
-			btTransform t;
-			t.setOrigin(btVector3(0, 0, -1000));
-			p.GetBody()->setCenterOfMassTransform(t);
-		}
+		e.Update(p, entity);
+		//std::cout << e.shouldFuckingDie << std::endl;
 		});
 	LightCount = 0;
 	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {

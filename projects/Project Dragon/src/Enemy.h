@@ -4,12 +4,13 @@
 #include <bullet/btBulletCollisionCommon.h>
 #include <Timer.h>
 #include <PhysicsBody.h>
+#include <iostream>
 //basically playerdata but for the enemy
 class Enemy
 {
 public:
 	//Enemy Stat Values
-	int m_hp = 10;
+	float m_hp = 10.f;
 
 	//Enemy(GameObject* ThisObj);
 
@@ -33,7 +34,15 @@ public:
 	//External Values
 	btVector3 playerPosition;
 
-	void Update(PhysicsBody m_This);
+	bool shouldFuckingDie = false;
+
+	void Update(PhysicsBody m_This, entt::entity e);
+	void TakeDamage(float damage) { m_hp -= damage;  };
+	void Kill() { shouldFuckingDie = true; };
+	
+
+	//temp
+	bool died = false;
 
 	//to check if the player should take damage
 };

@@ -107,23 +107,24 @@ bool WaterWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			//does damage to enemy
 
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
 			if (Results.m_collisionObject->getUserIndex2() == 0)
 			{
-				e->m_hp -= 100;
+				e->TakeDamage(5);
+				std::cout << "Jej";
 			}
 			else
-				e->m_hp -= 70;
+				e->TakeDamage(5);
 
 			return true;
 		}
 		else
 		{
-			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
@@ -196,22 +197,23 @@ bool AirWeapon::Fire()
 			if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 			{
 				//Instantiate projectile/marker of where you shot because hitscan
-				//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 				//does damage to enemy
 
 				Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
 				if (Results.m_collisionObject->getUserIndex2() == 1)
 				{
-					e->m_hp -= 5;
+					e->TakeDamage(5);
+					std::cout << "Jej";
 				}
 				else
-					e->m_hp -= 3;
+					e->TakeDamage(5); std::cout << "Jej";
 				//return true;
 			}
 			else
 			{
-				//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
+				InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
 				//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 				//return false;
 			}
@@ -241,7 +243,6 @@ bool EarthWeapon::Fire()
 
 	if (m_CanShoot)
 	{
-		std::cout << "Shot Earth\n";
 		m_CanShoot = false;
 		m_Timer = 0.f;
 
@@ -278,24 +279,25 @@ bool EarthWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			//does damage to enemy
 
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
 			
-			if (Results.m_collisionObject->getUserIndex2() == 3)
-			{
-				e->m_hp -= 5;
-			}
-			else
-				e->m_hp -= 3;
+			//if (Results.m_collisionObject->getUserIndex2() == 3)
+		//	{
+			e->shouldFuckingDie = true;
+				
+				
+		//	}
+	//		else
 
 			return true;
 		}
 		else
 		{
-			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
@@ -350,14 +352,14 @@ void Player::SwitchRightHand()
 	m_RightEquiped = !m_RightEquiped;
 }
 
-void Player::LeftHandShoot()
+bool Player::LeftHandShoot()
 {
-	m_LeftHandWeapons[m_LeftEquiped]->Fire();
+	return m_LeftHandWeapons[m_LeftEquiped]->Fire();
 }
 
-void Player::RightHandShoot()
+bool Player::RightHandShoot()
 {
-	m_RightHandWeapons[m_RightEquiped]->Fire();
+	return m_RightHandWeapons[m_RightEquiped]->Fire();
 }
 
 bool Weapon::Fire()
