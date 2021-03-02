@@ -179,7 +179,7 @@ void WorldBuilderV2::GenerateTiles()
 		}
 	}
 }
-
+int enCount;
 void WorldBuilderV2::PopulateWorld(int dificulty)
 {
 	for (int x = 0; x < 25; x++) {
@@ -208,6 +208,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 					for (int i = 0; i < dificulty; i++) { // Rock Enemy
 						int randX = (rand() % 20) - 10;
 						int randY = (rand() % 20) - 10;
+						enCount++;
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
 						GameObject fe = InstantiatingSystem::InstantiateEmpty("FE");
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);
@@ -226,6 +227,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 					for (int i = 0; i < dificulty * 1; i++) { // Water Enemy
 						int randX = (rand() % 20) - 10;
 						int randY = (rand() % 20) - 10;
+						enCount++;
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
 						GameObject fe = InstantiatingSystem::InstantiateEmpty("FE");
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);

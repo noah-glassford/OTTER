@@ -4,15 +4,14 @@
 #include <BtToGlm.h>
 #include <Player.h>
 
-#include <iostream>
-void Enemy::Update(PhysicsBody m_This)
+
+
+void Enemy::Update(PhysicsBody m_This, entt::entity e)
 {
-	if (m_hp <= 0)
+
+	if (shouldFuckingDie)
 	{
-		btTransform t;
-		t.setIdentity();
-		t.setOrigin(btVector3(0, 0, -1000));
-		m_This.GetBody()->setCenterOfMassTransform(t);
+		RenderingManager::activeScene->Registry().destroy(e);
 	}
 
 	mTimer += Timer::dt;
@@ -99,3 +98,4 @@ void Enemy::Update(PhysicsBody m_This)
 	
 
 }
+

@@ -114,10 +114,11 @@ bool WaterWeapon::Fire()
 			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
 			if (Results.m_collisionObject->getUserIndex2() == 0)
 			{
-				e->m_hp -= 100;
+				e->TakeDamage(5);
+				std::cout << "Jej";
 			}
 			else
-				e->m_hp -= 70;
+				e->TakeDamage(5);
 
 			return true;
 		}
@@ -203,10 +204,11 @@ bool AirWeapon::Fire()
 				Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
 				if (Results.m_collisionObject->getUserIndex2() == 1)
 				{
-					e->m_hp -= 5;
+					e->TakeDamage(5);
+					std::cout << "Jej";
 				}
 				else
-					e->m_hp -= 3;
+					e->TakeDamage(5); std::cout << "Jej";
 				//return true;
 			}
 			else
@@ -241,7 +243,6 @@ bool EarthWeapon::Fire()
 
 	if (m_CanShoot)
 	{
-		std::cout << "Shot Earth\n";
 		m_CanShoot = false;
 		m_Timer = 0.f;
 
@@ -348,14 +349,14 @@ void Player::SwitchRightHand()
 	m_RightEquiped = !m_RightEquiped;
 }
 
-void Player::LeftHandShoot()
+bool Player::LeftHandShoot()
 {
-	m_LeftHandWeapons[m_LeftEquiped]->Fire();
+	return m_LeftHandWeapons[m_LeftEquiped]->Fire();
 }
 
-void Player::RightHandShoot()
+bool Player::RightHandShoot()
 {
-	m_RightHandWeapons[m_RightEquiped]->Fire();
+	return m_RightHandWeapons[m_RightEquiped]->Fire();
 }
 
 bool Weapon::Fire()
