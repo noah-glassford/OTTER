@@ -57,7 +57,7 @@ void MainMenuScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		r.SetMaterial(Menu).SetMesh(vao);
 	}
-	/*
+	
 	//if these aren't here it crashes lmao
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
@@ -94,6 +94,6 @@ void MainMenuScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
-	*/
+	
 
 }

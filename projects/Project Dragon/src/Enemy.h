@@ -9,7 +9,7 @@ class Enemy
 {
 public:
 	//Enemy Stat Values
-	int m_hp = 10;
+	float m_hp = 10.f;
 
 	//Enemy(GameObject* ThisObj);
 

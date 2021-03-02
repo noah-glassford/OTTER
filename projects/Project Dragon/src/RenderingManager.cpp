@@ -106,7 +106,7 @@ bool DeathSoundPlayed = false;
 int LightCount;
 void RenderingManager::Render()
 {
-	/*
+	
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
@@ -115,7 +115,7 @@ void RenderingManager::Render()
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
-	*/
+	
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
@@ -126,12 +126,16 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	int enemyCount = 0;
 	// Update all world enemies for this frame
 	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
+		
 		e.Update(p);
-		if (e.m_hp <= 0)
+		if (e.m_hp <= 0.f)
 		{
-			t.SetLocalPosition(0,0,-1000);
+			activeScene->Registry().destroy(entity);
+
+			//t.SetLocalPosition(0,0,-1000);
 			//play temp death sound
 			//Placeholder shoot sfx
 			AudioEngine& engine = AudioEngine::Instance();
@@ -142,9 +146,9 @@ void RenderingManager::Render()
 				DeathSoundPlayed = true;
 				tempEnDeath.Play();
 			}
-			btTransform t;
-			t.setOrigin(btVector3(0, 0, -1000));
-			p.GetBody()->setCenterOfMassTransform(t);
+		//	btTransform t;
+			//t.setOrigin(btVector3(0, 0, -1000));
+			//p.GetBody()->setCenterOfMassTransform(t);
 		}
 		});
 	LightCount = 0;
@@ -215,7 +219,7 @@ void RenderingManager::Render()
 
 	
 
-	//postEffect->BindBuffer(0);
+	postEffect->BindBuffer(0);
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -233,14 +237,14 @@ void RenderingManager::Render()
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
 		
-		/*
+		
 		bloomEffect->ApplyEffect(postEffect);
 		bloomEffect->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
 
 		postEffect->UnBindBuffer();
-		*/
+		
 		BackendHandler::RenderImGui();
 
 		activeScene->Poll();

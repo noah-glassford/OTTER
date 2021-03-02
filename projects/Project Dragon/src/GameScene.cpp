@@ -29,7 +29,7 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr EarthEnemy = Texture2D::LoadFromFile("image/earthenemytexture.png");
 	Texture2D::sptr Barrel = Texture2D::LoadFromFile("image/BARREL.png");
 	Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
-	//TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
+	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
 	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
 
@@ -187,7 +187,7 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserIndex(2);
 		p.GetBody()->setUserPointer((void*)&e);
 	}
-	/*
+	
 	//skybox
 	{
 		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
@@ -204,7 +204,7 @@ void MainGameScene::InitGameScene()
 		skyboxObj.get<Transform>().SetLocalPosition(0.0f, 0.0f, 0.0f);
 		skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
 	}
-	*/
+	
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
 	{
@@ -234,9 +234,9 @@ void MainGameScene::InitGameScene()
 		colorEffect->Init(width, height);
 
 		//number here doesn't matter
-		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
 		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}

@@ -35,7 +35,7 @@ bool FireWeapon::Fire()
 		Transform t = cameraObj.get<Transform>();
 		glm::mat4 tempView = glm::inverse(t.WorldTransform());
 
-		double dArray[16] = { 0.0 };
+		double dArray[16] = { 0.0 }; 
 
 
 		//This here gives us a lookAt vector
@@ -107,7 +107,7 @@ bool WaterWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			//does damage to enemy
 
@@ -123,7 +123,7 @@ bool WaterWeapon::Fire()
 		}
 		else
 		{
-			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
@@ -196,7 +196,7 @@ bool AirWeapon::Fire()
 			if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 			{
 				//Instantiate projectile/marker of where you shot because hitscan
-				//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 				//does damage to enemy
 
@@ -211,7 +211,7 @@ bool AirWeapon::Fire()
 			}
 			else
 			{
-				//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
+				InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
 				//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 				//return false;
 			}
@@ -278,24 +278,22 @@ bool EarthWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
+			
 			//does damage to enemy
 
-			Enemy* e = reinterpret_cast<Enemy*>(Results.m_collisionObject->getUserPointer());
+			entt::registry& reg = RenderingManager::activeScene->Registry();
+
 			
-			if (Results.m_collisionObject->getUserIndex2() == 3)
-			{
-				e->m_hp -= 5;
-			}
-			else
-				e->m_hp -= 3;
+			reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 1;
+		
 
 			return true;
 		}
 		else
 		{
-			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
