@@ -234,9 +234,9 @@ void MainGameScene::InitGameScene()
 		colorEffect->Init(width, height);
 
 		//number here doesn't matter
-		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
 		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}

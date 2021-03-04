@@ -127,10 +127,10 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
-	
+	enemyCount = 0;
 	// Update all world enemies for this frame
 	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
-		
+		enemyCount++;
 		e.Update(p);
 		if (e.m_hp <= 0.f)
 		{
