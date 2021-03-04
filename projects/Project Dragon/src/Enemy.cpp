@@ -6,13 +6,8 @@
 
 
 
-void Enemy::Update(PhysicsBody m_This, entt::entity e)
+void Enemy::Update(PhysicsBody m_This)
 {
-
-	if (shouldFuckingDie)
-	{
-		RenderingManager::activeScene->Registry().destroy(e);
-	}
 
 	mTimer += Timer::dt;
 

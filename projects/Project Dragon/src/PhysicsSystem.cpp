@@ -108,9 +108,10 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 	{	
 			PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj1->getCollisionObject()->getUserPointer());
 		
-			Enemy* e = reinterpret_cast<Enemy*>(obj2->m_collisionObject->getUserPointer()); //direct hit damage
-			e->m_hp -= 1;
-
+			entt::registry& reg = RenderingManager::activeScene->Registry();
+			reg.destroy((entt::entity)obj1->getCollisionObject()->getUserIndex3());
+			
+			reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 1;
 			
 
 
@@ -118,11 +119,12 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 	}
 	if (obj2->getCollisionObject()->getUserIndex() == 3 && obj1->getCollisionObject()->getUserIndex() == 2)
 	{
-		PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj2->getCollisionObject()->getUserPointer());
-		PhysicsSystem::m_World->removeRigidBody(p->GetBody());
+		
 	
-			Enemy* e = reinterpret_cast<Enemy*>(obj1->m_collisionObject->getUserPointer());
-			e->m_hp -= 1;
+		entt::registry& reg = RenderingManager::activeScene->Registry();
+		reg.destroy((entt::entity)obj2->getCollisionObject()->getUserIndex3());
+
+		reg.get<Enemy>((entt::entity)obj1->getCollisionObject()->getUserIndex3()).m_hp -= 1;
 	}
 
 	//Fire attack explosion
@@ -148,11 +150,11 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
 				if (length < 10.f)
 				{
-					Enemy* e = reinterpret_cast<Enemy*>(PhysicsSystem::m_bodies[i]->getUserPointer());
+					entt::registry& reg = RenderingManager::activeScene->Registry();
 					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
-						e->m_hp -= 10;
+						reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 5;
 					else
-						e->m_hp -= 7;
+						reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 2;
 				}
 			}
 			

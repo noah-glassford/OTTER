@@ -104,6 +104,7 @@ void RenderingManager::Init()
 }
 bool DeathSoundPlayed = false;
 int LightCount;
+int enemyCount = 0;
 void RenderingManager::Render()
 {
 	
@@ -126,7 +127,7 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
-	int enemyCount = 0;
+	
 	// Update all world enemies for this frame
 	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
 		

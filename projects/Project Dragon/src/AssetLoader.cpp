@@ -12,7 +12,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	//basic floor tile
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
-	Texture2D::sptr test = Texture2D::LoadFromFile("image/test.png"); 
+	Texture2D::sptr test = Texture2D::LoadFromFile("image/wall.png");
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
 	Floor_Mat->Shader = RenderingManager::NoOutline;

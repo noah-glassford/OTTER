@@ -216,7 +216,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
 						e.m_hp = 5.f;
-						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
+						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 5), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(2);

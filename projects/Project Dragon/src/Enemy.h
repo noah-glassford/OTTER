@@ -36,7 +36,7 @@ public:
 
 	bool shouldFuckingDie = false;
 
-	void Update(PhysicsBody m_This, entt::entity e);
+	void Update(PhysicsBody m_This);
 	void TakeDamage(float damage) { m_hp -= damage;  };
 	void Kill() { shouldFuckingDie = true; };
 	
