@@ -102,14 +102,14 @@ bool hitByFireProj = false;
 
 bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1,  const btCollisionObjectWrapper* obj2, int id2, int index2)
 {
-
+	entt::registry& reg = RenderingManager::activeScene->Registry();
 	//for direct hit with fire attack
 	if (obj1->getCollisionObject()->getUserIndex() == 3 && obj2->getCollisionObject()->getUserIndex() == 2)
 	{	
-			PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj1->getCollisionObject()->getUserPointer());
+			
 		
-			entt::registry& reg = RenderingManager::activeScene->Registry();
-			reg.destroy((entt::entity)obj1->getCollisionObject()->getUserIndex3());
+		
+			
 			
 			reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 1;
 			
@@ -121,8 +121,8 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 	{
 		
 	
-		entt::registry& reg = RenderingManager::activeScene->Registry();
-		reg.destroy((entt::entity)obj2->getCollisionObject()->getUserIndex3());
+		
+	
 
 		reg.get<Enemy>((entt::entity)obj1->getCollisionObject()->getUserIndex3()).m_hp -= 1;
 	}
@@ -143,22 +143,21 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 				//due to the way collision call backs work we have to run this twice because it is equally likely the projectile is obj1 or obj2
 				ProjectilePosition = obj1->getWorldTransform().getOrigin();
 				enemyPosition = PhysicsSystem::m_bodies[i]->getCenterOfMassTransform().getOrigin();
-				PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj1->getCollisionObject()->getUserPointer());
-				PhysicsSystem::m_World->removeRigidBody(p->GetBody());
+			
 				btVector3 Diff;
 				Diff = ProjectilePosition - enemyPosition;
 				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
 				if (length < 10.f)
 				{
-					entt::registry& reg = RenderingManager::activeScene->Registry();
+					
 					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
-						reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 5;
-					else
-						reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 2;
+						reg.get<Enemy>((entt::entity)PhysicsSystem::m_bodies[i]->getUserIndex3()).m_hp -= 5;
+					
 				}
 			}
 			
 		}
+		reg.destroy((entt::entity)obj2->getCollisionObject()->getUserIndex3());
 	}
 	if (obj2->getCollisionObject()->getUserIndex() == 3)
 	{
@@ -174,23 +173,21 @@ bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int
 				//due to the way collision call backs work we have to run this twice because it is equally likely the projectile is obj1 or obj2
 				ProjectilePosition = obj2->getWorldTransform().getOrigin();
 				enemyPosition = PhysicsSystem::m_bodies[i]->getCenterOfMassTransform().getOrigin();
-				PhysicsBody* p = reinterpret_cast<PhysicsBody*>(obj2->getCollisionObject()->getUserPointer());
-				PhysicsSystem::m_World->removeRigidBody(p->GetBody());
+				
 
 				btVector3 Diff;
 				Diff = ProjectilePosition - enemyPosition;
 				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
 				if (length < 10.f)
 				{
-					Enemy* e = reinterpret_cast<Enemy*>(PhysicsSystem::m_bodies[i]->getUserPointer());
+					
 					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
-						e->m_hp -= 10;
-					else
-						e->m_hp -= 7;
+						reg.get<Enemy>((entt::entity)PhysicsSystem::m_bodies[i]->getUserIndex3()).m_hp -= 5;
 				}
-			}
-			
+			}	
 		}
+		reg.destroy((entt::entity)obj2->getCollisionObject()->getUserIndex3());
+		
 	}
 
 	return false;

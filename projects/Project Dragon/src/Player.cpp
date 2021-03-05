@@ -23,9 +23,10 @@ void Player::InitWeapons()
 
 bool FireWeapon::Fire()
 {
-
+	/*
 	if (m_CanShoot)
 	{
+	not needed at the moment (its broken lol)
 		m_CanShoot = false;
 		m_Timer = 0.f;
 
@@ -60,8 +61,10 @@ bool FireWeapon::Fire()
 		p.GetBody()->applyCentralImpulse(BtToGlm::GLMTOBTV3(lookDir) * 70.f);
 
 		//the damage and collision check will happen in physicssystem.cpp in the callback func
+		
 
 	}
+	*/
 	return false;
 }
 
@@ -108,14 +111,22 @@ bool WaterWeapon::Fire()
 			//Instantiate projectile/marker of where you shot because hitscan
 			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
-			//does damage to enemy
 			entt::registry& reg = RenderingManager::activeScene->Registry();
 
-
-			if (Results.m_collisionObject->getUserIndex2() == 0)
-				reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+			if (Results.m_collisionObject->getUserIndex2() == 3)
+			{
+				if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
+					if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
+						reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+			}
 			else
-				reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
+			{
+
+				if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
+					if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
+						reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
+			}
+
 			return true;
 		}
 		else
@@ -197,12 +208,19 @@ bool AirWeapon::Fire()
 
 				entt::registry& reg = RenderingManager::activeScene->Registry();
 
-
-				if (Results.m_collisionObject->getUserIndex2() == 1)
-					reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+				if (Results.m_collisionObject->getUserIndex2() == 3)
+				{
+					if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
+						if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
+							reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+				}
 				else
-					reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
+				{
 
+					if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
+						if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
+							reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
+				}
 
 			}
 			else
@@ -280,11 +298,19 @@ bool EarthWeapon::Fire()
 
 			entt::registry& reg = RenderingManager::activeScene->Registry();
 
-			if(Results.m_collisionObject->getUserIndex2() == 3)
-			reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+			if (Results.m_collisionObject->getUserIndex2() == 3)
+			{
+				if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3())) 
+					if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
+				reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+			}
 			else
-			reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
-		
+			{
+
+				if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
+					if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
+				reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
+			}
 
 			return true;
 		}
