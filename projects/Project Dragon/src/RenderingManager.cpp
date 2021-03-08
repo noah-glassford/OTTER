@@ -11,6 +11,7 @@
 #include <Bloom.h>
 #include <LightSource.h>
 #include <MorphAnimator.h>
+#include <UI.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -127,6 +128,8 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	
+
 	enemyCount = 0;
 	// Update all world enemies for this frame
 	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
@@ -222,14 +225,22 @@ void RenderingManager::Render()
 
 	postEffect->BindBuffer(0);
 
+	activeScene->Registry().view<Transform, UI, RendererComponent>().each([](entt::entity entity, Transform& t, UI& ui, RendererComponent& rc)
+		{
+			UIShader->SetUniform("u_Scale", ui.scale);
+			UIShader->SetUniform("u_Offset", ui.offset);
+		});
+
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
+		
 		if (current != renderer.Material->Shader) {
 			current = renderer.Material->Shader;
 			current->Bind();
 			BackendHandler::SetupShaderForFrame(current, view, projection);
 		}
+
 		// If the material has changed, apply it
 		if (currentMat != renderer.Material) {
 			currentMat = renderer.Material;

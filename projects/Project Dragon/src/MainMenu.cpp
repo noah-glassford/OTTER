@@ -12,6 +12,7 @@
 #include <BackendHandler.h>
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
+#include <UI.h>
 void MainMenuScene::InitGameScene()
 {
 
@@ -22,7 +23,7 @@ void MainMenuScene::InitGameScene()
 	scene = GameScene::Create("GameScene");
 	RenderingManager::activeScene = scene;
 
-	Texture2D::sptr menu = Texture2D::LoadFromFile("image/mainmenu.png");
+	Texture2D::sptr menu = Texture2D::LoadFromFile("image/crosshair.png");
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	//Material for menu
 	ShaderMaterial::sptr Menu = ShaderMaterial::Create();
@@ -55,6 +56,9 @@ void MainMenuScene::InitGameScene()
 	{ 
 		RendererComponent& r = UIObject.emplace<RendererComponent>();
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		UI& ui = UIObject.emplace<UI>();
+		ui.offset = glm::vec2(0, 0.2);
+		ui.scale = glm::vec2(1, 1);
 		r.SetMaterial(Menu).SetMesh(vao);
 	}
 	

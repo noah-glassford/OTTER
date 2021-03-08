@@ -12,7 +12,7 @@
 #include <Bloom.h>
 #include <LightSource.h>
 #include <MorphAnimator.h>
-
+#include <UI.h>
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -84,6 +84,16 @@ void MainGameScene::InitGameScene()
 	Elm_Cube->Set("u_Shininess", 3.0f);
 	Elm_Cube->Set("u_TextureMix", 0.0f);
 
+	Texture2D::sptr crosshair = Texture2D::LoadFromFile("image/HP_FULL.png");
+	//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+	//Material for menu
+	ShaderMaterial::sptr Crosshair = ShaderMaterial::Create();
+	Crosshair->Shader = RenderingManager::UIShader;
+	Crosshair->Set("s_Diffuse", crosshair);
+	Crosshair->Set("s_Specular", crosshair);
+	Crosshair->Set("u_Shininess", 2.0f);
+	Crosshair->Set("u_TextureMix", 0.0f);
+
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -104,6 +114,14 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setCollisionFlags(p.GetBody()->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
+	}
+
+	GameObject UIObject = scene->CreateEntity("Crosshair:)");
+	{
+		RendererComponent& r = UIObject.emplace<RendererComponent>();
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		
+		r.SetMaterial(Crosshair).SetMesh(vao);
 	}
 
 	GameObject RightHand = scene->CreateEntity("RHand");
