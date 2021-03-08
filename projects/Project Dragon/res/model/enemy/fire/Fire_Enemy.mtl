@@ -1,0 +1,46 @@
+# Blender MTL File: 'fire enemy die.blend'
+# Material Count: 4
+
+newmtl Material
+Ns 56.250000
+Ka 0.250000 0.250000 0.250000
+Kd 0.800000 0.800000 0.800000
+Ks 0.250000 0.250000 0.250000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd D:\\Art Wrok & pictures\\School work\\Year 2 Sem 2\\GDW\\Project-Dragon\\projects\\Project Dragon\\res\\For Alan\\PS&Exports\\fireenemytexurebig.png
+
+newmtl Material.001
+Ns 39.889209
+Ka 0.050000 0.050000 0.050000
+Kd 0.800000 0.800000 0.800000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd D:\\Art Wrok & pictures\\School work\\Year 2 Sem 2\\GDW\\Project-Dragon\\projects\\Project Dragon\\res\\For Alan\\PS&Exports\\fireenemytexurebig.png
+
+newmtl Material.002
+Ns 569.282843
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 0.000000
+d 1.000000
+illum 1
+map_Kd D:\\Art Wrok & pictures\\School work\\Year 2 Sem 2\\GDW\\Project-Dragon\\projects\\Project Dragon\\res\\For Alan\\PS&Exports\\fireenemytexurebig.png
+
+newmtl Material.003
+Ns 56.250000
+Ka 0.040000 0.040000 0.040000
+Kd 0.800000 0.800000 0.800000
+Ks 0.040000 0.040000 0.040000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd D:\\Art Wrok & pictures\\School work\\Year 2 Sem 2\\GDW\\Project-Dragon\\projects\\Project Dragon\\res\\For Alan\\PS&Exports\\fireenemytexurebig.png
