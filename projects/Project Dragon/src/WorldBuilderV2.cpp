@@ -196,7 +196,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
@@ -215,7 +215,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Earth_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 5), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
@@ -234,7 +234,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
@@ -252,7 +252,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Air_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
