@@ -20,6 +20,7 @@ public:
 	void ApplyForce(btVector3 direction);
 	void AddBody(float mass, btVector3 origin, btVector3 size);
 	void AddBody(float mass, btVector3 origin, btVector3 size, float friction);
+	void AddSphereBody(float mass, float radius, btVector3 origin);
 
 	void SetUserData(int data);
 	void SetUserData2(int data);
@@ -27,10 +28,14 @@ public:
 	int m_BodyId;//this for da world thing
 	int m_Entity;//attach this entitys id to itself so I can call the appropriate transform in update.
 
+	void* m_userObjectPointer;
+
 private:
 	//pass this to this components transform in the update
 
 	btRigidBody* m_Body = nullptr;
+
+
 	
 
 };

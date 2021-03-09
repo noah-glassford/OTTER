@@ -11,5 +11,7 @@ public:
 	static Shader::sptr NoOutline;
 	static Shader::sptr SkyBox;
 	static Shader::sptr Passthrough;
+	static Shader::sptr AnimationShader;
+	static Shader::sptr UIShader;
 	static GameScene::sptr activeScene; //keeps track of the active scene
 };

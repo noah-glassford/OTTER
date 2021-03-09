@@ -13,8 +13,11 @@
 #include <WorldBuilderV2.h>
 #include <AudioEngine.h>
 #include <Bloom.h>
+#include <PhysicsSystem.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
+std::vector<SceneBase*> BackendHandler::m_Scenes;
+int BackendHandler::m_ActiveScene = 0;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
@@ -64,7 +67,7 @@ bool BackendHandler::InitAll()
 	AudioEngine& engine = AudioEngine::Instance();
 	engine.Init();
 	//start the music
-	
+
 	engine.LoadBank("sound/music");
 	engine.LoadBank("sound/Sound Effects");
 	engine.LoadBank("sound/Music.strings");
@@ -73,7 +76,7 @@ bool BackendHandler::InitAll()
 	engine.CreateNewEvent("Element Swap", "{aa3a7bc0-fe97-48a1-8ce7-4680087fe66d}");
 	engine.CreateNewEvent("Enemy Jump", "{8ef856c1-a3f5-4313-8266-74b56a655319}");
 	engine.CreateNewEvent("Level Complete", "{7148fbe2-c4ee-4e3a-a254-5bb351cbcbf8}");
-	
+
 	music.Play();
 
 	InitImGui();
@@ -108,25 +111,11 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 		});
 }
 
-
-
 #include <Player.h>
 #include <Enemy.h>
 bool AudioInit = 0;
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-	//Placeholder shoot sfx
-	AudioEngine& engine = AudioEngine::Instance();
-	
-	AudioEvent& tempShoot = engine.GetEvent("Element Swap");
-	
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	{
-		RenderingManager::activeScene->FindFirst("Camera").get<Player>().FireWeapon(0);
-		tempShoot.Play();
-			
-	}
-}
+
+bool shouldSwitchWeaponL, shouldSwitchWeaponR;
 
 void BackendHandler::UpdateInput()
 {
@@ -138,6 +127,7 @@ void BackendHandler::UpdateInput()
 	Camera cam = cameraObj.get<Camera>();
 	Transform t = cameraObj.get<Transform>();
 	PhysicsBody phys = cameraObj.get<PhysicsBody>();
+	float verticalVelo = phys.GetBody()->getVelocityInLocalPoint(btVector3(0, 0, 0)).getZ();
 	//get a forward vector using fancy maths
 	glm::vec3 forward(0, 1, 0);
 	forward = glm::rotate(forward, glm::radians(t.GetLocalRotation().z), glm::vec3(0, 0, 1));
@@ -156,31 +146,33 @@ void BackendHandler::UpdateInput()
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		glm::vec3 direction = glm::normalize(glm::cross(forward, cam.GetUp()));
-		movement.setX(movement.getX() - direction.x * 1.8);
-		movement.setY(movement.getY() - direction.y * 1.8);
+		movement.setX(movement.getX() - direction.x);
+		movement.setY(movement.getY() - direction.y);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		glm::vec3 direction = -glm::normalize(glm::cross(forward, cam.GetUp()));
-		movement.setX(movement.getX() - direction.x * 1.8);
-		movement.setY(movement.getY() - direction.y * 1.8);
-	}
 
+		movement.setX(movement.getX() - direction.x);
+		movement.setY(movement.getY() - direction.y);
+	}
+	Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		Player& p = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
-		p.CheckJump();
+		AudioEngine& engine = AudioEngine::Instance();
+		AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
 
-		//if (p.GetPlayerData().m_CanJump) //To infinite jump remove this if statement
-		//{
-			//Placeholder shoot sfx
-			AudioEngine& engine = AudioEngine::Instance();
-			AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
+		if (p.m_CanJump)
+		{
 			tempJump.Play();
-			movement.setZ(1.0f);
-		//}
+
+			verticalVelo = 20.f;
+		}
 	}
+	phys.SetLinearVelocity(btVector3(movement.getX() * 22.f, movement.getY() * 22.f, verticalVelo));
+
+	//temporary
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -190,7 +182,82 @@ void BackendHandler::UpdateInput()
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
-	phys.ApplyForce(movement);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		if (shouldSwitchWeaponL)
+		{
+			p.SwitchLeftHand();
+			if (p.m_LeftEquiped)
+			{
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, 3, 0);
+			}
+			else
+			{
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, 3, 0);
+			}
+			shouldSwitchWeaponL = false;
+		}
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		if (shouldSwitchWeaponR)
+		{
+			p.SwitchRightHand();
+			if (p.m_RightEquiped)
+			{
+				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, 3, 0);
+				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -3, 0);
+			}
+			else
+			{
+				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, 3, 0);
+			}
+			shouldSwitchWeaponR = false;
+		}
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE)
+	{
+		shouldSwitchWeaponR = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE)
+	{
+		shouldSwitchWeaponL = true;
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+	{
+		p.LeftHandShoot();
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+	{
+		p.RightHandShoot();
+	}
+
+	//for scene switch
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && m_ActiveScene == 0)
+	{
+		m_ActiveScene = 1;
+		m_Scenes[0]->scene->DeleteAllEnts();
+		m_Scenes[m_ActiveScene]->InitGameScene();
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && m_ActiveScene == 2)
+	{
+		m_ActiveScene = 0;
+		m_Scenes[2]->scene->DeleteAllEnts();
+		m_Scenes[m_ActiveScene]->InitGameScene();
+	}
+
+	if (RenderingManager::activeScene->FindFirst("Camera").get<Player>().m_Hp == 0 && m_ActiveScene == 1)
+	{
+		m_ActiveScene = 2;
+		m_Scenes[1]->scene->DeleteAllEnts();
+		PhysicsSystem::ClearWorld();
+		m_Scenes[m_ActiveScene]->InitGameScene();
+	}
 
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
@@ -215,15 +282,14 @@ bool BackendHandler::InitGLFW()
 #endif
 
 	//Create a new GLFW window
-	window = glfwCreateWindow(1280, 720, "Project Dragon", nullptr, nullptr);
+	window = glfwCreateWindow(1920, 1080, "Project Dragon", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
 	// Set our window resized callback
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
-
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// Store the window in the application singleton
 	Application::Instance().Window = window;

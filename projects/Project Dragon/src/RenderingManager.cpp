@@ -9,10 +9,20 @@
 #include <Enemy.h>
 #include <AudioEngine.h>
 #include <Bloom.h>
+#include <LightSource.h>
+#include <MorphAnimator.h>
+#include <UI.h>
+#include <Interpolation.h>
+#include <PhysicsSystem.h>
+#include <CameraControlBehaviour.h>
+#include <WorldBuilderV2.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
+Shader::sptr RenderingManager::AnimationShader = NULL;
+Shader::sptr RenderingManager::UIShader = NULL;
+	
 GameScene::sptr RenderingManager::activeScene;
 
 bool ShouldBloom;
@@ -22,7 +32,6 @@ float Threshold;
 
 void RenderingManager::Init()
 {
-
 	// GL states
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
@@ -32,111 +41,53 @@ void RenderingManager::Init()
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/Cel_Shaded_Outline.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/Multiple_Light_Outline.glsl", GL_FRAGMENT_SHADER);
 	BaseShader->Link();
 
 	NoOutline = Shader::Create();
 	//First we initialize our shaders
 	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	NoOutline->LoadShaderPartFromFile("shader/Cel_Shaded_No_Outline.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/Multiple_Light_NoOutline.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
 
+	
 
-	//then we set some base values
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 5.0f);
-	glm::vec3 lightCol = glm::vec3(0.9f, 0.85f, 0.5f);
-	float     lightAmbientPow = 0.05f;
-	float     lightSpecularPow = 1.0f;
-	glm::vec3 ambientCol = glm::vec3(1.0f);
-	float     ambientPow = 0.6f;
-	float     lightLinearFalloff = 0.09f;
-	float     lightQuadraticFalloff = 0.032f;
+	UIShader = Shader::Create();
+	UIShader->LoadShaderPartFromFile("shader/ui_vert.glsl", GL_VERTEX_SHADER);
+	UIShader->LoadShaderPartFromFile("shader/ui_frag.glsl", GL_FRAGMENT_SHADER);
+	UIShader->Link();
+	UIShader->SetUniform("u_Scale", glm::vec2(1, 0.1));
+	UIShader->SetUniform("u_Offset", glm::vec2(0, 0));
 
-	// every frame
-	BaseShader->SetUniform("u_LightPos", lightPos);
-	BaseShader->SetUniform("u_LightCol", lightCol);
-	BaseShader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-	BaseShader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-	BaseShader->SetUniform("u_AmbientCol", ambientCol);
-	BaseShader->SetUniform("u_AmbientStrength", ambientPow);
-	BaseShader->SetUniform("u_LightAttenuationConstant", 1.0f);
-	BaseShader->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
-	BaseShader->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
+	BaseShader->SetUniform("u_LightAttenuationConstant", 1.f);
+	BaseShader->SetUniform("u_LightAttenuationLinear", 0.08f);
+	BaseShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
 
-	// every frame
-	NoOutline->SetUniform("u_LightPos", lightPos);
-	NoOutline->SetUniform("u_LightCol", lightCol);
-	NoOutline->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-	NoOutline->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-	NoOutline->SetUniform("u_AmbientCol", ambientCol);
-	NoOutline->SetUniform("u_AmbientStrength", ambientPow);
-	NoOutline->SetUniform("u_LightAttenuationConstant", 1.0f);
-	NoOutline->SetUniform("u_LightAttenuationLinear", lightLinearFalloff);
-	NoOutline->SetUniform("u_LightAttenuationQuadratic", lightQuadraticFalloff);
+
+
+	//init attenuation
+	NoOutline->SetUniform("u_LightAttenuationConstant", 1.f);
+	NoOutline->SetUniform("u_LightAttenuationLinear", 0.08f);
+	NoOutline->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+
+	//initialize primary fragment shader DirLight & spotlight
+	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
+	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+	//initialize primary fragment shader DirLight & spotlight
+	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
+	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+
+	
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
-		
-			if (ImGui::Button("No Lighting")) 
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 1);
-				NoOutline->SetUniform("u_Lightingtoggle", 1);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Ambient Only"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 2);
-				NoOutline->SetUniform("u_Lightingtoggle", 2);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Specular Only"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 3);
-				NoOutline->SetUniform("u_Lightingtoggle", 3);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Ambient + Specular"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 4);
-				NoOutline->SetUniform("u_Lightingtoggle", 4);
-				ShouldBloom = false;
-			}
-			if (ImGui::Button("Ambient + Spec + Bloom"))
-			{
-				BaseShader->SetUniform("u_Lightingtoggle", 5);
-				NoOutline->SetUniform("u_Lightingtoggle", 5);
-				ShouldBloom = true;
-			}
-			if (ImGui::Button("Texture Toggle"))
-			{
-				if (TextureToggle)
-				{
-					TextureToggle = 0;
-					NoOutline->SetUniform("u_TextureToggle", 0);
-					BaseShader->SetUniform("u_TextureToggle", 0);
-				}
-				else
-				{
-					TextureToggle = 1;
-					NoOutline->SetUniform("u_TextureToggle", 1);
-					BaseShader->SetUniform("u_TextureToggle", 1);
-				}
-			}
-			if (ImGui::DragInt("Blur Passes", &NumPasses, 1.f, 0, 100))
-			{
-				BloomEffect* bloomEffect;
-				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-				bloomEffect->SetPasses((unsigned)NumPasses);
-			}
-			if (ImGui::DragFloat("Threshold", &Threshold, 0.01f, 0, 1))
-			{
-				BloomEffect* bloomEffect;
-				bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-				bloomEffect->SetThreshold(Threshold);
-			}
-
-			
-		
 		
 		});
 
@@ -156,24 +107,19 @@ void RenderingManager::Init()
 
 }
 bool DeathSoundPlayed = false;
+int LightCount;
+int enemyCount = 0;
 void RenderingManager::Render()
 {
-	//gets frame buffer from the active scene
-	PostEffect* postEffect;
-	GreyscaleEffect* greyscale;
-	ColorCorrectionEffect* colEffect;
-	BloomEffect* bloomEffect;
-	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
-	greyscale = &activeScene->FindFirst("Greyscale Effect").get<GreyscaleEffect>();
-	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
-	bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-	// Clear the screen
-	
-	//greyscale->Clear();
+
+	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
+	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
+
 
 	postEffect->Clear();
-	colEffect->Clear();
 	bloomEffect->Clear();
+	colEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -185,11 +131,18 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+
+
+	enemyCount = 0;
 	// Update all world enemies for this frame
-	activeScene->Registry().view<Enemy, PhysicsBody>().each([](entt::entity entity, Enemy& e, PhysicsBody& p) {
+	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
+		enemyCount++;
 		e.Update(p);
-		if (e.m_hp <= 0)
+		if (e.m_hp <= 0.f)
 		{
+			activeScene->Registry().destroy(entity);
+
+			//t.SetLocalPosition(0,0,-1000);
 			//play temp death sound
 			//Placeholder shoot sfx
 			AudioEngine& engine = AudioEngine::Instance();
@@ -200,16 +153,47 @@ void RenderingManager::Render()
 				DeathSoundPlayed = true;
 				tempEnDeath.Play();
 			}
-			btTransform t;
-			t.setOrigin(btVector3(0, 0, -1000));
-			p.GetBody()->setCenterOfMassTransform(t);
+			
+
+			
 		}
+
 		});
+	
+	LightCount = 0;
+	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
+		
+		if (LightCount <= 50)
+		{
+			//create the string to send to the shader
+			std::string uniformName;
+			uniformName = "pointLights[";
+			uniformName += std::to_string(LightCount);
+			uniformName += "].";
+			//this will be the begining, now we just need to add the part of the struct we want to set
+			BaseShader->SetUniform(uniformName + "position", t.GetLocalPosition());
+			BaseShader->SetUniform(uniformName + "ambient", l.m_Ambient);
+			BaseShader->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			BaseShader->SetUniform(uniformName + "specular", l.m_Specular);
+			
+			NoOutline->SetUniform(uniformName + "position", t.GetLocalPosition());
+			NoOutline->SetUniform(uniformName + "ambient", l.m_Ambient);
+			NoOutline->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			NoOutline->SetUniform(uniformName + "specular", l.m_Specular);
+		
+		}
+		LightCount++;
+	
+		});
+	NoOutline->SetUniform("u_LightCount", LightCount);
+	BaseShader->SetUniform("u_LightCount", LightCount);
 
 
 	//get the camera mat4s
 	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
 	activeScene->FindFirst("Camera").get<Player>().Update();
+	//temp
+	//activeScene->FindFirst("NumberPlane").get<Transform>().LookAt(camTransform.GetLocalPosition());
 
 	
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
@@ -242,16 +226,39 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
+	//sets the scale for player HP Bar
+	if(BackendHandler::m_ActiveScene == 1)
+	{
+		float t2 = 0.2 * activeScene->FindFirst("Camera").get<Player>().m_Hp;
+
+	
+
+		float scaleX = Interpolation::LERP(0, 1, t2);
+
+		activeScene->FindFirst("PlayerHPBar").get<UI>().scale = glm::vec2(scaleX, 1);
+	}
+
+	activeScene->Registry().view<Transform, UI, RendererComponent>().each([](entt::entity entity, Transform& t, UI& ui, RendererComponent& rc)
+		{
+			UIShader->SetUniform("u_Scale", ui.scale);
+			UIShader->SetUniform("u_Offset", ui.offset);
+		});
+
+
 	postEffect->BindBuffer(0);
+
+
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
+		
 		if (current != renderer.Material->Shader) {
 			current = renderer.Material->Shader;
 			current->Bind();
 			BackendHandler::SetupShaderForFrame(current, view, projection);
 		}
+
 		// If the material has changed, apply it
 		if (currentMat != renderer.Material) {
 			currentMat = renderer.Material;
@@ -260,30 +267,28 @@ void RenderingManager::Render()
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
 		});
 		
-
-		//update the player class
 		
-
-
-
-		//greyscale->ApplyEffect(postEffect);
-		//greyscale->DrawToScreen();
+		bloomEffect->ApplyEffect(postEffect);
+		bloomEffect->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
-		if (ShouldBloom)
-		{
-			bloomEffect->ApplyEffect(postEffect);
-			bloomEffect->DrawToScreen();
-		}
 
 		postEffect->UnBindBuffer();
-
+		
 		BackendHandler::RenderImGui();
 
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
-	
+		std::cout << enemyCount << std::endl;
+		if (enemyCount <= 1 && BackendHandler::m_ActiveScene == 1)
+		{
+			activeScene->DeleteAllEnts();
+			PhysicsSystem::ClearWorld();
+			BackendHandler::m_Scenes[1]->InitGameScene();
+
+			
+		}
 
 
 	
