@@ -12,6 +12,10 @@
 #include <LightSource.h>
 #include <MorphAnimator.h>
 #include <UI.h>
+#include <Interpolation.h>
+#include <PhysicsSystem.h>
+#include <CameraControlBehaviour.h>
+#include <WorldBuilderV2.h>
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -28,7 +32,6 @@ float Threshold;
 
 void RenderingManager::Init()
 {
-
 	// GL states
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
@@ -108,16 +111,16 @@ int LightCount;
 int enemyCount = 0;
 void RenderingManager::Render()
 {
-	
+
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
-	
-	
+
+
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
-	
+
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
@@ -128,7 +131,7 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
-	
+
 
 	enemyCount = 0;
 	// Update all world enemies for this frame
@@ -150,11 +153,13 @@ void RenderingManager::Render()
 				DeathSoundPlayed = true;
 				tempEnDeath.Play();
 			}
-		//	btTransform t;
-			//t.setOrigin(btVector3(0, 0, -1000));
-			//p.GetBody()->setCenterOfMassTransform(t);
+			
+
+			
 		}
+
 		});
+	
 	LightCount = 0;
 	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
 		
@@ -221,15 +226,28 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
+	//sets the scale for player HP Bar
+	if(BackendHandler::m_ActiveScene == 1)
+	{
+		float t2 = 0.2 * activeScene->FindFirst("Camera").get<Player>().m_Hp;
+
 	
 
-	postEffect->BindBuffer(0);
+		float scaleX = Interpolation::LERP(0, 1, t2);
+
+		activeScene->FindFirst("PlayerHPBar").get<UI>().scale = glm::vec2(scaleX, 1);
+	}
 
 	activeScene->Registry().view<Transform, UI, RendererComponent>().each([](entt::entity entity, Transform& t, UI& ui, RendererComponent& rc)
 		{
 			UIShader->SetUniform("u_Scale", ui.scale);
 			UIShader->SetUniform("u_Offset", ui.offset);
 		});
+
+
+	postEffect->BindBuffer(0);
+
+
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -262,7 +280,15 @@ void RenderingManager::Render()
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
-		
+		std::cout << enemyCount << std::endl;
+		if (enemyCount <= 1 && BackendHandler::m_ActiveScene == 1)
+		{
+			activeScene->DeleteAllEnts();
+			PhysicsSystem::ClearWorld();
+			BackendHandler::m_Scenes[1]->InitGameScene();
+
+			
+		}
 
 
 	

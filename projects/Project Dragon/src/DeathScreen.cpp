@@ -12,6 +12,8 @@
 #include <BackendHandler.h>
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
+#include <UI.h>
+#include <AssetLoader.h>
 void DeathSceen::InitGameScene()
 {
 
@@ -22,15 +24,8 @@ void DeathSceen::InitGameScene()
 	scene = GameScene::Create("GameScene");
 	RenderingManager::activeScene = scene;
 
-	Texture2D::sptr menu = Texture2D::LoadFromFile("image/deathscreen.png");
-	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
-	//Material for menu
-	ShaderMaterial::sptr Menu = ShaderMaterial::Create();
-	Menu->Shader = RenderingManager::UIShader;
-	Menu->Set("s_Diffuse", menu);
-	Menu->Set("s_Specular", menu);
-	Menu->Set("u_Shininess", 2.0f);
-	Menu->Set("u_TextureMix", 0.0f);
+
+
 
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -55,9 +50,10 @@ void DeathSceen::InitGameScene()
 	{ 
 		RendererComponent& r = UIObject.emplace<RendererComponent>();
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
-		r.SetMaterial(Menu).SetMesh(vao);
+		UI& ui = UIObject.emplace<UI>();
+		r = AssetLoader::GetRendererFromStr("DeathScreen");
 	}
-	/*
+	
 	//if these aren't here it crashes lmao
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
@@ -94,6 +90,6 @@ void DeathSceen::InitGameScene()
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
-	*/
+	
 
 }

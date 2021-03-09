@@ -24,14 +24,15 @@ void MainGameScene::InitGameScene()
 	Application::Instance().ActiveScene = scene;
 	RenderingManager::activeScene = scene;
 
-	Texture2D::sptr grass = Texture2D::LoadFromFile("image/grass.jpg");
+	
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	Texture2D::sptr EarthEnemy = Texture2D::LoadFromFile("image/earthenemytexture.png");
 	Texture2D::sptr Barrel = Texture2D::LoadFromFile("image/BARREL.png");
-	Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
-	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
+	Texture2D::sptr FloorTexture = Texture2D::LoadFromFile("image/Stone_001_Diffuse.png");
+	//Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
+	//TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
-	Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
+	
 
 	// Creating an empty texture
 	Texture2DDescription desc = Texture2DDescription();
@@ -42,19 +43,14 @@ void MainGameScene::InitGameScene()
 	// Clear it with a white colour
 	texture2->Clear();
 
+	
 	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
 	Floor_Mat->Shader = RenderingManager::NoOutline;
-	Floor_Mat->Set("s_Diffuse", grass);
+	Floor_Mat->Set("s_Diffuse", FloorTexture);
 	Floor_Mat->Set("s_Specular", noSpec);
-	Floor_Mat->Set("u_Shininess", 2.0f);
+	Floor_Mat->Set("u_Shininess", 3.0f);
 	Floor_Mat->Set("u_TextureMix", 0.0f);
-
-	ShaderMaterial::sptr handMat = ShaderMaterial::Create();
-	handMat->Shader = RenderingManager::BaseShader;
-	handMat->Set("s_Diffuse", hand);
-	handMat->Set("s_Specular", noSpec);
-	handMat->Set("u_Shininess", 1.0f);
-	handMat->Set("u_TextureMix", 0.0f);
+	
 
 	ShaderMaterial::sptr EE_MAT = ShaderMaterial::Create();
 	EE_MAT->Shader = RenderingManager::NoOutline;
@@ -70,12 +66,7 @@ void MainGameScene::InitGameScene()
 	BarrelMat->Set("u_Shininess", 3.0f);
 	BarrelMat->Set("u_TextureMix", 0.0f);
 
-	ShaderMaterial::sptr NumMat = ShaderMaterial::Create();
-	NumMat->Shader = RenderingManager::NoOutline;
-	NumMat->Set("s_Diffuse", nine);
-	NumMat->Set("s_Specular", noSpec);
-	NumMat->Set("u_Shininess", 3.0f);
-	NumMat->Set("u_TextureMix", 0.0f);
+
 
 	ShaderMaterial::sptr Elm_Cube = ShaderMaterial::Create();
 	Elm_Cube->Shader = RenderingManager::NoOutline;
@@ -84,15 +75,7 @@ void MainGameScene::InitGameScene()
 	Elm_Cube->Set("u_Shininess", 3.0f);
 	Elm_Cube->Set("u_TextureMix", 0.0f);
 
-	Texture2D::sptr crosshair = Texture2D::LoadFromFile("image/HP_FULL.png");
-	//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
-	//Material for menu
-	ShaderMaterial::sptr Crosshair = ShaderMaterial::Create();
-	Crosshair->Shader = RenderingManager::UIShader;
-	Crosshair->Set("s_Diffuse", crosshair);
-	Crosshair->Set("s_Specular", crosshair);
-	Crosshair->Set("u_Shininess", 2.0f);
-	Crosshair->Set("u_TextureMix", 0.0f);
+	
 
 	// Create an object to be our camera
 	GameObject cameraObject = scene->CreateEntity("Camera");
@@ -104,6 +87,7 @@ void MainGameScene::InitGameScene()
 		Camera& camera = cameraObject.emplace<Camera>();// Camera::Create();
 		Player& player = cameraObject.emplace<Player>();
 		player.InitWeapons();
+		player.m_Hp = 5;
 		camera.SetPosition(glm::vec3(0, 3, 3));
 		camera.SetUp(glm::vec3(0, 0, 1));
 		camera.LookAt(glm::vec3(0));
@@ -112,16 +96,20 @@ void MainGameScene::InitGameScene()
 		PhysicsBody& p = cameraObject.emplace<PhysicsBody>();
 		p.AddBody(100.f, btVector3(15, 15, 5), btVector3(1, 1, 2), 3.f);
 		p.GetBody()->setCollisionFlags(p.GetBody()->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+		p.GetBody()->setUserIndex(1);
+		p.GetBody()->setUserIndex3((unsigned)cameraObject.entity());
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
 
-	GameObject UIObject = scene->CreateEntity("Crosshair:)");
+	GameObject UIObject = scene->CreateEntity("PlayerHPBar");
 	{
 		RendererComponent& r = UIObject.emplace<RendererComponent>();
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		
-		r.SetMaterial(Crosshair).SetMesh(vao);
+		UI& ui = UIObject.emplace<UI>();
+		ui.offset = glm::vec2(0, 0.2);
+		ui.scale = glm::vec2(1, 1);
+		r = AssetLoader::GetRendererFromStr("hpBar");
 	}
 
 	GameObject RightHand = scene->CreateEntity("RHand");
@@ -129,16 +117,16 @@ void MainGameScene::InitGameScene()
 		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
 		RightHand.get<Transform>().SetParent(cameraObject);
 
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		
 
-		RightHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+		RightHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
 		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
 		LeftHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		LeftHand.emplace<RendererComponent>().SetMesh(vao).SetMaterial(handMat);
+		LeftHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
 	}
 
 	GameObject obj4 = scene->CreateEntity("Barrel");
@@ -206,22 +194,7 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserPointer((void*)&e);
 	}
 	
-	//skybox
-	{
-		ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
-		skyboxMat->Shader = RenderingManager::SkyBox;
-		skyboxMat->Set("s_Environment", environmentMap);
-		skyboxMat->Set("u_EnvironmentRotation", glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))));
-		skyboxMat->RenderLayer = 100;
-		MeshBuilder<VertexPosNormTexCol> mesh;
-		MeshFactory::AddIcoSphere(mesh, glm::vec3(0.0f), 1.0f);
-		MeshFactory::InvertFaces(mesh);
-		VertexArrayObject::sptr meshVao = mesh.Bake();
 
-		GameObject skyboxObj = scene->CreateEntity("skybox");
-		skyboxObj.get<Transform>().SetLocalPosition(0.0f, 0.0f, 0.0f);
-		skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
-	}
 	
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
@@ -252,9 +225,9 @@ void MainGameScene::InitGameScene()
 		colorEffect->Init(width, height);
 
 		//number here doesn't matter
-		//colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
+		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
 		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}

@@ -13,6 +13,7 @@
 #include <WorldBuilderV2.h>
 #include <AudioEngine.h>
 #include <Bloom.h>
+#include <PhysicsSystem.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 std::vector<SceneBase*> BackendHandler::m_Scenes;
@@ -169,7 +170,7 @@ void BackendHandler::UpdateInput()
 			verticalVelo = 20.f;
 		}
 	}
-	phys.SetLinearVelocity(btVector3(movement.getX() * 17.f, movement.getY() * 17.f, verticalVelo));
+	phys.SetLinearVelocity(btVector3(movement.getX() * 22.f, movement.getY() * 22.f, verticalVelo));
 
 	//temporary
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
@@ -240,6 +241,21 @@ void BackendHandler::UpdateInput()
 	{
 		m_ActiveScene = 1;
 		m_Scenes[0]->scene->DeleteAllEnts();
+		m_Scenes[m_ActiveScene]->InitGameScene();
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && m_ActiveScene == 2)
+	{
+		m_ActiveScene = 0;
+		m_Scenes[2]->scene->DeleteAllEnts();
+		m_Scenes[m_ActiveScene]->InitGameScene();
+	}
+
+	if (RenderingManager::activeScene->FindFirst("Camera").get<Player>().m_Hp == 0 && m_ActiveScene == 1)
+	{
+		m_ActiveScene = 2;
+		m_Scenes[1]->scene->DeleteAllEnts();
+		PhysicsSystem::ClearWorld();
 		m_Scenes[m_ActiveScene]->InitGameScene();
 	}
 

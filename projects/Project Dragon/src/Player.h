@@ -46,7 +46,7 @@ public:
 	void SwitchRightHand();
 	bool LeftHandShoot();
 	bool RightHandShoot();
-	int m_Hp;
+	int m_Hp = 5;
 	std::vector<Weapon*> m_LeftHandWeapons;
 	std::vector<Weapon*> m_RightHandWeapons;
 	bool m_LeftEquiped;

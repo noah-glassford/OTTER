@@ -134,7 +134,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
-		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Shader = RenderingManager::NoOutline;
 		box_Mat->Set("s_Diffuse", box_tex);
 		box_Mat->Set("s_Specular", noSpec);
 		box_Mat->Set("u_Shininess", 2.0f);
@@ -150,7 +150,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
 		Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
-		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Shader = RenderingManager::NoOutline;
 		box_Mat->Set("s_Diffuse", box_tex);
 		box_Mat->Set("s_Specular", noSpec);
 		box_Mat->Set("u_Shininess", 2.0f);
@@ -166,7 +166,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/earthenemytexture.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
-		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Shader = RenderingManager::NoOutline;
 		box_Mat->Set("s_Diffuse", box_tex);
 		box_Mat->Set("s_Specular", noSpec);
 		box_Mat->Set("u_Shininess", 2.0f);
@@ -182,7 +182,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
-		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Shader = RenderingManager::NoOutline;
 		box_Mat->Set("s_Diffuse", box_tex);
 		box_Mat->Set("s_Specular", noSpec);
 		box_Mat->Set("u_Shininess", 2.0f);
@@ -192,6 +192,63 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(Box);
 		RendererNames.push_back("Air_Enemy");
 	}
+
+	//model for player hands
+	{
+		Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
+		ShaderMaterial::sptr handMat = ShaderMaterial::Create();
+		handMat->Shader = RenderingManager::BaseShader;
+		handMat->Set("s_Diffuse", hand);
+		handMat->Set("s_Specular", noSpec);
+		handMat->Set("u_Shininess", 1.0f);
+		handMat->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		RendererComponent hands;
+		hands.SetMesh(vao).SetMaterial(handMat);
+		Renderers.push_back(hands);
+		RendererNames.push_back("hands");
+	}
+
+	{
+		Texture2D::sptr hpBar = Texture2D::LoadFromFile("image/HP_FULL.png");
+		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr HP = ShaderMaterial::Create();
+		HP->Shader = RenderingManager::UIShader;
+		HP->Set("s_Diffuse", hpBar);
+		HP->Set("s_Specular", hpBar);
+		HP->Set("u_Shininess", 2.0f);
+		HP->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(HP).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("hpBar");
+	}
+
+	{
+
+		Texture2D::sptr menu = Texture2D::LoadFromFile("image/deathscreen.png");
+
+	
+		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr HP = ShaderMaterial::Create();
+		HP->Shader = RenderingManager::UIShader;
+		HP->Set("s_Diffuse", menu);
+		HP->Set("s_Specular", menu);
+		HP->Set("u_Shininess", 2.0f);
+		HP->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(HP).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("DeathScreen");
+
+	}
+
+
+
 }
 RendererComponent& AssetLoader::GetRendererFromStr(std::string name)
 {
