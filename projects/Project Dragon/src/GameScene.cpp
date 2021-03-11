@@ -112,9 +112,22 @@ void MainGameScene::InitGameScene()
 		r = AssetLoader::GetRendererFromStr("hpBar");
 	}
 
+	/*
+	* I can't have nice things this is broken :(
+	GameObject Crosshair = scene->CreateEntity("Crosshair");
+	{
+		RendererComponent& r = Crosshair.emplace<RendererComponent>();
+
+		UI& ui = Crosshair.emplace<UI>();
+		ui.offset = glm::vec2(0, -0.2);
+		ui.scale = glm::vec2(0.1, 0.1);
+		r = AssetLoader::GetRendererFromStr("crosshair");
+	}
+	
+	*/
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
-		RightHand.get<Transform>().SetLocalPosition(1, -1, 0).SetLocalRotation(-90, 0, 0);
+		RightHand.get<Transform>().SetLocalPosition(1.5, -1, 0).SetLocalRotation(-90, 0, 0);
 		RightHand.get<Transform>().SetParent(cameraObject);
 
 		
@@ -123,7 +136,7 @@ void MainGameScene::InitGameScene()
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
-		LeftHand.get<Transform>().SetLocalPosition(-1, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
+		LeftHand.get<Transform>().SetLocalPosition(-1.5, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
 		LeftHand.get<Transform>().SetParent(cameraObject);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
 		LeftHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");

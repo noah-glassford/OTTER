@@ -225,6 +225,25 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(hp);
 		RendererNames.push_back("hpBar");
 	}
+	//crosshairs
+	{
+		Texture2D::sptr hpBar = Texture2D::LoadFromFile("image/crosshair.png");
+		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr HP = ShaderMaterial::Create();
+		HP->Shader = RenderingManager::UIShader;
+		HP->Set("s_Diffuse", hpBar);
+		HP->Set("s_Specular", hpBar);
+		HP->Set("u_Shininess", 2.0f);
+		HP->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(HP).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("crosshair");
+	}
+
+	
 
 	{
 
