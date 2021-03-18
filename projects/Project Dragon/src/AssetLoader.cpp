@@ -10,7 +10,7 @@ std::vector<GameObject> AssetLoader::GameObjects;
 void AssetLoader::Init() //doing it manually because, actually I don't know why
 {
 	//basic floor tile
-	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
+	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj", glm::vec4(1,1,1,1));
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
 	Texture2D::sptr test = Texture2D::LoadFromFile("image/wall.png");
 	Texture2D::sptr Wall_Normal = Texture2D::LoadFromFile("image/Wall_Normal_Map.png");
