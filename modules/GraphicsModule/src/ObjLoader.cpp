@@ -9,7 +9,7 @@
 #include "StringUtils.h"
 
 VertexArrayObject::sptr ObjLoader::LoadFromFile(const std::string& filename, const glm::vec4& inColor)
-{	
+{
 	// Open our file in binary mode
 	std::ifstream file;
 	file.open(filename, std::ios::binary);
@@ -33,7 +33,7 @@ VertexArrayObject::sptr ObjLoader::LoadFromFile(const std::string& filename, con
 	// Temporaries for loading data
 	glm::vec3 temp;
 	glm::ivec3 vertexIndices;
-	
+
 	std::string line;
 	// Iterate as long as there is content to read
 	while (file.peek() != EOF) {
@@ -60,7 +60,7 @@ VertexArrayObject::sptr ObjLoader::LoadFromFile(const std::string& filename, con
 			// Read the entire line, trim it, and stuff it into a string stream
 			std::string line;
 			std::getline(file, line);
-			trim(line);			
+			trim(line);
 			std::stringstream stream = std::stringstream(line);
 
 			// We'll store the edges in case we added a quad
@@ -105,7 +105,8 @@ VertexArrayObject::sptr ObjLoader::LoadFromFile(const std::string& filename, con
 						// Add index to mesh, and add to edges list for if we are using quads
 						edges[ix] = index;
 					}
-				} else {
+				}
+				else {
 					break;
 				}
 			}
@@ -224,11 +225,9 @@ Frame ObjLoader::LoadFrame(std::string filename, glm::vec4 col)
 				{
 					counter = 0;
 				}
-
 			}
 		}
 	}
-
 
 	//this actually hurts
 	//vbo needs a float array, managing an array is more annoying than a vector
@@ -274,7 +273,6 @@ Frame ObjLoader::LoadFrame(std::string filename, glm::vec4 col)
 		uvs.push_back(vertex_texture[Tex_Ind[i] - 1].y);
 	}
 
-
 	frame.m_Pos = VertexBuffer::Create();
 	frame.m_Col = VertexBuffer::Create();
 	frame.m_Normal = VertexBuffer::Create();
@@ -287,5 +285,4 @@ Frame ObjLoader::LoadFrame(std::string filename, glm::vec4 col)
 	frame.m_UV->LoadData(uvs.data(), uvs.size());
 
 	return frame;
-
 }
