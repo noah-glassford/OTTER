@@ -5,6 +5,8 @@
 #include <BtToGlm.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <Enemy.h>
+#include <InstantiatingSystem.h>
 
 btDiscreteDynamicsWorld* PhysicsSystem::m_World;
 
@@ -95,11 +97,99 @@ void PhysicsSystem::ClearWorld()
 		m_World->removeRigidBody(m_bodies[i]);
 }
 
-bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1, const btCollisionObjectWrapper* obj2, int id2, int index2)
-{
-	//std::cout << "Collision\n";
+//idk this probably works or smth
+bool hitByFireProj = false;
 
+bool callbackFunc(btManifoldPoint& cp, const btCollisionObjectWrapper* obj1, int id1, int index1,  const btCollisionObjectWrapper* obj2, int id2, int index2)
+{
+	entt::registry& reg = RenderingManager::activeScene->Registry();
+	//for direct hit with fire attack
+	if (obj1->getCollisionObject()->getUserIndex() == 3 && obj2->getCollisionObject()->getUserIndex() == 2)
+	{	
+			
+		
+		
+			
+			
+			reg.get<Enemy>((entt::entity)obj2->getCollisionObject()->getUserIndex3()).m_hp -= 1;
+			
+
+
+		
+	}
+	if (obj2->getCollisionObject()->getUserIndex() == 3 && obj1->getCollisionObject()->getUserIndex() == 2)
+	{
+		
 	
+		
+	
+
+		reg.get<Enemy>((entt::entity)obj1->getCollisionObject()->getUserIndex3()).m_hp -= 1;
+	}
+
+	//Fire attack explosion
+	//this gets called whenever the fire attack projectile hits anything
+	if (obj1->getCollisionObject()->getUserIndex() == 3)
+	{
+		//loop through all the bodies in the world
+		for (int i = 0; i < PhysicsSystem::m_bodies.size(); i++)
+		{
+			//we are only interested in bodies that are enemies
+			if (PhysicsSystem::m_bodies[i]->getUserIndex() == 2)
+			{
+				//now that we have it narrowed down to our enemies we can do more computationally expensive stuff
+				//set the positions
+				btVector3 ProjectilePosition, enemyPosition;
+				//due to the way collision call backs work we have to run this twice because it is equally likely the projectile is obj1 or obj2
+				ProjectilePosition = obj1->getWorldTransform().getOrigin();
+				enemyPosition = PhysicsSystem::m_bodies[i]->getCenterOfMassTransform().getOrigin();
+			
+				btVector3 Diff;
+				Diff = ProjectilePosition - enemyPosition;
+				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
+				if (length < 10.f)
+				{
+					
+					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
+						reg.get<Enemy>((entt::entity)PhysicsSystem::m_bodies[i]->getUserIndex3()).m_hp -= 5;
+					
+				}
+			}
+			
+		}
+		reg.destroy((entt::entity)obj2->getCollisionObject()->getUserIndex3());
+	}
+	if (obj2->getCollisionObject()->getUserIndex() == 3)
+	{
+		//loop through all the bodies in the world
+		for (int i = 0; i < PhysicsSystem::m_bodies.size(); i++)
+		{
+			//we are only interested in bodies that are enemies
+			if (PhysicsSystem::m_bodies[i]->getUserIndex() == 2)
+			{
+				//now that we have it narrowed down to our enemies we can do more computationally expensive stuff
+				//set the positions
+				btVector3 ProjectilePosition, enemyPosition;
+				//due to the way collision call backs work we have to run this twice because it is equally likely the projectile is obj1 or obj2
+				ProjectilePosition = obj2->getWorldTransform().getOrigin();
+				enemyPosition = PhysicsSystem::m_bodies[i]->getCenterOfMassTransform().getOrigin();
+				
+
+				btVector3 Diff;
+				Diff = ProjectilePosition - enemyPosition;
+				float length = glm::length(BtToGlm::BTTOGLMV3(Diff));
+				if (length < 10.f)
+				{
+					
+					if (PhysicsSystem::m_bodies[i]->getUserIndex2() == 2)
+						reg.get<Enemy>((entt::entity)PhysicsSystem::m_bodies[i]->getUserIndex3()).m_hp -= 5;
+				}
+			}	
+		}
+		reg.destroy((entt::entity)obj2->getCollisionObject()->getUserIndex3());
+		
+	}
+
 	return false;
 }
 

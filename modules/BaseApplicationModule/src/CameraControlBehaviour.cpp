@@ -31,6 +31,15 @@ void CameraControlBehaviour::Update(entt::handle entity)
 
 		_rotationX += static_cast<float>(mx - _prevMouseX) * 0.5f;
 		_rotationY += static_cast<float>(my - _prevMouseY) * 0.3f;
+		if (_rotationY > 0.f)
+		{
+			_rotationY = 0.f;
+		}
+		if (_rotationY < -180.f)
+		{
+			_rotationY = -180.f;
+		}
+
 		glm::quat rotX = glm::angleAxis(glm::radians(-_rotationX), glm::vec3(0, 0, 1));
 		glm::quat rotY = glm::angleAxis(glm::radians(-_rotationY), glm::vec3(1, 0, 0));
 		transform.SetLocalRotation(rotX * rotY);

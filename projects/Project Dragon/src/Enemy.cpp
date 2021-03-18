@@ -4,10 +4,10 @@
 #include <BtToGlm.h>
 #include <Player.h>
 
-#include <iostream>
+
+
 void Enemy::Update(PhysicsBody m_This)
 {
-	
 
 	mTimer += Timer::dt;
 
@@ -51,17 +51,17 @@ void Enemy::Update(PhysicsBody m_This)
 				movementDirection.x = 1;
 			}
 			else movementDirection.x = -1;
-			if (thisPosition.getZ() < playerPosition.getZ()) {
-				movementDirection.z = 1;
+			if (thisPosition.getY() < playerPosition.getY()) {
+				movementDirection.y = 1;
 			}
-			else movementDirection.z = -1;
+			else movementDirection.y = -1;
 		}
 		//std::cout << "\nX: " << distance.getX() << "\nY: " << distance.getY() << "\nZ: " << distance.getZ() << "\n\n";
 		distanceNorm = sqrtf(distance.getX() + distance.getY() + distance.getZ());
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
 	//uncomment this to make it move again
-	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, 0, movementDirection.z * m_MovementSpeed));
+	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,-30.f));
 
 
 	//check if player should take damage
@@ -74,13 +74,13 @@ void Enemy::Update(PhysicsBody m_This)
 	{
 		if (canBeHit)
 		{
-			/*
+			
 			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
-			player.SetHp(player.GetPlayerData().m_HP - 1);
+			player.m_Hp--;
 			canBeHit = false;
 			HitTimer = 0.f;
-			player.PlayDamageSound();
-			*/
+			//player.PlayDamageSound();
+			
 		}
 	}
 
@@ -93,3 +93,4 @@ void Enemy::Update(PhysicsBody m_This)
 	
 
 }
+

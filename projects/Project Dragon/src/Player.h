@@ -6,12 +6,12 @@
 class Weapon
 {
 public:
-	void Update() { m_Timer += Timer::dt; if (m_Timer > m_FireDelay) CanShoot = true; else CanShoot = false; };
+	virtual void Update() { m_Timer += Timer::dt; if (m_Timer > m_FireDelay) m_CanShoot = true; else m_CanShoot = false; };
 	virtual bool Fire();
 	bool m_FireDelay;
 	float m_Timer;
 	float m_Damage;
-	bool CanShoot;
+	bool m_CanShoot;
 };
 
 class FireWeapon : public Weapon
@@ -34,6 +34,7 @@ public:
 class EarthWeapon : public Weapon
 {
 public:
+	void Update() override;
 	bool Fire() override;
 };
 class Player
@@ -43,9 +44,9 @@ public:
 	void Update();
 	void SwitchLeftHand();
 	void SwitchRightHand();
-	void LeftHandShoot();
-	void RightHandShoot();
-	int m_Hp;
+	bool LeftHandShoot();
+	bool RightHandShoot();
+	int m_Hp = 5;
 	std::vector<Weapon*> m_LeftHandWeapons;
 	std::vector<Weapon*> m_RightHandWeapons;
 	bool m_LeftEquiped;

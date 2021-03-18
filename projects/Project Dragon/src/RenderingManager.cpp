@@ -10,10 +10,25 @@
 #include <AudioEngine.h>
 #include <Bloom.h>
 #include <LightSource.h>
+
+#include <UI.h>
+#include <Interpolation.h>
+#include <PhysicsSystem.h>
+#include <CameraControlBehaviour.h>
+#include <WorldBuilderV2.h>
+#include <UniformBuffer.h>
+#include <DirectionalLight.h>
+#include <GLM/gtc/matrix_transform.hpp>
+#include <SkinnedMesh.h>
+
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
+Shader::sptr RenderingManager::UIShader = NULL;
+Shader::sptr RenderingManager::simpleDepthShader = NULL;
+Shader::sptr RenderingManager::BoneAnimShader = NULL;
+	
 GameScene::sptr RenderingManager::activeScene;
 
 bool ShouldBloom;
@@ -23,7 +38,6 @@ float Threshold;
 
 void RenderingManager::Init()
 {
-
 	// GL states
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
@@ -33,18 +47,46 @@ void RenderingManager::Init()
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/Multiple_Light_Outline.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
 	BaseShader->Link();
 
 	NoOutline = Shader::Create();
 	//First we initialize our shaders
 	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	NoOutline->LoadShaderPartFromFile("shader/Multiple_Light_NoOutline.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
+
+	simpleDepthShader = Shader::Create();
+	//First we initialize our shaders
+	simpleDepthShader->LoadShaderPartFromFile("shader/simple_depth_vert.glsl", GL_VERTEX_SHADER);
+	simpleDepthShader->LoadShaderPartFromFile("shader/simple_depth_frag.glsl", GL_FRAGMENT_SHADER);
+	simpleDepthShader->Link();
+
+	//For animated models only
+	BoneAnimShader = Shader::Create();
+	//First we initialize our shaders
+	BoneAnimShader->LoadShaderPartFromFile("shader/skinned_vertex_shader.glsl", GL_VERTEX_SHADER);
+	BoneAnimShader->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
+	BoneAnimShader->Link();
+
+	
+
+	UIShader = Shader::Create();
+	UIShader->LoadShaderPartFromFile("shader/ui_vert.glsl", GL_VERTEX_SHADER);
+	UIShader->LoadShaderPartFromFile("shader/ui_frag.glsl", GL_FRAGMENT_SHADER);
+	UIShader->Link();
+	UIShader->SetUniform("u_Scale", glm::vec2(1, 0.1));
+	UIShader->SetUniform("u_Offset", glm::vec2(0, 0));
 
 	BaseShader->SetUniform("u_LightAttenuationConstant", 1.f);
 	BaseShader->SetUniform("u_LightAttenuationLinear", 0.08f);
 	BaseShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+	BoneAnimShader->SetUniform("u_LightAttenuationConstant", 1.f);
+	BoneAnimShader->SetUniform("u_LightAttenuationLinear", 0.08f);
+	BoneAnimShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+
 
 	//init attenuation
 	NoOutline->SetUniform("u_LightAttenuationConstant", 1.f);
@@ -52,17 +94,9 @@ void RenderingManager::Init()
 	NoOutline->SetUniform("u_LightAttenuationQuadratic", 0.032f);
 
 
-	//initialize primary fragment shader DirLight & spotlight
-	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
-	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
-	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	
 
-	//initialize primary fragment shader DirLight & spotlight
-	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
-	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.5f, 0.5f, 0.5f));
-	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
 	
 
 	//creates some IMGUI sliders
@@ -87,14 +121,18 @@ void RenderingManager::Init()
 }
 bool DeathSoundPlayed = false;
 int LightCount;
+int enemyCount = 0;
 void RenderingManager::Render()
 {
-	
-	
+	//Framebuffer* shadowBuf = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
+	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
+	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
 
-	//greyscale->Clear();
 
-
+	postEffect->Clear();
+	bloomEffect->Clear();
+	colEffect->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -106,11 +144,24 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	glm::mat4 lightProjectionMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -30.0f, 30.0f);
+	
+		DirectionalLight& sun = activeScene->FindFirst("SUN").get<DirectionalLight>();
+		glm::vec3 LightDirection = sun._lightDirection;
+		glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(LightDirection), glm::vec3(), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 lightSpaceViewProj = lightProjectionMatrix * lightViewMatrix;
+	
+
+	enemyCount = 0;
 	// Update all world enemies for this frame
-	activeScene->Registry().view<Enemy, PhysicsBody>().each([](entt::entity entity, Enemy& e, PhysicsBody& p) {
+	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
+		enemyCount++;
 		e.Update(p);
-		if (e.m_hp <= 0)
+		if (e.m_hp <= 0.f)
 		{
+			activeScene->Registry().destroy(entity);
+
+			//t.SetLocalPosition(0,0,-1000);
 			//play temp death sound
 			//Placeholder shoot sfx
 			AudioEngine& engine = AudioEngine::Instance();
@@ -121,11 +172,13 @@ void RenderingManager::Render()
 				DeathSoundPlayed = true;
 				tempEnDeath.Play();
 			}
-			btTransform t;
-			t.setOrigin(btVector3(0, 0, -1000));
-			p.GetBody()->setCenterOfMassTransform(t);
+			
+
+			
 		}
+
 		});
+	
 	LightCount = 0;
 	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
 		
@@ -192,36 +245,109 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
+
+
+	//sets the scale for player HP Bar
+	if(BackendHandler::m_ActiveScene == 1)
+	{
+		float t2 = 0.2 * activeScene->FindFirst("Camera").get<Player>().m_Hp;
+
 	
 
+		float scaleX = Interpolation::LERP(0, 1, t2);
+
+		activeScene->FindFirst("PlayerHPBar").get<UI>().scale = glm::vec2(scaleX, 1);
+	}
+
+	activeScene->Registry().view<Transform, UI, RendererComponent>().each([](entt::entity entity, Transform& t, UI& ui, RendererComponent& rc)
+		{
+			UIShader->SetUniform("u_Scale", ui.scale);
+			UIShader->SetUniform("u_Offset", ui.offset);
+		});
+
+
+	postEffect->BindBuffer(0);
+
+
+	//firstly render gltf animations
+	/*
+	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t ) {
+		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
+		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
+		glm::mat4 viewProjection = projection * view;
+
+		//goes through everuthing in the loaded mesh, then draws it
+		for (auto const mesh : m.GetLoadedMeshes())
+		{
+			int skinIndex = mesh.second.m_associatedSkin;
+			if (m.GetSkinData().count(skinIndex))
+			{
+				m.GetSkinData()[skinIndex].RecalculateJoints();
+				BoneAnimShader->SetUniformMatrix(BoneAnimShader->GetUniformLocation("u_JointMatrices"),
+					m.GetSkinData()[skinIndex].m_jointMatrices.data(), 12, false);
+
+			}
+
+			for (int i = 0; i < mesh.second.m_primitives.size(); i++)
+			{
+				BackendHandler::SetupShaderForFrame(BoneAnimShader, view, projection);
+				BackendHandler::RenderVAO(BoneAnimShader, mesh.second.m_primitives[i], viewProjection, t);
+			}
+
+		}
+
+		});
+
+	*/
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
+		
 		if (current != renderer.Material->Shader) {
 			current = renderer.Material->Shader;
 			current->Bind();
 			BackendHandler::SetupShaderForFrame(current, view, projection);
 		}
+
 		// If the material has changed, apply it
 		if (currentMat != renderer.Material) {
 			currentMat = renderer.Material;
 			currentMat->Apply();
 		}
-		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
+
+		
+		//shadowBuf->BindDepthAsTexture(30);
+		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
 		});
 		
 		
+		
+	//shadowBuf->UnbindTexture(30);
 
+		postEffect->UnBindBuffer();
 
+		bloomEffect->ApplyEffect(postEffect);
+		bloomEffect->DrawToScreen();
+		colEffect->ApplyEffect(postEffect);
+		colEffect->DrawToScreen();
 
 		
-
 		BackendHandler::RenderImGui();
 
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
-	
+		std::cout << enemyCount << std::endl;
+		if (enemyCount <= 1 && BackendHandler::m_ActiveScene == 1)
+		{
+			activeScene->DeleteAllEnts();
+			PhysicsSystem::ClearWorld();
+			BackendHandler::m_Scenes[1]->InitGameScene();
+
+			
+		}
 
 
 	

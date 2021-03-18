@@ -37,6 +37,13 @@ public:
 		_deletionQueue.clear();
 	}
 
+	//to delete ALL entities in the reg
+	void DeleteAllEnts()
+	{
+		_registry.clear();
+	}
+
+
 	/// <summary>
 	/// Creates a new entity in the <i>to</i> registry, copying the components from the <i>src</i> entity in the from registry
 	/// </summary>

@@ -22,9 +22,9 @@ public:
 	
 	//apply to screen
 private:
-	float m_downscale = 2.f;
+	float m_downscale = 1.f;
 	float m_threshold = 0.01f;
-	unsigned m_passes = 20;
+	unsigned m_passes = 1;
 	glm::vec2 m_pixelSize;
 
 };

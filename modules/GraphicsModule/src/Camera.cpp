@@ -6,7 +6,7 @@ Camera::Camera() :
     _isOrtho(false),
 	_orthoHeight(1.0f),
 	_nearPlane(0.1f),
-	_farPlane(1000.0f),
+	_farPlane(500.0f),
 	_fovRadians(glm::radians(90.0f)),
 	_aspectRatio(1.0f),
 	_position(glm::vec3(0.0f)),

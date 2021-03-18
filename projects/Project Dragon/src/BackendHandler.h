@@ -8,6 +8,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <SceneBaseClass.h>
+
 #include <Transform.h>
 #include <VertexArrayObject.h>
 #include <Shader.h>
@@ -59,10 +61,18 @@ public:
 	static void RenderImGui();
 
 	//Render our VAO
+	static void RenderVAO(const Shader::sptr& shader, const VertexArrayObject::sptr& vao, const glm::mat4& viewProjection, const Transform& transform, const glm::mat4& lightSpaceMat);
+
 	static void RenderVAO(const Shader::sptr& shader, const VertexArrayObject::sptr& vao, const glm::mat4& viewProjection, const Transform& transform);
 	static void SetupShaderForFrame(const Shader::sptr& shader, const glm::mat4& view, const glm::mat4& projection);
 
 	static GLFWwindow* window;
-	static std::vector<std::function<void()>> imGuiCallbacks;	
+	static std::vector<std::function<void()>> imGuiCallbacks;
+
+	//stores the scenes
+	static std::vector<SceneBase*> m_Scenes;
+
+	//Keeps track of active scene
+	static int m_ActiveScene;
 	
 };

@@ -3,7 +3,7 @@
 #include <Scene.h>
 #include <RenderingManager.h>
 #include <InstantiatingSystem.h>
-
+#include <random>
 class WorldBuilderV2
 {
 public:
@@ -16,6 +16,9 @@ public:
 
 	//TrueFalse data for the world || helps track if there is already a tile placed on a location
 	int WorldData[25][25];
+
+	//	--	 Use this for changine the node size, will update the world get		-- //
+	int nodeSize = 40;
 
 	//
 	// Entry and Exit Points:
@@ -37,4 +40,9 @@ public:
 	void FillWorldData();
 	//Fills the world reletive to the data collected in FillWorldData()
 	void GenerateTiles();
+	//	WIP
+	//		Populate the world with enemies (fills the currentEnemy variable)
+	//  WIP
+	void PopulateWorld(int dificulty);
+	//Dificualy - 1 is normal, scale off of that
 };
