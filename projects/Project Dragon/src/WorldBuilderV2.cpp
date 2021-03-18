@@ -117,8 +117,8 @@ void WorldBuilderV2::GenerateTiles()
 	//
 	//	TEMP -- Builds the world of empty tiles -- TEMP
 	//
-	for (int x = 0; x < 25; x++) {
-		for (int y = 0; y < 25; y++) {
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
 			if (WorldData[x][y] > 0) {
 				//Floor
 
@@ -182,8 +182,8 @@ void WorldBuilderV2::GenerateTiles()
 int enCount;
 void WorldBuilderV2::PopulateWorld(int dificulty)
 {
-	for (int x = 0; x < 25; x++) {
-		for (int y = 0; y < 25; y++) {	//Read through the world data Array
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {	//Read through the world data Array
 			if (WorldData[x][y] > 0) {	//Find spawned floors and spawn eneies in them
 				int RandEnemyType = rand() % 16;
 				if (RandEnemyType == 0) {
@@ -197,7 +197,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
 						e.m_hp = 25.f;
-						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(2, 2, 2), 3.f);
+						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(5, 5, 5), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(0);
@@ -216,7 +216,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
 						e.m_hp = 25.f;
-						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(2, 2, 5), 3.f);
+						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(4, 4, 5), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(2);
@@ -235,7 +235,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
 						e.m_hp = 25.f;
-						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(2, 2, 2), 3.f);
+						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(4, 4, 4), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(1);
@@ -253,7 +253,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
 						e.m_hp = 25.f;
-						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(2, 2, 2), 3.f);
+						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(4, 4, 4), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(3);

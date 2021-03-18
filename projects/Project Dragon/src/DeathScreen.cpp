@@ -91,15 +91,6 @@ void DeathSceen::InitGameScene()
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 	
-	int shadowWidth = 1024;
-	int shadowHeight = 1024;
 
-	Framebuffer* shadowBuffer;
-	GameObject shadowBufferObj = scene->CreateEntity("Shadow Buffer");
-	{
-		shadowBuffer = &shadowBufferObj.emplace<Framebuffer>();
-		shadowBuffer->AddDepthTarget();
-		shadowBuffer->Init(shadowWidth, shadowHeight);
-	}
 
 }

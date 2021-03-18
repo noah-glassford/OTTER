@@ -15,5 +15,7 @@ public:
 	static Shader::sptr AnimationShader;
 	static Shader::sptr UIShader;
 	static Shader::sptr simpleDepthShader;
+	static Shader::sptr BoneAnimShader;
+
 	static GameScene::sptr activeScene; //keeps track of the active scene
 };

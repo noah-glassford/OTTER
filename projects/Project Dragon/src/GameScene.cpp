@@ -15,6 +15,7 @@
 #include <UI.h>
 #include <DirectionalLight.h>
 #include <UniformBuffer.h>
+#include <SkinnedMesh.h>
 
 void MainGameScene::InitGameScene()
 {
@@ -156,8 +157,11 @@ void MainGameScene::InitGameScene()
 	{
 		LeftHand.get<Transform>().SetLocalPosition(-1.5, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
 		LeftHand.get<Transform>().SetParent(cameraObject);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
-		LeftHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
+		//load a gltf skinned mesh and emplace it
+		GLTFSkinnedMesh& mesh = LeftHand.emplace<GLTFSkinnedMesh>();
+		mesh.LoadFromFile("models/character/hand/hand_attack.glb");
+		mesh.SetLooping(true);
+
 	}
 
 	GameObject obj4 = scene->CreateEntity("Barrel");
@@ -225,18 +229,6 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserPointer((void*)&e);
 	}
 	
-	int shadowWidth = 1024;
-	int shadowHeight = 1024;
-
-	//frameBuffer for shadows
-	Framebuffer* shadowBuffer;
-	GameObject shadowBufferObj = scene->CreateEntity("Shadow Buffer");
-	{
-		shadowBuffer = &shadowBufferObj.emplace<Framebuffer>();
-		shadowBuffer->AddDepthTarget();
-		shadowBuffer->Init(shadowWidth, shadowHeight);
-	}
-
 
 	
 	BloomEffect* bloom;

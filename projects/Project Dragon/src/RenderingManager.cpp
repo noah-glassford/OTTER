@@ -19,14 +19,15 @@
 #include <UniformBuffer.h>
 #include <DirectionalLight.h>
 #include <GLM/gtc/matrix_transform.hpp>
+#include <SkinnedMesh.h>
 
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
-Shader::sptr RenderingManager::AnimationShader = NULL;
 Shader::sptr RenderingManager::UIShader = NULL;
 Shader::sptr RenderingManager::simpleDepthShader = NULL;
+Shader::sptr RenderingManager::BoneAnimShader = NULL;
 	
 GameScene::sptr RenderingManager::activeScene;
 
@@ -61,6 +62,13 @@ void RenderingManager::Init()
 	simpleDepthShader->LoadShaderPartFromFile("shader/simple_depth_frag.glsl", GL_FRAGMENT_SHADER);
 	simpleDepthShader->Link();
 
+	//For animated models only
+	BoneAnimShader = Shader::Create();
+	//First we initialize our shaders
+	BoneAnimShader->LoadShaderPartFromFile("shader/skinned_vertex_shader.glsl", GL_VERTEX_SHADER);
+	BoneAnimShader->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
+	BoneAnimShader->Link();
+
 	
 
 	UIShader = Shader::Create();
@@ -73,6 +81,10 @@ void RenderingManager::Init()
 	BaseShader->SetUniform("u_LightAttenuationConstant", 1.f);
 	BaseShader->SetUniform("u_LightAttenuationLinear", 0.08f);
 	BaseShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
+
+	BoneAnimShader->SetUniform("u_LightAttenuationConstant", 1.f);
+	BoneAnimShader->SetUniform("u_LightAttenuationLinear", 0.08f);
+	BoneAnimShader->SetUniform("u_LightAttenuationQuadratic", 0.032f);
 
 
 
@@ -112,7 +124,7 @@ int LightCount;
 int enemyCount = 0;
 void RenderingManager::Render()
 {
-	Framebuffer* shadowBuf = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
+	//Framebuffer* shadowBuf = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
@@ -121,7 +133,6 @@ void RenderingManager::Render()
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
-	shadowBuf->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -233,22 +244,6 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
-	int width;
-	int height;
-	glfwGetWindowSize(BackendHandler::window, &width, &height);
-	//set the viewport
-	glViewport(0, 0, width, height);
-	shadowBuf->Bind();
-	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
-		
-		BackendHandler::RenderVAO(simpleDepthShader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
-		});
-	shadowBuf->Unbind();
-
-
-
-	glfwGetWindowSize(BackendHandler::window, &width, &height);
-	glViewport(0, 0, width, height);
 
 
 	//sets the scale for player HP Bar
@@ -273,6 +268,16 @@ void RenderingManager::Render()
 	postEffect->BindBuffer(0);
 
 
+	//firstly render gltf animations
+	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t) {
+		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
+		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
+		glm::mat4 viewProjection = projection * view;
+		m.Draw(BoneAnimShader, viewProjection, (glm::mat4)t.LocalTransform());
+		});
+
 
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -291,13 +296,13 @@ void RenderingManager::Render()
 		}
 
 		
-		shadowBuf->BindDepthAsTexture(30);
+		//shadowBuf->BindDepthAsTexture(30);
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
 		});
 		
 		
 		
-	shadowBuf->UnbindTexture(30);
+	//shadowBuf->UnbindTexture(30);
 
 		postEffect->UnBindBuffer();
 
