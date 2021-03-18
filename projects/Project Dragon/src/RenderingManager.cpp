@@ -10,7 +10,7 @@
 #include <AudioEngine.h>
 #include <Bloom.h>
 #include <LightSource.h>
-#include <MorphAnimator.h>
+
 #include <UI.h>
 #include <Interpolation.h>
 #include <PhysicsSystem.h>
@@ -18,6 +18,7 @@
 #include <WorldBuilderV2.h>
 #include <UniformBuffer.h>
 #include <DirectionalLight.h>
+#include <GLM/gtc/matrix_transform.hpp>
 
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;

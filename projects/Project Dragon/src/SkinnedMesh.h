@@ -6,8 +6,8 @@
 #include <tiny_gltf.h>
 #include <GLM/glm.hpp>
 
-#include "Graphics/VertexArrayObject.h"
-#include "Graphics/Shader.h"
+#include <VertexArrayObject.h>
+#include <Shader.h>
 
 #include "SimpleTransform.h"
 

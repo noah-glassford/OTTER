@@ -2,7 +2,7 @@
 #include <ObjLoader.h>
 #include <RenderingManager.h>
 #include <Texture2D.h>
-#include <MorphAnimator.h>
+
 std::vector<std::string> AssetLoader::RendererNames;
 std::vector<RendererComponent> AssetLoader::Renderers;
 std::vector<std::string> AssetLoader::GameObjectNames;
