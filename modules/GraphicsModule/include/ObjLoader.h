@@ -12,7 +12,6 @@ class ObjLoader
 {
 public:
 	static VertexArrayObject::sptr LoadFromFile(const std::string& filename, const glm::vec4& inColor = glm::vec4(1.0f));
-	static Frame LoadFrame(std::string filename, glm::vec4 col);
 
 protected:
 	ObjLoader() = default;

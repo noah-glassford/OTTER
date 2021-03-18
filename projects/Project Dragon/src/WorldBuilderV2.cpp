@@ -126,24 +126,24 @@ void WorldBuilderV2::GenerateTiles()
 				int RandTile = rand() % 4;
 
 				if (RandTile == 0)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Blank_Floor_Tile.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Blank_Floor_Tile.node");
 				else if (RandTile == 1)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_1.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Node_1.node");
 				else if (RandTile == 2)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_2.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Node_2.node");
 				else if (RandTile == 3)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_3.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Node_3.node");
 
 				//places the camera properly
 				btTransform t;
 				t.setIdentity();
-				t.setOrigin(btVector3(x * 20.f, y * 20.f, 2.f));
+				t.setOrigin(btVector3(x * nodeSize, y * nodeSize, 2.f));
 				RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->setWorldTransform(t);
 
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 
 				//Roof
-				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
+				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, nodeSize)
 					, "node/Blank_Floor_Tile.node");
 
 				//
@@ -151,25 +151,25 @@ void WorldBuilderV2::GenerateTiles()
 				//
 
 				if (WorldData[x][y + 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) + 10, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) + (nodeSize / 2), nodeSize / 2)
 						, "node/Blank_Wall_Y.node");
 					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x][y - 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) - 10, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) - (nodeSize / 2), nodeSize / 2)
 						, "node/Blank_Wall_Y.node"); \
 						currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x + 1][y] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) + 10, y * 20, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * nodeSize) + (nodeSize / 2), y * nodeSize, nodeSize / 2)
 						, "node/Blank_Wall_X.node");
 					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x - 1][y] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) - 10, y * 20, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * nodeSize) - (nodeSize / 2), y * nodeSize, nodeSize / 2)
 						, "node/Blank_Wall_X.node");
 					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
@@ -196,7 +196,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
@@ -215,7 +215,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Earth_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 5), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
@@ -234,7 +234,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
@@ -252,7 +252,7 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Air_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-						e.m_hp = 5.f;
+						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer(&fe);
 						p.GetBody()->setUserIndex(2);
