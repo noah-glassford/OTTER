@@ -35,7 +35,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	RendererComponent Wall_Tile;
 	Wall_Tile.SetMaterial(Wall_Mat).SetMesh(plane);
 	Renderers.push_back(Wall_Tile);
-	RendererNames.push_back("Wall");	
+	RendererNames.push_back("Wall");
 
 	//Water Proj
 	VertexArrayObject::sptr Ice_Mesh = ObjLoader::LoadFromFile("model/Ice projectile.obj");
@@ -244,13 +244,9 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		RendererNames.push_back("crosshair");
 	}
 
-	
-
 	{
-
 		Texture2D::sptr menu = Texture2D::LoadFromFile("image/deathscreen.png");
 
-	
 		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		//Material for menu
 		ShaderMaterial::sptr HP = ShaderMaterial::Create();
@@ -264,7 +260,6 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		hp.SetMaterial(HP).SetMesh(vao);
 		Renderers.push_back(hp);
 		RendererNames.push_back("DeathScreen");
-
 	}
 
 	{
@@ -321,7 +316,6 @@ Mesh& AssetLoader::GetMeshFromStr(std::string name)
 		}
 	}
 	return m_Meshes[0];
-
 }
 
 Material& AssetLoader::GetMatFromStr(std::string name)

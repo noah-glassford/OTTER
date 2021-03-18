@@ -17,6 +17,9 @@ public:
 	//TrueFalse data for the world || helps track if there is already a tile placed on a location
 	int WorldData[25][25];
 
+	//	--	 Use this for changine the node size, will update the world get		-- //
+	int nodeSize = 40;
+
 	//
 	// Entry and Exit Points:
 	//		0 = Top | 1 = Bottom | 2 = Right | 3 = Left | 4 = Null

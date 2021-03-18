@@ -126,50 +126,50 @@ void WorldBuilderV2::GenerateTiles()
 				int RandTile = rand() % 4;
 
 				if (RandTile == 0)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Blank_Floor_Tile.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Blank_Floor_Tile.node");
 				else if (RandTile == 1)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_1.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Node_1.node");
 				else if (RandTile == 2)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_2.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Node_2.node");
 				else if (RandTile == 3)
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 0), "node/Node_3.node");
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, 0), "node/Node_3.node");
 
 				//places the camera properly
 				btTransform t;
 				t.setIdentity();
-				t.setOrigin(btVector3(x * 20.f, y * 20.f, 2.f));
+				t.setOrigin(btVector3(x * nodeSize, y * nodeSize, 2.f));
 				RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->setWorldTransform(t);
 
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 
 				//Roof
-			//	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
-					//, "node/Blank_Floor_Tile.node");
+				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, y * nodeSize, nodeSize)
+					, "node/Blank_Floor_Tile.node");
 
 				//
 				// Exterior Walls
 				//
 
 				if (WorldData[x][y + 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) + 10, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) + (nodeSize / 2), nodeSize / 2)
 						, "node/Blank_Wall_Y.node");
 					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x][y - 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, (y * 20) - 10, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) - (nodeSize / 2), nodeSize / 2)
 						, "node/Blank_Wall_Y.node"); \
 						currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x + 1][y] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) + 10, y * 20, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * nodeSize) + (nodeSize / 2), y * nodeSize, nodeSize / 2)
 						, "node/Blank_Wall_X.node");
 					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
 
 				if (WorldData[x - 1][y] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * 20) - 10, y * 20, 10)
+					InstantiatingSystem::LoadPrefabFromFile(glm::vec3((x * nodeSize) - (nodeSize / 2), y * nodeSize, nodeSize / 2)
 						, "node/Blank_Wall_X.node");
 					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 				}
