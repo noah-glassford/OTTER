@@ -27,6 +27,8 @@ public:
 		_gameObject(gameObject),
 		_hierarchyDepth(0)
 	{}
+
+	//std::vector<Transform*> m_children;
 	Transform(const Transform& other) = default;
 	Transform(Transform&& other) = default;
 	Transform& operator =(const Transform & other) = default;
@@ -84,7 +86,19 @@ public:
 	/// <param name="z">The z coordinate in local space</param>
 	/// <returns>A pointer to this, to allow for chaining. DO NOT STORE POINTER!</returns>
 	Transform& SetLocalPosition(float x, float y, float z);
+	/*
+	  void UpdateGlobalTransform(glm::mat4 parentTransform)
+    {
+        glm::mat4 localTransform = _localTransform;
 
+		_worldTransform = parentTransform * localTransform;
+
+        for (Transform* child : m_children)
+        {
+            child->UpdateGlobalTransform(_worldTransform);
+        }
+    }
+	*/
 	// Scale Getters/Setters
 
 	/// <summary>

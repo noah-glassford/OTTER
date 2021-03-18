@@ -14,6 +14,7 @@
 #include <IBehaviour.h>
 #include <CameraControlBehaviour.h>
 #include <UI.h>
+#include <DirectionalLight.h>
 void MainMenuScene::InitGameScene()
 {
 
@@ -93,6 +94,9 @@ void MainMenuScene::InitGameScene()
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 
-	
+	GameObject sunObj = scene->CreateEntity("SUN");
+	{
+		sunObj.emplace<DirectionalLight>();
+	}
 
 }

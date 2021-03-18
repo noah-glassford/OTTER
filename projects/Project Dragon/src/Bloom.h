@@ -24,7 +24,7 @@ public:
 private:
 	float m_downscale = 1.f;
 	float m_threshold = 0.01f;
-	unsigned m_passes = 10;
+	unsigned m_passes = 1;
 	glm::vec2 m_pixelSize;
 
 };

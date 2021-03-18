@@ -14,6 +14,7 @@
 #include <CameraControlBehaviour.h>
 #include <UI.h>
 #include <AssetLoader.h>
+#include <DirectionalLight.h>
 void DeathSceen::InitGameScene()
 {
 
@@ -91,6 +92,9 @@ void DeathSceen::InitGameScene()
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 	
-
+	GameObject sunObj = scene->CreateEntity("SUN");
+	{
+		sunObj.emplace<DirectionalLight>();
+	}
 
 }

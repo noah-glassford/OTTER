@@ -1,3 +1,4 @@
+/*
 #include "SkinnedMesh.h"
 
 VertexPosNormTexJointWeight* VPNTJW = nullptr;
@@ -105,7 +106,7 @@ bool GLTFSkinnedMesh::LoadFromFile(std::string const path)
 	return LoadNodes();
 }
 
-SimpleTransform* const GLTFSkinnedMesh::FindNodeSimpleTransform(int const nodeIndex) const
+Transform* const GLTFSkinnedMesh::FindNodeSimpleTransform(int const nodeIndex) const
 {
 	for (auto skinData : m_skinData)
 	{
@@ -234,7 +235,7 @@ bool GLTFSkinnedMesh::LoadSkin(int const skinIndex)
 		for (int i = 0; i < skin.joints.size(); i++)
 		{
 			int jointIndex = skin.joints[i];
-			SimpleTransform* transform = new SimpleTransform();
+			Transform* transform = new Transform();
 			CopyNodeLocalTransform(m_model.nodes[jointIndex], *transform);
 
 			skinData.m_transforms.emplace(jointIndex, transform);
@@ -438,7 +439,7 @@ T GLTFSkinnedMesh::SampleAnimationChannel(tinygltf::AnimationChannel& const chan
 	return (1.0f - t) * frame1 + t * frame2;
 }
 
-void GLTFSkinnedMesh::CopyNodeLocalTransform(tinygltf::Node& const node, SimpleTransform& transform)
+void GLTFSkinnedMesh::CopyNodeLocalTransform(tinygltf::Node& const node, Transform& transform)
 {
 	// Default Values
 	glm::vec3 position(0, 0, 0);
@@ -470,9 +471,9 @@ void GLTFSkinnedMesh::CopyNodeLocalTransform(tinygltf::Node& const node, SimpleT
 		}
 	}
 
-	transform.m_position = position;
-	transform.m_rotation = rotation;
-	transform.m_scale = scale;
+	transform.SetLocalPosition(position);
+	transform.SetLocalRotation(rotation);
+	transform.SetLocalScale(scale);
 }
 
 void GLTFSkinnedMesh::Draw(Shader::sptr& const shader, glm::mat4& const viewProjection, glm::mat4& const worldTransform)
@@ -538,7 +539,7 @@ void GLTFSkinnedMesh::UpdateAnimation(tinygltf::Animation& const animation, floa
 		tinygltf::AnimationChannel& const channel = animation.channels[i];
 
 		// Check if the target node exists
-		SimpleTransform* const transform = FindNodeSimpleTransform(channel.target_node);
+		Transform* const transform = FindNodeSimpleTransform(channel.target_node);
 
 		if (!transform)
 		{
@@ -549,19 +550,19 @@ void GLTFSkinnedMesh::UpdateAnimation(tinygltf::Animation& const animation, floa
 		{
 			glm::vec3 translation =
 				SampleAnimationChannel<glm::vec3>(channel, m_animationTime, animation, TINYGLTF_TYPE_VEC3);
-			transform->m_position = translation;
+			transform->SetLocalPosition(translation);
 		}
 		else if (channel.target_path == "rotation")
 		{
 			glm::vec4 rotation =
 				SampleAnimationChannel<glm::vec4>(channel, m_animationTime, animation, TINYGLTF_TYPE_VEC4);
-			transform->m_rotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
+			transform->SetLocalRotation( glm::quat(rotation.w, rotation.x, rotation.y, rotation.z));
 		}
 		else if (channel.target_path == "scale")
 		{
 			glm::vec3 scale =
 				SampleAnimationChannel<glm::vec3>(channel, m_animationTime, animation, TINYGLTF_TYPE_VEC3);
-			transform->m_scale = scale;
+			transform->SetLocalScale(scale);
 		}
 	}
 }
@@ -578,6 +579,7 @@ void GLTFSkinData::RecalculateJoints()
 	for (int i = 0; i < m_skin->joints.size(); i++)
 	{
 		int jointIndex = m_skin->joints[i];
-		m_jointMatrices[i] = (m_transforms[jointIndex]->m_globalTransform * m_inverseBindMatrices[i]);
+		m_jointMatrices[i] = (m_transforms[jointIndex]->WorldTransform() * m_inverseBindMatrices[i]);
 	}
 }
+*/

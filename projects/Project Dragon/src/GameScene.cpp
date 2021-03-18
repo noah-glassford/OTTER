@@ -157,10 +157,7 @@ void MainGameScene::InitGameScene()
 	{
 		LeftHand.get<Transform>().SetLocalPosition(-1.5, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
 		LeftHand.get<Transform>().SetParent(cameraObject);
-		//load a gltf skinned mesh and emplace it
-		GLTFSkinnedMesh& mesh = LeftHand.emplace<GLTFSkinnedMesh>();
-		mesh.LoadFromFile("models/character/hand/hand_attack.glb");
-		mesh.SetLooping(true);
+		LeftHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
 
 	}
 
