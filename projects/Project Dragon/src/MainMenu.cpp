@@ -2,6 +2,7 @@
 #include <Transform.h>
 #include <Camera.h>
 #include <RenderingManager.h>
+#include <AssetLoader.h>
 #include <Texture2D.h>
 #include <ObjLoader.h>
 #include <PhysicsBody.h>
@@ -23,15 +24,7 @@ void MainMenuScene::InitGameScene()
 	scene = GameScene::Create("GameScene");
 	RenderingManager::activeScene = scene;
 
-	Texture2D::sptr menu = Texture2D::LoadFromFile("image/MainMenu.png");
-	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
-	//Material for menu
-	ShaderMaterial::sptr Menu = ShaderMaterial::Create();
-	Menu->Shader = RenderingManager::UIShader;
-	Menu->Set("s_Diffuse", menu);
-	Menu->Set("s_Specular", menu);
-	Menu->Set("u_Shininess", 2.0f);
-	Menu->Set("u_TextureMix", 0.0f);
+	
 
 	GameObject cameraObject = scene->CreateEntity("Camera");
 	{
@@ -55,11 +48,12 @@ void MainMenuScene::InitGameScene()
 	GameObject UIObject = scene->CreateEntity("Menu");
 	{ 
 		RendererComponent& r = UIObject.emplace<RendererComponent>();
+		r = AssetLoader::GetRendererFromStr("MainMenu");
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
 		UI& ui = UIObject.emplace<UI>();
 		ui.offset = glm::vec2(0, 0);
 		ui.scale = glm::vec2(1, 1);
-		r.SetMaterial(Menu).SetMesh(vao);
+		
 	}
 	
 	//if these aren't here it crashes lmao
@@ -97,6 +91,17 @@ void MainMenuScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
+	}
+
+	int shadowWidth = 1024;
+	int shadowHeight = 1024;
+
+	Framebuffer* shadowBuffer;
+	GameObject shadowBufferObj = scene->CreateEntity("Shadow Buffer");
+	{
+		shadowBuffer = &shadowBufferObj.emplace<Framebuffer>();
+		shadowBuffer->AddDepthTarget();
+		shadowBuffer->Init(shadowWidth, shadowHeight);
 	}
 	
 

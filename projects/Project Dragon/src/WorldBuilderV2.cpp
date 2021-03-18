@@ -143,8 +143,8 @@ void WorldBuilderV2::GenerateTiles()
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 
 				//Roof
-				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
-					, "node/Blank_Floor_Tile.node");
+			//	InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
+					//, "node/Blank_Floor_Tile.node");
 
 				//
 				// Exterior Walls

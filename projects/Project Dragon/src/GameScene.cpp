@@ -13,6 +13,9 @@
 #include <LightSource.h>
 #include <MorphAnimator.h>
 #include <UI.h>
+#include <DirectionalLight.h>
+#include <UniformBuffer.h>
+
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -29,8 +32,8 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr EarthEnemy = Texture2D::LoadFromFile("image/earthenemytexture.png");
 	Texture2D::sptr Barrel = Texture2D::LoadFromFile("image/BARREL.png");
 	Texture2D::sptr FloorTexture = Texture2D::LoadFromFile("image/Stone_001_Diffuse.png");
-	//Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
-	//TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
+	Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
+	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
 
 	
 
@@ -125,6 +128,21 @@ void MainGameScene::InitGameScene()
 	}
 	
 	*/
+
+	//creates directional light gameobject
+	GameObject sunObj = scene->CreateEntity("SUN");
+	{
+		sunObj.emplace<DirectionalLight>();
+	}
+	GameObject sunBufferObj = scene->CreateEntity("SunBuffer");
+	{
+		UniformBuffer& sunBuf = sunBufferObj.emplace<UniformBuffer>();
+		sunBuf.AllocateMemory(sizeof(DirectionalLight));
+		sunBuf.SendData(reinterpret_cast<void*>(&sunObj.get<DirectionalLight>()), sizeof(DirectionalLight));
+		sunBuf.Bind(0);
+	}
+
+
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
 		RightHand.get<Transform>().SetLocalPosition(1.5, -1, 0).SetLocalRotation(-90, 0, 0);
@@ -207,6 +225,18 @@ void MainGameScene::InitGameScene()
 		p.GetBody()->setUserPointer((void*)&e);
 	}
 	
+	int shadowWidth = 1024;
+	int shadowHeight = 1024;
+
+	//frameBuffer for shadows
+	Framebuffer* shadowBuffer;
+	GameObject shadowBufferObj = scene->CreateEntity("Shadow Buffer");
+	{
+		shadowBuffer = &shadowBufferObj.emplace<Framebuffer>();
+		shadowBuffer->AddDepthTarget();
+		shadowBuffer->Init(shadowWidth, shadowHeight);
+	}
+
 
 	
 	BloomEffect* bloom;
@@ -244,6 +274,23 @@ void MainGameScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
+
+	ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
+	skyboxMat->Shader = RenderingManager::SkyBox;
+	skyboxMat->Set("s_Environment", environmentMap);
+	skyboxMat->Set("u_EnvironmentRotation", glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))));
+	skyboxMat->RenderLayer = 100;
+
+	//skybox
+	MeshBuilder<VertexPosNormTexCol> mesh;
+	MeshFactory::AddIcoSphere(mesh, glm::vec3(0.0f), 1.0f);
+	MeshFactory::InvertFaces(mesh);
+	VertexArrayObject::sptr meshVao = mesh.Bake();
+
+	GameObject skyboxObj = scene->CreateEntity("skybox");
+	skyboxObj.get<Transform>().SetLocalPosition(0.0f, 0.0f, 0.0f);
+	skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
+
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();

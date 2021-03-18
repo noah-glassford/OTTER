@@ -13,6 +13,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
 	Texture2D::sptr test = Texture2D::LoadFromFile("image/wall.png");
+	Texture2D::sptr Wall_Normal = Texture2D::LoadFromFile("image/Wall_Normal_Map.png");
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
 	Floor_Mat->Shader = RenderingManager::NoOutline;
@@ -28,7 +29,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	ShaderMaterial::sptr Wall_Mat = ShaderMaterial::Create();
 	Wall_Mat->Shader = RenderingManager::NoOutline;
 	Wall_Mat->Set("s_Diffuse", test);
-	Wall_Mat->Set("s_Specular", noSpec);
+	Wall_Mat->Set("s_Specular", test);
 	Wall_Mat->Set("u_Shininess", 2.0f);
 	Wall_Mat->Set("u_TextureMix", 0.0f);
 	RendererComponent Wall_Tile;
@@ -67,7 +68,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	//box
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/box.obj");
-		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/BARREL.png");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/box.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
 		box_Mat->Shader = RenderingManager::BaseShader;
@@ -99,7 +100,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	//Pillar
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/pillar.obj");
-		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/pillar.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
 		box_Mat->Shader = RenderingManager::BaseShader;
@@ -115,7 +116,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	//pillar broken
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/pillar broken.obj");
-		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/pillar.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
 		box_Mat->Shader = RenderingManager::BaseShader;
@@ -264,6 +265,23 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(hp);
 		RendererNames.push_back("DeathScreen");
 
+	}
+
+	{
+		Texture2D::sptr menu = Texture2D::LoadFromFile("image/MainMenu.png");
+		Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr Menu = ShaderMaterial::Create();
+		Menu->Shader = RenderingManager::UIShader;
+		Menu->Set("s_Diffuse", menu);
+		Menu->Set("s_Specular", menu);
+		Menu->Set("u_Shininess", 2.0f);
+		Menu->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(Menu).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("MainMenu");
 	}
 
 

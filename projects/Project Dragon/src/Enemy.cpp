@@ -76,7 +76,7 @@ void Enemy::Update(PhysicsBody m_This)
 		{
 			
 			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
-			player.m_Hp--;
+		//	player.m_Hp--;
 			canBeHit = false;
 			HitTimer = 0.f;
 			//player.PlayDamageSound();

@@ -73,82 +73,21 @@ void main() {
 	vec4 textureColor2 = texture(s_Diffuse2, inUV);
 	vec4 textureColor = mix(textureColor1, textureColor2, u_TextureMix);
 
-	if(u_Lightingtoggle == 1)
-	{
-	ambient = vec3(0,0,0);
-	diffuse = vec3(0,0,0);
-	specular = vec3(0,0,0);
-	}
-	if(u_Lightingtoggle == 2)
-	{
-	ambient = u_AmbientLightStrength * u_LightCol;
-	diffuse = vec3(0,0,0);
-	specular = vec3(0,0,0);
-	}
-	if(u_Lightingtoggle == 3)
-	{
-		ambient = vec3(0,0,0);
-		diffuse = vec3(0,0,0);
-		 diffuse = floor(diffuse * bands)*scaleFactor;
-
-		
-		if (u_TextureToggle == 1)
-		{
-			specular = u_SpecularLightStrength * texSpec * spec * u_LightCol; 
-		}
-		else
-		{
-			specular = u_SpecularLightStrength * spec * u_LightCol; 
-		}
-	}
-	if(u_Lightingtoggle == 4)
-	{
-		ambient = u_AmbientLightStrength * u_LightCol;
-		 diffuse = dif * u_LightCol;
 	
-		
-		if (u_TextureToggle == 1)
-		{
-			specular = u_SpecularLightStrength * texSpec * spec * u_LightCol; 
-		}
-		else
-		{
-			specular = u_SpecularLightStrength * spec * u_LightCol; 
-		}
-	}
-	if(u_Lightingtoggle == 5)
-	{
 		ambient = u_AmbientLightStrength * u_LightCol;
-		 diffuse = dif * u_LightCol;
-	
+		diffuse = dif * u_LightCol;
 
-		if (u_TextureToggle == 1)
-		{
-			specular = u_SpecularLightStrength * texSpec * spec * u_LightCol; 
-		}
-		else
-		{
-			specular = u_SpecularLightStrength * spec * u_LightCol; 
-		}
-	}
+		specular = u_SpecularLightStrength * spec * u_LightCol; 
+
 	 diffuse = floor(diffuse * bands)*scaleFactor;
 
 	vec3 result;
 
-	if (u_TextureToggle == 1)
-	{
 	result = (
 		(u_AmbientCol * u_AmbientStrength) + // global ambient light
 		(ambient + diffuse + specular)// * attenuation // light factors from our single light
 		) * inColor * textureColor.rgb; // Object color
-	}
-	else
-	{
-	result = (
-		(u_AmbientCol * u_AmbientStrength) + // global ambient light
-		(ambient + diffuse + specular)// * attenuation // light factors from our single light
-		) * inColor;
-	}
+
 
 
 	frag_color = vec4(result, textureColor.a);

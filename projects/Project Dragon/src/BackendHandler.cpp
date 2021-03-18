@@ -382,10 +382,11 @@ void BackendHandler::RenderImGui()
 	}
 }
 
-void BackendHandler::RenderVAO(const Shader::sptr& shader, const VertexArrayObject::sptr& vao, const glm::mat4& viewProjection, const Transform& transform)
+void BackendHandler::RenderVAO(const Shader::sptr& shader, const VertexArrayObject::sptr& vao, const glm::mat4& viewProjection, const Transform& transform, const glm::mat4& lightSpaceMat)
 {
 	shader->SetUniformMatrix("u_ModelViewProjection", viewProjection * transform.WorldTransform());
 	shader->SetUniformMatrix("u_Model", transform.WorldTransform());
+	//shader->SetUniformMatrix("u_LightSpaceMatrix", lightSpaceMat);
 	shader->SetUniformMatrix("u_NormalMatrix", transform.WorldNormalMatrix());
 	vao->Render();
 }

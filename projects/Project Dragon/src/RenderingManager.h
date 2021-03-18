@@ -9,9 +9,11 @@ public:
 	static void Render();
 	static Shader::sptr BaseShader;
 	static Shader::sptr NoOutline;
+
 	static Shader::sptr SkyBox;
 	static Shader::sptr Passthrough;
 	static Shader::sptr AnimationShader;
 	static Shader::sptr UIShader;
+	static Shader::sptr simpleDepthShader;
 	static GameScene::sptr activeScene; //keeps track of the active scene
 };

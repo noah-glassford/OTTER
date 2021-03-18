@@ -16,12 +16,16 @@
 #include <PhysicsSystem.h>
 #include <CameraControlBehaviour.h>
 #include <WorldBuilderV2.h>
+#include <UniformBuffer.h>
+#include <DirectionalLight.h>
+
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
 Shader::sptr RenderingManager::Passthrough = NULL;
 Shader::sptr RenderingManager::AnimationShader = NULL;
 Shader::sptr RenderingManager::UIShader = NULL;
+Shader::sptr RenderingManager::simpleDepthShader = NULL;
 	
 GameScene::sptr RenderingManager::activeScene;
 
@@ -41,14 +45,20 @@ void RenderingManager::Init()
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/Multiple_Light_Outline.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
 	BaseShader->Link();
 
 	NoOutline = Shader::Create();
 	//First we initialize our shaders
 	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	NoOutline->LoadShaderPartFromFile("shader/Multiple_Light_NoOutline.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
+
+	simpleDepthShader = Shader::Create();
+	//First we initialize our shaders
+	simpleDepthShader->LoadShaderPartFromFile("shader/simple_depth_vert.glsl", GL_VERTEX_SHADER);
+	simpleDepthShader->LoadShaderPartFromFile("shader/simple_depth_frag.glsl", GL_FRAGMENT_SHADER);
+	simpleDepthShader->Link();
 
 	
 
@@ -71,17 +81,7 @@ void RenderingManager::Init()
 	NoOutline->SetUniform("u_LightAttenuationQuadratic", 0.032f);
 
 
-	//initialize primary fragment shader DirLight & spotlight
-	BaseShader->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
-	BaseShader->SetUniform("dirLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-	BaseShader->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-	BaseShader->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-
-	//initialize primary fragment shader DirLight & spotlight
-	NoOutline->SetUniform("dirLight.direction", glm::vec3(-0.0f, -0.0f, -1.0f));
-	NoOutline->SetUniform("dirLight.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
-	NoOutline->SetUniform("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-	NoOutline->SetUniform("dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	
 
 
 	
@@ -111,7 +111,7 @@ int LightCount;
 int enemyCount = 0;
 void RenderingManager::Render()
 {
-
+	Framebuffer* shadowBuf = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
 	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
@@ -120,6 +120,7 @@ void RenderingManager::Render()
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
+	shadowBuf->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -131,6 +132,11 @@ void RenderingManager::Render()
 		t.UpdateWorldMatrix();
 		});
 
+	glm::mat4 lightProjectionMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -30.0f, 30.0f);
+	DirectionalLight& sun = activeScene->FindFirst("SUN").get<DirectionalLight>();
+	glm::vec3 LightDirection = sun._lightDirection;
+	glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(LightDirection), glm::vec3(), glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 lightSpaceViewProj = lightProjectionMatrix * lightViewMatrix;
 
 
 	enemyCount = 0;
@@ -226,6 +232,24 @@ void RenderingManager::Render()
 	Shader::sptr current = nullptr;
 	ShaderMaterial::sptr currentMat = nullptr;
 
+	int width;
+	int height;
+	glfwGetWindowSize(BackendHandler::window, &width, &height);
+	//set the viewport
+	glViewport(0, 0, width, height);
+	shadowBuf->Bind();
+	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
+		
+		BackendHandler::RenderVAO(simpleDepthShader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
+		});
+	shadowBuf->Unbind();
+
+
+
+	glfwGetWindowSize(BackendHandler::window, &width, &height);
+	glViewport(0, 0, width, height);
+
+
 	//sets the scale for player HP Bar
 	if(BackendHandler::m_ActiveScene == 1)
 	{
@@ -264,16 +288,23 @@ void RenderingManager::Render()
 			currentMat = renderer.Material;
 			currentMat->Apply();
 		}
-		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform);
+
+		
+		shadowBuf->BindDepthAsTexture(30);
+		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
 		});
 		
 		
+		
+	shadowBuf->UnbindTexture(30);
+
+		postEffect->UnBindBuffer();
+
 		bloomEffect->ApplyEffect(postEffect);
 		bloomEffect->DrawToScreen();
 		colEffect->ApplyEffect(postEffect);
 		colEffect->DrawToScreen();
 
-		postEffect->UnBindBuffer();
 		
 		BackendHandler::RenderImGui();
 
