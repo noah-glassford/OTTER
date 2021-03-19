@@ -22,7 +22,7 @@ public:
 	int lookRange = 5;
 	float distanceNorm = 100.0f;
 	float mTimer = 0.0f;
-	float m_MovementSpeed = 10.f;
+	float m_MovementSpeed = 100.f;
 
 	float TimeBetweenHits = 1.f;
 	float HitTimer = 0.f;

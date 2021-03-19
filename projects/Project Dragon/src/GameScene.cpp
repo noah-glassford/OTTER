@@ -146,7 +146,7 @@ void MainGameScene::InitGameScene()
 
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
-		RightHand.get<Transform>().SetLocalPosition(1.5, -1, 0).SetLocalRotation(-90, 0, 0);
+		RightHand.get<Transform>().SetLocalPosition(1, -0.7, -0.5).SetLocalRotation(-0, 0, 90).SetLocalScale(0.5, 0.5, 0.5);
 		RightHand.get<Transform>().SetParent(cameraObject);
 
 		
@@ -155,7 +155,7 @@ void MainGameScene::InitGameScene()
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
-		LeftHand.get<Transform>().SetLocalPosition(-1.5, -1, 0).SetLocalRotation(-90, 0, 0).SetLocalScale(-1, 1, 1);
+		LeftHand.get<Transform>().SetLocalPosition(-1, -0.7, -0.5).SetLocalRotation(-0, 0, -90).SetLocalScale(-0.5, 0.5, 0.5);
 		LeftHand.get<Transform>().SetParent(cameraObject);
 		LeftHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
 
@@ -180,7 +180,7 @@ void MainGameScene::InitGameScene()
 	//test cubes
 	GameObject FireCubeVisual = scene->CreateEntity("FireCube");
 	{
-		FireCubeVisual.get<Transform>().SetParent(RightHand);
+		FireCubeVisual.get<Transform>().SetParent(LeftHand);
 		FireCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 
 		//FireCubeVisual.get<Transform>().SetParent(RightHand);
@@ -190,13 +190,13 @@ void MainGameScene::InitGameScene()
 
 	GameObject WaterCubevisual = scene->CreateEntity("WaterCube");
 	{
-		WaterCubevisual.get<Transform>().SetParent(RightHand);
+		WaterCubevisual.get<Transform>().SetParent(LeftHand);
 		WaterCubevisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 		WaterCubevisual.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Proj");
 	}
 	GameObject AirCubeVisual = scene->CreateEntity("AirCube");
 	{
-		AirCubeVisual.get<Transform>().SetParent(LeftHand);
+		AirCubeVisual.get<Transform>().SetParent(RightHand);
 		AirCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 
 		//FireCubeVisual.get<Transform>().SetParent(RightHand);
@@ -206,7 +206,7 @@ void MainGameScene::InitGameScene()
 
 	GameObject EarthCubeVisual = scene->CreateEntity("EarthCube");
 	{
-		EarthCubeVisual.get<Transform>().SetParent(LeftHand);
+		EarthCubeVisual.get<Transform>().SetParent(RightHand);
 		EarthCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
 		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);

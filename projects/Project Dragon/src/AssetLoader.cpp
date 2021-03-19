@@ -11,8 +11,9 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 {
 	//basic floor tile
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj", glm::vec4(1,1,1,1));
+	VertexArrayObject::sptr wall = ObjLoader::LoadFromFile("model/wall.obj", glm::vec4(1, 1, 1, 1));
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
-	Texture2D::sptr test = Texture2D::LoadFromFile("image/wall.png");
+	Texture2D::sptr test = Texture2D::LoadFromFile("image/New_Wall_Tex.png");
 	Texture2D::sptr Wall_Normal = Texture2D::LoadFromFile("image/Wall_Normal_Map.png");
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 	ShaderMaterial::sptr Floor_Mat = ShaderMaterial::Create();
@@ -33,7 +34,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Wall_Mat->Set("u_Shininess", 2.0f);
 	Wall_Mat->Set("u_TextureMix", 0.0f);
 	RendererComponent Wall_Tile;
-	Wall_Tile.SetMaterial(Wall_Mat).SetMesh(plane);
+	Wall_Tile.SetMaterial(Wall_Mat).SetMesh(wall);
 	Renderers.push_back(Wall_Tile);
 	RendererNames.push_back("Wall");
 
@@ -203,7 +204,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		handMat->Set("s_Specular", noSpec);
 		handMat->Set("u_Shininess", 1.0f);
 		handMat->Set("u_TextureMix", 0.0f);
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand.obj");
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand_rest.obj");
 		RendererComponent hands;
 		hands.SetMesh(vao).SetMaterial(handMat);
 		Renderers.push_back(hands);
