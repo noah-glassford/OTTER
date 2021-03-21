@@ -190,13 +190,13 @@ void BackendHandler::UpdateInput()
 			p.SwitchLeftHand();
 			if (p.m_LeftEquiped)
 			{
-				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -3, 0);
-				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, 3, 0);
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -5, 0);
 			}
 			else
 			{
-				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -3, 0);
-				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, 3, 0);
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -5, 0);
 			}
 			shouldSwitchWeaponL = false;
 		}
@@ -208,13 +208,13 @@ void BackendHandler::UpdateInput()
 			p.SwitchRightHand();
 			if (p.m_RightEquiped)
 			{
-				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, 3, 0);
-				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -3, 0);
+				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -5, 0);
 			}
 			else
 			{
-				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -3, 0);
-				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, 3, 0);
+				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -5, 0);
 			}
 			shouldSwitchWeaponR = false;
 		}
