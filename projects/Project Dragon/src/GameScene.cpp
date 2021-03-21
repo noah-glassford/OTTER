@@ -34,7 +34,7 @@ void MainGameScene::InitGameScene()
 	Texture2D::sptr Barrel = Texture2D::LoadFromFile("image/BARREL.png");
 	Texture2D::sptr FloorTexture = Texture2D::LoadFromFile("image/Stone_001_Diffuse.png");
 	Texture2D::sptr nine = Texture2D::LoadFromFile("image/9.png");
-	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/ToonSky.jpg");
+	TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("image/skybox/night.png");
 
 	
 
@@ -163,6 +163,7 @@ void MainGameScene::InitGameScene()
 
 	GameObject obj4 = scene->CreateEntity("Barrel");
 	{
+		/*
 		obj4.get<Transform>().SetLocalRotation(0, 0, 0);
 		obj4.get<Transform>().SetLocalScale(50, 50, 50); //:) small tiny baby tiny little idiot
 		obj4.get<Transform>().SetLocalPosition(1000, 1000, 1000);
@@ -170,6 +171,7 @@ void MainGameScene::InitGameScene()
 		obj4.emplace<GLTFSkinnedMesh>();
 		obj4.get<GLTFSkinnedMesh>().LoadFromFile("model/JellyCube.gltf");
 		obj4.get<GLTFSkinnedMesh>().SetLooping(1);
+		*/
 	}
 
 	//test cubes
@@ -278,9 +280,9 @@ void MainGameScene::InitGameScene()
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-	btTransform t;
-	t.setIdentity();
-	t.setOrigin(btVector3(0, 0, 0));
-	cameraObject.get<PhysicsBody>().GetBody()->setWorldTransform(t);
-	obj4.get<Transform>().SetLocalPosition(cameraObject.get<Transform>().GetLocalPosition());
+	//btTransform t;
+	//t.setIdentity();
+//	t.setOrigin(btVector3(0, 0, 0));
+	//cameraObject.get<PhysicsBody>().GetBody()->setWorldTransform(t);
+	//obj4.get<Transform>().SetLocalPosition(cameraObject.get<Transform>().GetLocalPosition());
 }
