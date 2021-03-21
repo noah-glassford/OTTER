@@ -15,8 +15,8 @@ int main()
 	BackendHandler::m_Scenes.push_back(new MainMenuScene());
 	BackendHandler::m_Scenes.push_back(new MainGameScene());
 	BackendHandler::m_Scenes.push_back(new DeathSceen());
-	BackendHandler::m_Scenes[0]->InitGameScene();
-	BackendHandler::m_ActiveScene = 0;
+	BackendHandler::m_Scenes[1]->InitGameScene();
+	BackendHandler::m_ActiveScene = 1;
 
 	
 

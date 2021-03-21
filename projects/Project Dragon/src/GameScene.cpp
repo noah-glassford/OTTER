@@ -163,18 +163,13 @@ void MainGameScene::InitGameScene()
 
 	GameObject obj4 = scene->CreateEntity("Barrel");
 	{
-		obj4.get<Transform>().SetLocalRotation(90, 0, 0);
+		obj4.get<Transform>().SetLocalRotation(0, 0, 0);
+		obj4.get<Transform>().SetLocalScale(50, 50, 50); //:) small tiny baby tiny little idiot
+		obj4.get<Transform>().SetLocalPosition(1000, 1000, 1000);
 
-		RendererComponent& RC = obj4.emplace<RendererComponent>();
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/Barrel.obj");
-		RC.SetMesh(vao);
-		RC.SetMaterial(BarrelMat);
-
-		PhysicsBody& p = obj4.emplace<PhysicsBody>();
-		//Enemy& e = obj4.emplace<Enemy>();
-		p.AddBody(0.f, btVector3(2.f, 3.f, 1.f), btVector3(2.f, 2.f, 2.f));
-		//p.GetBody()->setUserIndex(5);
-		//p.GetBody()->setUserPointer((void*)&e);
+		obj4.emplace<GLTFSkinnedMesh>();
+		obj4.get<GLTFSkinnedMesh>().LoadFromFile("model/JellyCube.gltf");
+		obj4.get<GLTFSkinnedMesh>().SetLooping(1);
 	}
 
 	//test cubes
@@ -277,10 +272,15 @@ void MainGameScene::InitGameScene()
 	VertexArrayObject::sptr meshVao = mesh.Bake();
 
 	GameObject skyboxObj = scene->CreateEntity("skybox");
-	skyboxObj.get<Transform>().SetLocalPosition(0.0f, 0.0f, 0.0f);
+	skyboxObj.get<Transform>().SetLocalPosition(500.f, 500.0f, 200.0f);
 	skyboxObj.get_or_emplace<RendererComponent>().SetMesh(meshVao).SetMaterial(skyboxMat);
 
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(0, 0, 0));
+	cameraObject.get<PhysicsBody>().GetBody()->setWorldTransform(t);
+	obj4.get<Transform>().SetLocalPosition(cameraObject.get<Transform>().GetLocalPosition());
 }

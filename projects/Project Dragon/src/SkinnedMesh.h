@@ -11,7 +11,6 @@
 
 #include "SimpleTransform.h"
 
-#include <Transform.h>
 // Ensure this is the same number as your vertex shader
 #define MAX_BONES 12
 
@@ -62,8 +61,8 @@ public:
     std::vector<glm::mat4x4> m_inverseBindMatrices;
     std::vector<glm::mat4x4> m_jointMatrices;
 
-    Transform* m_transformRoot;
-    std::map<int, Transform*> m_transforms;
+    SimpleTransform* m_transformRoot;
+    std::map<int, SimpleTransform*> m_transforms;
 };
 
 // Forward declare shader class
@@ -74,6 +73,9 @@ class GLTFSkinnedMesh
 public:
 
     ~GLTFSkinnedMesh();
+
+    std::map<int, GLTFMesh> GetLoadedMeshes() { return m_loadedMeshes; }
+    std::map<int, GLTFSkinData> GetSkinData() { return m_skinData; }
 
     bool LoadFromFile(std::string const path);
 
@@ -87,7 +89,7 @@ public:
     template <typename T>
     T RetrieveModelData(int const accessorIndex, int const accessorType, unsigned int const dataIndex) const;
 
-    void CopyNodeLocalTransform(tinygltf::Node& const node, Transform& transform);
+    void CopyNodeLocalTransform(tinygltf::Node& const node, SimpleTransform& transform);
 
     void Draw(Shader::sptr& const shader, glm::mat4& const viewProjection, glm::mat4& const worldTransform);
 
@@ -105,10 +107,7 @@ public:
 
     void SetLooping(bool const shouldLoop) { m_animationLooping = shouldLoop; }
 
-    Transform* const FindNodeSimpleTransform(int const nodeIndex) const;
-
-    std::map<int, GLTFMesh> GetLoadedMeshes() { return m_loadedMeshes; }
-    std::map<int, GLTFSkinData> GetSkinData() { return m_skinData; }
+    SimpleTransform* const FindNodeSimpleTransform(int const nodeIndex) const;
 
 private:
     bool LoadNodes();

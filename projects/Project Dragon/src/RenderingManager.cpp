@@ -270,7 +270,7 @@ void RenderingManager::Render()
 
 
 	//firstly render gltf animations
-	/*
+	BoneAnimShader->Bind();
 	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t ) {
 		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
 		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
@@ -278,29 +278,12 @@ void RenderingManager::Render()
 		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 		glm::mat4 viewProjection = projection * view;
 
-		//goes through everuthing in the loaded mesh, then draws it
-		for (auto const mesh : m.GetLoadedMeshes())
-		{
-			int skinIndex = mesh.second.m_associatedSkin;
-			if (m.GetSkinData().count(skinIndex))
-			{
-				m.GetSkinData()[skinIndex].RecalculateJoints();
-				BoneAnimShader->SetUniformMatrix(BoneAnimShader->GetUniformLocation("u_JointMatrices"),
-					m.GetSkinData()[skinIndex].m_jointMatrices.data(), 12, false);
-
-			}
-
-			for (int i = 0; i < mesh.second.m_primitives.size(); i++)
-			{
-				BackendHandler::SetupShaderForFrame(BoneAnimShader, view, projection);
-				BackendHandler::RenderVAO(BoneAnimShader, mesh.second.m_primitives[i], viewProjection, t);
-			}
-
-		}
+		m.Draw(BoneAnimShader, viewProjection,  (glm::mat4) t.WorldTransform());
+			
 
 		});
-
-	*/
+	BoneAnimShader->UnBind();
+	
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms

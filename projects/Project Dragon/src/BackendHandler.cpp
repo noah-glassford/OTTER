@@ -163,14 +163,15 @@ void BackendHandler::UpdateInput()
 		AudioEngine& engine = AudioEngine::Instance();
 		AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
 
-		if (p.m_CanJump)
-		{
+		//if (p.m_CanJump)
+		//{
 			tempJump.Play();
 
 			verticalVelo = 20.f;
-		}
+		//}
 	}
-	phys.SetLinearVelocity(btVector3(movement.getX() * 22.f, movement.getY() * 22.f, verticalVelo));
+	std::cout << t.GetLocalPosition().x << ", " << t.GetLocalPosition().y << ", " << t.GetLocalPosition().z << "\n";
+	phys.SetLinearVelocity(btVector3(movement.getX() * 50.f, movement.getY() * 50.f, verticalVelo));
 
 	//temporary
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
