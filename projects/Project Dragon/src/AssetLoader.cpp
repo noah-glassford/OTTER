@@ -82,6 +82,23 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(Box);
 		RendererNames.push_back("Box");
 	}
+
+	//box
+	{
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/Offsetcube.obj");
+		//Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/box.png");
+		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
+		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Set("s_Diffuse", Ice_Tex);
+		box_Mat->Set("s_Specular", noSpec);
+		box_Mat->Set("u_Shininess", 2.0f);
+		box_Mat->Set("u_TextureMix", 0.0f);
+		RendererComponent Box;
+		Box.SetMaterial(box_Mat).SetMesh(box_Mesh);
+		Renderers.push_back(Box);
+		RendererNames.push_back("Ice_Tracer");
+	}
 	//Torch
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/torch.obj");

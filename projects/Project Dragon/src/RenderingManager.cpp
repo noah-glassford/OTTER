@@ -322,7 +322,7 @@ void RenderingManager::Render()
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
 
-		std::cout << enemyCount << std::endl;
+		//std::cout << enemyCount << std::endl;
 		if (enemyCount <= 1 && BackendHandler::m_ActiveScene == 1)
 		{
 			activeScene->DeleteAllEnts();

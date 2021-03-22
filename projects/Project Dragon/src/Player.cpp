@@ -71,6 +71,7 @@ bool FireWeapon::Fire()
 bool WaterWeapon::Fire()
 {
 	
+	
 	if (m_CanShoot)
 	{
 		m_CanShoot = false;
@@ -98,6 +99,17 @@ bool WaterWeapon::Fire()
 		btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
 
 		//construct our raycast vector for shooting
+
+		//make laser to show where shot going
+		//ITS SO TEMPORARY
+		GameObject tracer = InstantiatingSystem::InstantiateEmpty("Shot_Tracer");
+		tracer.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Ice_Tracer");
+		tracer.get<Transform>().SetLocalPosition(t.GetLocalPosition() + glm::normalize(lookDir)* 25.f);
+		tracer.get<Transform>().SetLocalScale(0.1f, 0.1f, 25);
+		tracer.get<Transform>().SetLocalRotation(t.GetLocalRotation());
+
+
+
 		lookDir *= 50;
 		btVector3 to = BtToGlm::GLMTOBTV3(lookDir);
 		to += playerPosition;
@@ -117,14 +129,14 @@ bool WaterWeapon::Fire()
 			{
 				if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
 					if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
-						reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 5;
+						reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 15;
 			}
 			else
 			{
 
 				if (reg.valid((entt::entity)Results.m_collisionObject->getUserIndex3()))
 					if (reg.has<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()))
-						reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 2;
+						reg.get<Enemy>((entt::entity)Results.m_collisionObject->getUserIndex3()).m_hp -= 10;
 			}
 
 			return true;

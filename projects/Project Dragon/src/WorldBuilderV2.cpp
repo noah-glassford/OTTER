@@ -62,11 +62,11 @@ void WorldBuilderV2::FillWorldData()
 		pastX = currentX; pastY = currentY;
 
 		//Data check
-		if (WorldData[currentX + 1][currentY] < 1 && currentX < 18)
+		if (WorldData[currentX + 1][currentY] < 1 && currentX < 16)
 			canRight = true;
 		if (WorldData[currentX - 1][currentY] < 1 && currentX > 1)
 			canLeft = true;
-		if (WorldData[currentX][currentY + 1] < 1 && currentY < 18)
+		if (WorldData[currentX][currentY + 1] < 1 && currentY < 16)
 			canUp = true;
 		if (WorldData[currentX][currentY - 1] < 1 && currentY > 1)
 			canDown = true;
@@ -117,8 +117,8 @@ void WorldBuilderV2::GenerateTiles()
 	//
 	//	TEMP -- Builds the world of empty tiles -- TEMP
 	//
-	for (int x = 0; x < 19; x++) {
-		for (int y = 0; y < 19; y++) {
+	for (int x = 0; x < 17; x++) {
+		for (int y = 0; y < 17; y++) {
 			if (WorldData[x][y] > 0) {
 				//Floor
 

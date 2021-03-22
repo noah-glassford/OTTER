@@ -62,7 +62,9 @@ bool BackendHandler::InitAll()
 		return 1;
 	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
-
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	
 	//Init Audio
 	AudioEngine& engine = AudioEngine::Instance();
 	engine.Init();
@@ -119,6 +121,8 @@ bool shouldSwitchWeaponL, shouldSwitchWeaponR;
 
 void BackendHandler::UpdateInput()
 {
+	//std::cout << 1 / Timer::dt << "\n";
+
 	//creates a single camera object to call
 
 	GameObject cameraObj = RenderingManager::activeScene->FindFirst("Camera");
@@ -163,14 +167,14 @@ void BackendHandler::UpdateInput()
 		AudioEngine& engine = AudioEngine::Instance();
 		AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
 
-		//if (p.m_CanJump)
-		//{
+		if (p.m_CanJump)
+		{
 			tempJump.Play();
 
 			verticalVelo = 20.f;
-		//}
+		}
 	}
-	std::cout << t.GetLocalPosition().x << ", " << t.GetLocalPosition().y << ", " << t.GetLocalPosition().z << "\n";
+	//std::cout << t.GetLocalPosition().x << ", " << t.GetLocalPosition().y << ", " << t.GetLocalPosition().z << "\n";
 	phys.SetLinearVelocity(btVector3(movement.getX() * 50.f, movement.getY() * 50.f, verticalVelo));
 
 	//temporary
