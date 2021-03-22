@@ -3,6 +3,16 @@
 #include <Timer.h>
 #include <InstantiatingSystem.h>
 //base weapon class other weapons inherit from this
+class Weap_Laser
+{
+public:
+	float m_Timer;
+	void Update();
+	void Delete();
+	entt::entity m_Entity;
+	int PlaceInVec;
+};
+
 class Weapon
 {
 public:
@@ -52,5 +62,6 @@ public:
 	bool m_LeftEquiped;
 	bool m_RightEquiped;
 	bool m_CanJump;
+	std::vector<Weap_Laser> m_Lasers;
 
 };

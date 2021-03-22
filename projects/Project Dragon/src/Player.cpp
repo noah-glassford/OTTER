@@ -103,11 +103,16 @@ bool WaterWeapon::Fire()
 		//make laser to show where shot going
 		//ITS SO TEMPORARY
 		GameObject tracer = InstantiatingSystem::InstantiateEmpty("Shot_Tracer");
+		tracer.emplace<Weap_Laser>();
+		tracer.get<Weap_Laser>().m_Entity = tracer.entity();
 		tracer.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Ice_Tracer");
-		tracer.get<Transform>().SetLocalPosition(t.GetLocalPosition() + glm::normalize(lookDir)* 25.f);
+		//creates a slight offset to make sure you can see where it goes
+		glm::vec3 Offset = glm::vec3(1, 0, 0);
+		tracer.get<Transform>().SetLocalPosition(t.GetLocalPosition() + glm::normalize(lookDir)* 25.f + Offset);
 		tracer.get<Transform>().SetLocalScale(0.1f, 0.1f, 25);
 		tracer.get<Transform>().SetLocalRotation(t.GetLocalRotation());
-
+		cameraObj.get<Player>().m_Lasers.push_back(tracer.get<Weap_Laser>());
+		cameraObj.get<Player>().m_Lasers[cameraObj.get<Player>().m_Lasers.size() -1 ].PlaceInVec = cameraObj.get<Player>().m_Lasers.size();
 
 
 		lookDir *= 50;
@@ -121,7 +126,7 @@ bool WaterWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			entt::registry& reg = RenderingManager::activeScene->Registry();
 
@@ -143,7 +148,7 @@ bool WaterWeapon::Fire()
 		}
 		else
 		{
-			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
@@ -209,6 +214,18 @@ bool AirWeapon::Fire()
 			tempVec.setZ(tempVec.getZ() + PathDeviation * 2);
 
 
+			GameObject tracer = InstantiatingSystem::InstantiateEmpty("Shot_Tracer");
+			tracer.emplace<Weap_Laser>();
+			tracer.get<Weap_Laser>().m_Entity = tracer.entity();
+			tracer.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Ice_Tracer");
+			//creates a slight offset to make sure you can see where it goes
+			glm::vec3 Offset = glm::vec3(1, 0, 0);
+			tracer.get<Transform>().SetLocalPosition(t.GetLocalPosition() + glm::normalize(BtToGlm::BTTOGLMV3(tempVec)) * 5.f);
+			tracer.get<Transform>().SetLocalScale(0.1f, 0.1f, 5);
+			tracer.get<Transform>().SetLocalRotation(t.GetLocalRotation());
+			cameraObj.get<Player>().m_Lasers.push_back(tracer.get<Weap_Laser>());
+			cameraObj.get<Player>().m_Lasers[cameraObj.get<Player>().m_Lasers.size() - 1].PlaceInVec = cameraObj.get<Player>().m_Lasers.size();
+
 			btCollisionWorld::ClosestRayResultCallback Results(playerPosition, tempVec);
 
 			PhysicsSystem::GetWorld()->rayTest(playerPosition, tempVec, Results);
@@ -216,7 +233,7 @@ bool AirWeapon::Fire()
 			if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 			{
 				//Instantiate projectile/marker of where you shot because hitscan
-				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+				//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 				entt::registry& reg = RenderingManager::activeScene->Registry();
 
@@ -237,7 +254,7 @@ bool AirWeapon::Fire()
 			}
 			else
 			{
-				InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
+				//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(tempVec), "node/Water_Proj.node");
 				//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 				//return false;
 			}
@@ -291,6 +308,18 @@ bool EarthWeapon::Fire()
 		//Grabs player position
 		btVector3 playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
 
+		GameObject tracer = InstantiatingSystem::InstantiateEmpty("Shot_Tracer");
+		tracer.emplace<Weap_Laser>();
+		tracer.get<Weap_Laser>().m_Entity = tracer.entity();
+		tracer.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Ice_Tracer");
+		//creates a slight offset to make sure you can see where it goes
+		glm::vec3 Offset = glm::vec3(1, 0, 0);
+		tracer.get<Transform>().SetLocalPosition(t.GetLocalPosition() + glm::normalize(lookDir) * 15.f );
+		tracer.get<Transform>().SetLocalScale(0.1f, 0.1f, 15);
+		tracer.get<Transform>().SetLocalRotation(t.GetLocalRotation());
+		cameraObj.get<Player>().m_Lasers.push_back(tracer.get<Weap_Laser>());
+		cameraObj.get<Player>().m_Lasers[cameraObj.get<Player>().m_Lasers.size() - 1].PlaceInVec = cameraObj.get<Player>().m_Lasers.size();
+
 		//construct our raycast vector for shooting
 		lookDir *= 30;
 		btVector3 to = BtToGlm::GLMTOBTV3(lookDir);
@@ -303,7 +332,7 @@ bool EarthWeapon::Fire()
 		if (Results.hasHit() && Results.m_collisionObject->getUserIndex() == 2) //if this is run you hit an enemy
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
-			InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
 			
 			//does damage to enemy
@@ -328,7 +357,7 @@ bool EarthWeapon::Fire()
 		}
 		else
 		{
-			InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
+			//InstantiatingSystem::LoadPrefabFromFile(BtToGlm::BTTOGLMV3(to), "node/Water_Proj.node");
 			//ECS::Get<Transform>(2).SetPosition(BtToGlm::BTTOGLMV3(to));
 			return false;
 		}
@@ -371,6 +400,11 @@ void Player::Update()
 	m_LeftHandWeapons[m_LeftEquiped]->Update();
 	m_RightHandWeapons[m_RightEquiped]->Update();
 
+	for (int i = 0; i < m_Lasers.size(); i++)
+	{
+		m_Lasers[i].Update();
+	}
+
 }
 
 void Player::SwitchLeftHand()
@@ -396,4 +430,24 @@ bool Player::RightHandShoot()
 bool Weapon::Fire()
 {
 	return false;
+}
+
+void Weap_Laser::Update()
+{
+	//get camera obj
+	GameObject camObj = RenderingManager::activeScene->FindFirst("Camera");
+	m_Timer += Timer::dt;
+	if (m_Timer > 0.2f)
+	{
+		Delete();
+//		camObj.get<Player>().m_Lasers.erase(camObj.get<Player>().m_Lasers.begin() + (int)PlaceInVec - 1);
+	}
+}
+
+void Weap_Laser::Delete()
+{
+
+	if (RenderingManager::activeScene->Registry().valid(m_Entity))
+	RenderingManager::activeScene->Registry().destroy(m_Entity);
+	//
 }
