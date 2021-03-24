@@ -21,6 +21,9 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include <SkinnedMesh.h>
 
+#include <GBuffer.h>
+#include <IlluminationBuffer.h>
+
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
 Shader::sptr RenderingManager::SkyBox = NULL;
@@ -47,13 +50,13 @@ void RenderingManager::Init()
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/gBuffer_Pass_frag.glsl", GL_FRAGMENT_SHADER);
 	BaseShader->Link();
 
 	NoOutline = Shader::Create();
 	//First we initialize our shaders
 	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	NoOutline->LoadShaderPartFromFile("shader/directional_blinn_phong_frag.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/gBuffer_Pass_frag.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
 
 	simpleDepthShader = Shader::Create();
@@ -127,29 +130,30 @@ void RenderingManager::Render()
 	//Framebuffer* shadowBuf = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
-	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();;
-
+	ColorCorrectionEffect* colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
+	GBuffer* gBuffer = &activeScene->FindFirst("G Buffer").get<GBuffer>();
+	IlluminationBuffer* illuminationBuffer = &activeScene->FindFirst("Illumination Buffer").get<IlluminationBuffer>();
+	Framebuffer* shadowBuffer = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
 
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
+	gBuffer->Clear();
+	illuminationBuffer->Clear();
 
 	glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#pragma region Game_Updates
+
 	// Update all world matrices for this frame
 	activeScene->Registry().view<Transform>().each([](entt::entity entity, Transform& t) {
 		t.UpdateWorldMatrix();
 		});
 
-	glm::mat4 lightProjectionMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -30.0f, 30.0f);
 	
-		DirectionalLight& sun = activeScene->FindFirst("SUN").get<DirectionalLight>();
-		glm::vec3 LightDirection = sun._lightDirection;
-		glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(LightDirection), glm::vec3(), glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 lightSpaceViewProj = lightProjectionMatrix * lightViewMatrix;
 	
 
 	enemyCount = 0;
@@ -171,10 +175,7 @@ void RenderingManager::Render()
 			{
 				DeathSoundPlayed = true;
 				tempEnDeath.Play();
-			}
-			
-
-			
+			}		
 		}
 
 		});
@@ -208,21 +209,50 @@ void RenderingManager::Render()
 	BaseShader->SetUniform("u_LightCount", LightCount);
 
 
-	//get the camera mat4s
-	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+	//sets the scale for player HP Bar
+	if (BackendHandler::m_ActiveScene == 1)
+	{
+		float t2 = 0.2 * activeScene->FindFirst("Camera").get<Player>().m_Hp;
+
+
+
+		float scaleX = Interpolation::LERP(0, 1, t2);
+
+	//	activeScene->FindFirst("PlayerHPBar").get<UI>().scale = glm::vec2(scaleX, 1);
+	}
+
+	activeScene->Registry().view<Transform, UI, RendererComponent>().each([](entt::entity entity, Transform& t, UI& ui, RendererComponent& rc)
+		{
+			UIShader->SetUniform("u_Scale", ui.scale);
+			UIShader->SetUniform("u_Offset", ui.offset);
+		});
+
+	
 	activeScene->FindFirst("Camera").get<Player>().Update();
 	//temp
 	//activeScene->FindFirst("NumberPlane").get<Transform>().LookAt(camTransform.GetLocalPosition());
 
+#pragma endregion
 	
-	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
-	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
-	glm::mat4 viewProjection = projection * view;
-
-
+#pragma region Rendering
 	entt::basic_group<entt::entity, entt::exclude_t<>, entt::get_t<Transform>, RendererComponent> renderGroup =
 		activeScene->Registry().group<RendererComponent>(entt::get_t<Transform>());
 
+	glm::mat4 lightProjectionMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -30.0f, 30.0f);
+
+	DirectionalLight& sun = activeScene->FindFirst("SUN").get<DirectionalLight>();
+	glm::vec3 LightDirection = sun._lightDirection;
+	glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(LightDirection), glm::vec3(), glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 lightSpaceViewProj = lightProjectionMatrix * lightViewMatrix;
+	//get the camera mat4s
+	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+
+
+	//Set shadow stuff
+	illuminationBuffer->SetLightSpaceViewProj(lightSpaceViewProj);
+	glm::vec3 camPos = glm::inverse(view) * glm::vec4(0, 0, 0, 1);
+	illuminationBuffer->SetCamPos(camPos);
 
 
 	renderGroup.sort<RendererComponent>([](const RendererComponent& l, const RendererComponent& r) {
@@ -247,30 +277,15 @@ void RenderingManager::Render()
 
 
 
-	//sets the scale for player HP Bar
-	if(BackendHandler::m_ActiveScene == 1)
-	{
-		float t2 = 0.2 * activeScene->FindFirst("Camera").get<Player>().m_Hp;
 
+
+	glViewport(0, 0, 4096, 4096);
 	
-
-		float scaleX = Interpolation::LERP(0, 1, t2);
-
-		activeScene->FindFirst("PlayerHPBar").get<UI>().scale = glm::vec2(scaleX, 1);
-	}
-
-	activeScene->Registry().view<Transform, UI, RendererComponent>().each([](entt::entity entity, Transform& t, UI& ui, RendererComponent& rc)
-		{
-			UIShader->SetUniform("u_Scale", ui.scale);
-			UIShader->SetUniform("u_Offset", ui.offset);
-		});
-
-
-	postEffect->BindBuffer(0);
-
+	shadowBuffer->Bind();
 
 	//firstly render gltf animations
-	BoneAnimShader->Bind();
+	//BoneAnimShader->Bind();
+	/*
 	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t ) {
 		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
 		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
@@ -278,16 +293,18 @@ void RenderingManager::Render()
 		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 		glm::mat4 viewProjection = projection * view;
 
-		m.Draw(BoneAnimShader, viewProjection,  (glm::mat4) t.WorldTransform());
+		m.Draw(simpleDepthShader, viewProjection,  (glm::mat4) t.WorldTransform());
 			
 
 		});
-	BoneAnimShader->UnBind();
+		*/
+	//BoneAnimShader->UnBind();
 	
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		// If the shader has changed, set up it's uniforms
-		
+		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
 		if (current != renderer.Material->Shader) {
 			current = renderer.Material->Shader;
 			current->Bind();
@@ -299,28 +316,85 @@ void RenderingManager::Render()
 			currentMat = renderer.Material;
 			currentMat->Apply();
 		}
-
+		glm::mat4 viewProjection = projection * view;
 		
 		//shadowBuf->BindDepthAsTexture(30);
-		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
+		BackendHandler::RenderVAO(simpleDepthShader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
 		});
 		
+	shadowBuffer->Unbind();
+
+	int width, height;
+
+	glfwGetWindowSize(BackendHandler::window, &width, &height);
+
+	glViewport(0, 0, width, height);
+
+	gBuffer->Bind();
+
+	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t) {
+		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
+		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
+		glm::mat4 viewProjection = projection * view;
+
+		m.Draw(BoneAnimShader, viewProjection, (glm::mat4)t.WorldTransform());
+
+
+		});
+
+	
+	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		
-		
+		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
+		glm::mat4 viewProjection = projection * view;
+
+		// If the shader has changed, set up it's uniforms
+		if (current != renderer.Material->Shader) {
+			current = renderer.Material->Shader;
+			current->Bind();
+			BackendHandler::SetupShaderForFrame(current, view, projection);
+		}
+		// If the material has changed, apply it
+		if (currentMat != renderer.Material) {
+			currentMat = renderer.Material;
+			currentMat->Apply();
+		}
+
+		// Render the mesh
+		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
+		});
+	gBuffer->Unbind();
+
+	
+
+	shadowBuffer->BindDepthAsTexture(30);
+
+	illuminationBuffer->ApplyEffect(gBuffer);
+
+	shadowBuffer->UnbindTexture(30);
+
+	illuminationBuffer->DrawToScreen();
+
 	//shadowBuf->UnbindTexture(30);
 
-		postEffect->UnBindBuffer();
+		//postEffect->UnBindBuffer();
 
-		bloomEffect->ApplyEffect(postEffect);
-		bloomEffect->DrawToScreen();
-		colEffect->ApplyEffect(postEffect);
-		colEffect->DrawToScreen();
+		//bloomEffect->ApplyEffect(postEffect);
+		//bloomEffect->DrawToScreen();
+		//colEffect->ApplyEffect(postEffect);
+		//colEffect->DrawToScreen();
 
 		
 		BackendHandler::RenderImGui();
 
 		activeScene->Poll();
 		glfwSwapBuffers(BackendHandler::window);
+#pragma endregion
+
+//This needs to be at the end, risk crashes otherwise since it is deleting entities before the end of the render loop
 
 		//std::cout << enemyCount << std::endl;
 		if (enemyCount <= 1 && BackendHandler::m_ActiveScene == 1)

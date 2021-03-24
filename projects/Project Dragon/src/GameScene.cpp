@@ -17,6 +17,9 @@
 #include <UniformBuffer.h>
 #include <SkinnedMesh.h>
 
+#include <GBuffer.h>
+#include <IlluminationBuffer.h>
+
 void MainGameScene::InitGameScene()
 {
 	GameScene::RegisterComponentType<Camera>();
@@ -105,7 +108,7 @@ void MainGameScene::InitGameScene()
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
-
+	/*
 	GameObject UIObject = scene->CreateEntity("PlayerHPBar");
 	{
 		RendererComponent& r = UIObject.emplace<RendererComponent>();
@@ -115,7 +118,7 @@ void MainGameScene::InitGameScene()
 		ui.scale = glm::vec2(1, 1);
 		r = AssetLoader::GetRendererFromStr("hpBar");
 	}
-
+	*/
 	/*
 	* I can't have nice things this is broken :(
 	GameObject Crosshair = scene->CreateEntity("Crosshair");
@@ -259,6 +262,36 @@ void MainGameScene::InitGameScene()
 		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
 		//colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
+	}
+
+	GBuffer* gBuffer;
+	IlluminationBuffer* illuminationBuffer;
+
+
+	int width, height;
+	glfwGetWindowSize(BackendHandler::window, &width, &height);
+
+	GameObject gBufferObject = scene->CreateEntity("G Buffer");
+	{
+		gBuffer = &gBufferObject.emplace<GBuffer>();
+		gBuffer->Init(width, height);
+	}
+
+	GameObject illuminationbufferObject = scene->CreateEntity("Illumination Buffer");
+	{
+		illuminationBuffer = &illuminationbufferObject.emplace<IlluminationBuffer>();
+		illuminationBuffer->Init(width, height);
+	}
+
+	Framebuffer* shadowBuffer;
+	int shadowWidth = 4096;
+	int shadowHeight = 4096;
+
+	GameObject shadowBufferObject = scene->CreateEntity("Shadow Buffer");
+	{
+		shadowBuffer = &shadowBufferObject.emplace<Framebuffer>();
+		shadowBuffer->AddDepthTarget();
+		shadowBuffer->Init(shadowWidth, shadowHeight);
 	}
 
 	ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
