@@ -104,7 +104,7 @@ protected:
 	//Default filter is GL_NEAREST
 	GLenum _filter = GL_NEAREST;
 	//Default filter is GL_CLAMP_TO_EDGE
-	GLenum _wrap = GL_CLAMP_TO_EDGE;
+	GLenum _wrap = GL_CLAMP_TO_BORDER;
 
 	//Clearflag is nothing by default
 	GLbitfield _clearFlag = 0;

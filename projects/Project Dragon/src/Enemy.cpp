@@ -8,7 +8,7 @@
 
 void Enemy::Update(PhysicsBody m_This)
 {
-
+	/*
 	mTimer += Timer::dt;
 
 	if (mTimer >= 0.5f)
@@ -91,6 +91,6 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = false;
 	
 	
-
+	*/
 }
 

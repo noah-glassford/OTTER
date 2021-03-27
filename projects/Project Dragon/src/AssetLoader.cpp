@@ -24,6 +24,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	Floor_Mat->Set("u_TextureMix", 0.0f);
 	RendererComponent FloorTile;
 	FloorTile.SetMaterial(Floor_Mat).SetMesh(plane);
+	FloorTile.CastShadows = false;
 	Renderers.push_back(FloorTile);
 	RendererNames.push_back("Floor");
 
@@ -224,6 +225,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand_rest.obj");
 		RendererComponent hands;
 		hands.SetMesh(vao).SetMaterial(handMat);
+		hands.CastShadows = false;
 		Renderers.push_back(hands);
 		RendererNames.push_back("hands");
 	}

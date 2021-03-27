@@ -179,6 +179,8 @@ void WorldBuilderV2::GenerateTiles()
 int enCount;
 void WorldBuilderV2::PopulateWorld(int dificulty)
 {
+
+	
 	for (int x = 0; x < 19; x++) {
 		for (int y = 0; y < 19; y++) {	//Read through the world data Array
 			if (WorldData[x][y] > 0) {	//Find spawned floors and spawn eneies in them
@@ -260,4 +262,5 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 			}
 		}
 	}
+	
 }

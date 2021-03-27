@@ -2,6 +2,7 @@
 #include <RenderingManager.h>
 #include <Timer.h>
 #include <InstantiatingSystem.h>
+#include <AudioEngine.h>
 //base weapon class other weapons inherit from this
 class Weap_Laser
 {

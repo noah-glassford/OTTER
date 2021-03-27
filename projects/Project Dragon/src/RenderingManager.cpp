@@ -50,13 +50,13 @@ void RenderingManager::Init()
 	BaseShader = Shader::Create();
 	//First we initialize our shaders
 	BaseShader->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	BaseShader->LoadShaderPartFromFile("shader/gBuffer_Pass_frag.glsl", GL_FRAGMENT_SHADER);
+	BaseShader->LoadShaderPartFromFile("shader/gbuffer_pass_frag.glsl", GL_FRAGMENT_SHADER); 
 	BaseShader->Link();
 
 	NoOutline = Shader::Create();
 	//First we initialize our shaders
 	NoOutline->LoadShaderPartFromFile("shader/vertex_shader.glsl", GL_VERTEX_SHADER);
-	NoOutline->LoadShaderPartFromFile("shader/gBuffer_Pass_frag.glsl", GL_FRAGMENT_SHADER);
+	NoOutline->LoadShaderPartFromFile("shader/gbuffer_pass_frag.glsl", GL_FRAGMENT_SHADER);
 	NoOutline->Link();
 
 	simpleDepthShader = Shader::Create();
@@ -138,6 +138,7 @@ void RenderingManager::Render()
 	postEffect->Clear();
 	bloomEffect->Clear();
 	colEffect->Clear();
+	shadowBuffer->Clear();
 	gBuffer->Clear();
 	illuminationBuffer->Clear();
 
@@ -163,23 +164,17 @@ void RenderingManager::Render()
 		e.Update(p);
 		if (e.m_hp <= 0.f)
 		{
+
 			activeScene->Registry().destroy(entity);
 
 			//t.SetLocalPosition(0,0,-1000);
 			//play temp death sound
 			//Placeholder shoot sfx
-			AudioEngine& engine = AudioEngine::Instance();
-
-			AudioEvent& tempEnDeath = engine.GetEvent("Level Complete");
-			if (!DeathSoundPlayed)
-			{
-				DeathSoundPlayed = true;
-				tempEnDeath.Play();
-			}		
+			
 		}
 
 		});
-	
+	/*
 	LightCount = 0;
 	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
 		
@@ -207,7 +202,7 @@ void RenderingManager::Render()
 		});
 	NoOutline->SetUniform("u_LightCount", LightCount);
 	BaseShader->SetUniform("u_LightCount", LightCount);
-
+	*/
 
 	//sets the scale for player HP Bar
 	if (BackendHandler::m_ActiveScene == 1)
@@ -237,15 +232,20 @@ void RenderingManager::Render()
 #pragma region Rendering
 	entt::basic_group<entt::entity, entt::exclude_t<>, entt::get_t<Transform>, RendererComponent> renderGroup =
 		activeScene->Registry().group<RendererComponent>(entt::get_t<Transform>());
+	
+	
 
-	glm::mat4 lightProjectionMatrix = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -30.0f, 30.0f);
+	DirectionalLight& sun = illuminationBuffer->GetSunRef();
+	
 
-	DirectionalLight& sun = activeScene->FindFirst("SUN").get<DirectionalLight>();
-	glm::vec3 LightDirection = sun._lightDirection;
-	glm::mat4 lightViewMatrix = glm::lookAt(glm::vec3(LightDirection), glm::vec3(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+
+	glm::mat4 lightProjectionMatrix = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, -45.0f, 45.0f);
+	glm::mat4 lightViewMatrix = glm::lookAt(camTransform.GetLocalPosition() + glm::vec3(-sun._lightDirection), camTransform.GetLocalPosition(), glm::vec3(0, 0, 1));
 	glm::mat4 lightSpaceViewProj = lightProjectionMatrix * lightViewMatrix;
 	//get the camera mat4s
-	Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
 
 
@@ -281,7 +281,7 @@ void RenderingManager::Render()
 
 	glViewport(0, 0, 4096, 4096);
 	
-	shadowBuffer->Bind();
+
 
 	//firstly render gltf animations
 	//BoneAnimShader->Bind();
@@ -300,30 +300,20 @@ void RenderingManager::Render()
 		*/
 	//BoneAnimShader->UnBind();
 	
+	shadowBuffer->Bind();
+	simpleDepthShader->Bind();
 	// Iterate over the render group components and draw them
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
-		// If the shader has changed, set up it's uniforms
-		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
-		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
-		if (current != renderer.Material->Shader) {
-			current = renderer.Material->Shader;
-			current->Bind();
-			BackendHandler::SetupShaderForFrame(current, view, projection);
-		}
-
-		// If the material has changed, apply it
-		if (currentMat != renderer.Material) {
-			currentMat = renderer.Material;
-			currentMat->Apply();
-		}
-		glm::mat4 viewProjection = projection * view;
+		
 		
 		//shadowBuf->BindDepthAsTexture(30);
-		BackendHandler::RenderVAO(simpleDepthShader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
+		if(renderer.CastShadows)
+		BackendHandler::RenderVAO(simpleDepthShader, renderer.Mesh,glm::mat4(1), transform, lightSpaceViewProj);
 		});
+		simpleDepthShader->UnBind();
 		
 	shadowBuffer->Unbind();
-
+	
 	int width, height;
 
 	glfwGetWindowSize(BackendHandler::window, &width, &height);
@@ -395,17 +385,26 @@ void RenderingManager::Render()
 #pragma endregion
 
 //This needs to be at the end, risk crashes otherwise since it is deleting entities before the end of the render loop
-
+		/*
 		//std::cout << enemyCount << std::endl;
 		if (enemyCount <= 1 && BackendHandler::m_ActiveScene == 1)
 		{
+			AudioEngine& engine = AudioEngine::Instance();
+
+			AudioEvent& tempEnDeath = engine.GetEvent("Level Complete");
+			if (!DeathSoundPlayed)
+			{
+				DeathSoundPlayed = true;
+				tempEnDeath.Play();
+			}		
+
 			activeScene->DeleteAllEnts();
 			PhysicsSystem::ClearWorld();
 			BackendHandler::m_Scenes[1]->InitGameScene();
 
 			
 		}
-
+		*/
 
 	
 

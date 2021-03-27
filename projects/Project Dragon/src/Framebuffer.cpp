@@ -54,14 +54,14 @@ void Framebuffer::Init(unsigned width, unsigned height)
 	//Inits framebuffer
 	Init();
 }
-
+glm::vec4 white = glm::vec4(1.f,1.f,1.f,1.f);
 void Framebuffer::Init()
 {
 	//Generates the FBO
 	glGenFramebuffers(1, &_FBO);
 	//Bind it
 	glBindFramebuffer(GL_FRAMEBUFFER, _FBO);
-
+	
 	if (_depthActive)
 	{
 		//because we have depth we need to clear our depth bit
@@ -73,12 +73,12 @@ void Framebuffer::Init()
 		glBindTexture(GL_TEXTURE_2D, _depth._texture.GetHandle());
 		//Sets the texture data
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, _width, _height);
-
+		glTextureParameterfv(_depth._texture.GetHandle(), GL_TEXTURE_BORDER_COLOR, &white[0]);
 		//Set texture parameters
 		glTextureParameteri(_depth._texture.GetHandle(), GL_TEXTURE_MIN_FILTER, _filter);
 		glTextureParameteri(_depth._texture.GetHandle(), GL_TEXTURE_MAG_FILTER, _filter);
-		glTextureParameteri(_depth._texture.GetHandle(), GL_TEXTURE_WRAP_S, _wrap);
-		glTextureParameteri(_depth._texture.GetHandle(), GL_TEXTURE_WRAP_T, _wrap);
+		glTextureParameteri(_depth._texture.GetHandle(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTextureParameteri(_depth._texture.GetHandle(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 		//Sets up as a framebuffer texture
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depth._texture.GetHandle(), 0);

@@ -14,6 +14,9 @@
 #include <AudioEngine.h>
 #include <Bloom.h>
 #include <PhysicsSystem.h>
+#include <gbuffer.h>
+#include <IlluminationBuffer.h>
+#include <UniformBuffer.h>
 GLFWwindow* BackendHandler::window = nullptr;
 std::vector<std::function<void()>> BackendHandler::imGuiCallbacks;
 std::vector<SceneBase*> BackendHandler::m_Scenes;
@@ -74,10 +77,16 @@ bool BackendHandler::InitAll()
 	engine.LoadBank("sound/Sound Effects");
 	engine.LoadBank("sound/Music.strings");
 	engine.LoadBus("MusicBus", "{137cb40e-93aa-4837-8626-c2445824f974}");
+	engine.LoadBus("Reverb", "{bfbde08e-52e9-4364-9c18-4e47b745c39c}");
 	AudioEvent& music = engine.CreateNewEvent("Ambient Music 1", "{eac6c8f2-dc46-4acb-96a2-d4271dbe8072}");
 	engine.CreateNewEvent("Element Swap", "{aa3a7bc0-fe97-48a1-8ce7-4680087fe66d}");
 	engine.CreateNewEvent("Enemy Jump", "{8ef856c1-a3f5-4313-8266-74b56a655319}");
 	engine.CreateNewEvent("Level Complete", "{7148fbe2-c4ee-4e3a-a254-5bb351cbcbf8}");
+	engine.CreateNewEvent("Ice Shoot", "{a86451b2-fa0c-49b0-87eb-aff10c726089}");
+	engine.CreateNewEvent("Air Shoot", "{bdc96b56-d036-4b7d-92b7-50bbe4de3441}");
+	engine.CreateNewEvent("Fire Shoot", "{275b1ed5-5e3c-493c-a5d2-b91942c49408}");
+	engine.CreateNewEvent("Ground Shoot", "{1a32d75b-6dc8-422b-9934-338e75d47983}");
+	engine.CreateNewEvent("Hitmarker", "{091f377d-ffcf-479d-85ea-a756e00380e0}");
 
 	music.Play();
 
@@ -90,10 +99,6 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 	RenderingManager::activeScene->Registry().view<Camera>().each([=](Camera& cam)
 		{
 			cam.ResizeWindow(width, height);
-		});
-	RenderingManager::activeScene->Registry().view<Framebuffer>().each([=](Framebuffer& buf)
-		{
-			buf.Reshape(width, height);
 		});
 	RenderingManager::activeScene->Registry().view<PostEffect>().each([=](PostEffect& buf)
 		{
@@ -108,6 +113,14 @@ void BackendHandler::GlfwWindowResizedCallback(GLFWwindow* window, int width, in
 			buf.Reshape(width, height);
 		});
 	RenderingManager::activeScene->Registry().view<BloomEffect>().each([=](BloomEffect& buf)
+		{
+			buf.Reshape(width, height);
+		});
+	RenderingManager::activeScene->Registry().view<GBuffer>().each([=](GBuffer& buf)
+		{
+			buf.Reshape(width, height);
+		});
+	RenderingManager::activeScene->Registry().view<IlluminationBuffer>().each([=](IlluminationBuffer& buf)
 		{
 			buf.Reshape(width, height);
 		});
@@ -189,36 +202,42 @@ void BackendHandler::UpdateInput()
 
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
+		AudioEngine& engine = AudioEngine::Instance();
+		AudioEvent& switchSound = engine.GetEvent("Element Swap");
 		if (shouldSwitchWeaponL)
 		{
+			switchSound.Play();
 			p.SwitchLeftHand();
 			if (p.m_LeftEquiped)
 			{
 				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -5, 0);
-				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, 5, 0);
 			}
 			else
 			{
 				RenderingManager::activeScene->FindFirst("EarthCube").get<Transform>().SetLocalPosition(0, -5, 0);
-				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("AirCube").get<Transform>().SetLocalPosition(0, 5, 0);
 			}
 			shouldSwitchWeaponL = false;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
+		AudioEngine& engine = AudioEngine::Instance();
+		AudioEvent& switchSound = engine.GetEvent("Element Swap");
 		if (shouldSwitchWeaponR)
 		{
+			switchSound.Play();
 			p.SwitchRightHand();
 			if (p.m_RightEquiped)
 			{
-				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, 5, 0);
 				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -5, 0);
 			}
 			else
 			{
 				RenderingManager::activeScene->FindFirst("WaterCube").get<Transform>().SetLocalPosition(0, -5, 0);
-				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, -5, 0);
+				RenderingManager::activeScene->FindFirst("FireCube").get<Transform>().SetLocalPosition(0, 5, 0);
 			}
 			shouldSwitchWeaponR = false;
 		}
@@ -391,7 +410,7 @@ void BackendHandler::RenderVAO(const Shader::sptr& shader, const VertexArrayObje
 {
 	shader->SetUniformMatrix("u_ModelViewProjection", viewProjection * transform.WorldTransform());
 	shader->SetUniformMatrix("u_Model", transform.WorldTransform());
-	//shader->SetUniformMatrix("u_LightSpaceMatrix", lightSpaceMat);
+	shader->SetUniformMatrix("u_LightSpaceMatrix", lightSpaceMat);
 	shader->SetUniformMatrix("u_NormalMatrix", transform.WorldNormalMatrix());
 	vao->Render();
 }

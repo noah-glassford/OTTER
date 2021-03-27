@@ -18,7 +18,7 @@ public:
 	int WorldData[25][25];
 
 	//	--	 Use this for changine the node size, will update the world get		-- //
-	int nodeSize = 40;
+	const int nodeSize = 40;
 
 	//
 	// Entry and Exit Points:

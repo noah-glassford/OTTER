@@ -70,10 +70,12 @@ bool FireWeapon::Fire()
 
 bool WaterWeapon::Fire()
 {
-	
+	AudioEngine& engine = AudioEngine::Instance();
+	AudioEvent& ShootSound = engine.GetEvent("Ice Shoot");
 	
 	if (m_CanShoot)
 	{
+		ShootSound.Play();
 		m_CanShoot = false;
 		m_Timer = 0.f;
 
@@ -127,6 +129,9 @@ bool WaterWeapon::Fire()
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
 			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
+			AudioEngine& engine = AudioEngine::Instance();
+			AudioEvent& HitMarker = engine.GetEvent("Hitmarker");
+			HitMarker.Play();
 
 			entt::registry& reg = RenderingManager::activeScene->Registry();
 
@@ -165,8 +170,12 @@ bool WaterWeapon::Fire()
 
 bool AirWeapon::Fire()
 {
+	AudioEngine& engine = AudioEngine::Instance();
+	AudioEvent& ShootSound = engine.GetEvent("Air Shoot");
+
 	if (m_CanShoot)
 	{
+		ShootSound.Play();
 		m_CanShoot = false;
 		m_Timer = 0.f;
 	
@@ -235,6 +244,10 @@ bool AirWeapon::Fire()
 				//Instantiate projectile/marker of where you shot because hitscan
 				//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
 
+				AudioEngine& engine = AudioEngine::Instance();
+				AudioEvent& HitMarker = engine.GetEvent("Hitmarker");
+				HitMarker.Play();
+
 				entt::registry& reg = RenderingManager::activeScene->Registry();
 
 				if (Results.m_collisionObject->getUserIndex2() == 3)
@@ -281,9 +294,12 @@ void EarthWeapon::Update()
 
 bool EarthWeapon::Fire()
 {
+	AudioEngine& engine = AudioEngine::Instance();
+	AudioEvent& ShootSound = engine.GetEvent("Ground Shoot");
 
 	if (m_CanShoot)
 	{
+		ShootSound.Play();
 		m_CanShoot = false;
 		m_Timer = 0.f;
 
@@ -333,7 +349,9 @@ bool EarthWeapon::Fire()
 		{
 			//Instantiate projectile/marker of where you shot because hitscan
 			//InstantiatingSystem::LoadPrefabFromFile(glm::vec3(BtToGlm::BTTOGLMV3(Results.m_collisionObject->getWorldTransform().getOrigin())), "node/Water_Proj.node");
-
+			AudioEngine& engine = AudioEngine::Instance();
+			AudioEvent& HitMarker = engine.GetEvent("Hitmarker");
+			HitMarker.Play();
 			
 			//does damage to enemy
 

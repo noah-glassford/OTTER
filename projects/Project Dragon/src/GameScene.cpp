@@ -108,7 +108,7 @@ void MainGameScene::InitGameScene()
 
 		BehaviourBinding::Bind<CameraControlBehaviour>(cameraObject);
 	}
-	/*
+	
 	GameObject UIObject = scene->CreateEntity("PlayerHPBar");
 	{
 		RendererComponent& r = UIObject.emplace<RendererComponent>();
@@ -118,7 +118,7 @@ void MainGameScene::InitGameScene()
 		ui.scale = glm::vec2(1, 1);
 		r = AssetLoader::GetRendererFromStr("hpBar");
 	}
-	*/
+	
 	/*
 	* I can't have nice things this is broken :(
 	GameObject Crosshair = scene->CreateEntity("Crosshair");
@@ -185,7 +185,7 @@ void MainGameScene::InitGameScene()
 
 		//FireCubeVisual.get<Transform>().SetParent(RightHand);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(1, 0, 0, 1));
-		FireCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(BarrelMat);
+		FireCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(BarrelMat).CastShadows = false;
 	}
 
 	GameObject WaterCubevisual = scene->CreateEntity("WaterCube");
@@ -193,6 +193,7 @@ void MainGameScene::InitGameScene()
 		WaterCubevisual.get<Transform>().SetParent(LeftHand);
 		WaterCubevisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 		WaterCubevisual.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Proj");
+			WaterCubevisual.get<RendererComponent>().CastShadows = false;
 	}
 	GameObject AirCubeVisual = scene->CreateEntity("AirCube");
 	{
@@ -201,7 +202,7 @@ void MainGameScene::InitGameScene()
 
 		//FireCubeVisual.get<Transform>().SetParent(RightHand);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(1, 0, 0, 1));
-		AirCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(EE_MAT);
+		AirCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(EE_MAT).CastShadows = false;
 	}
 
 	GameObject EarthCubeVisual = scene->CreateEntity("EarthCube");
@@ -209,23 +210,8 @@ void MainGameScene::InitGameScene()
 		EarthCubeVisual.get<Transform>().SetParent(RightHand);
 		EarthCubeVisual.get<Transform>().SetLocalPosition(0, 3, 0).SetLocalRotation(0, 0, 0).SetLocalScale(0.5, 0.5, 0.5);
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
-		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat);
+		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat).CastShadows = false;
 	}
-
-	GameObject obj3 = scene->CreateEntity("Test Enemy");
-	{
-		obj3.get<Transform>().SetLocalRotation(90, 0, 0);
-
-		RendererComponent& RC = obj3.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
-		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj");
-
-		PhysicsBody& p = obj3.emplace<PhysicsBody>();
-		Enemy& e = obj3.emplace<Enemy>();
-		p.AddBody(1.f, btVector3(0.f, 0.f, 3.f), btVector3(2.f, 2.f, 2.f));
-		p.GetBody()->setUserIndex(2);
-		p.GetBody()->setUserPointer((void*)&e);
-	}
-	
 
 	
 	BloomEffect* bloom;

@@ -32,7 +32,6 @@ layout (binding = 0) uniform sampler2D s_albedoTex;
 layout (binding = 1) uniform sampler2D s_normalsTex;
 layout (binding = 2) uniform sampler2D s_specularTex;
 layout (binding = 3) uniform sampler2D s_positionTex;
-
 layout (binding = 4) uniform sampler2D s_lightAccumTex;
 
 uniform mat4 u_LightSpaceMatrix;
@@ -47,6 +46,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, float bias)
 	
 	//Transform into a [0,1] range
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
+
+	if (projectionCoordinates.z > 1.0)
+	return 0.0;
 	
 	//Get the closest depth value from light's perspective (using our 0-1 range)
 	float closestDepth = texture(s_ShadowMap, projectionCoordinates.xy).r;
