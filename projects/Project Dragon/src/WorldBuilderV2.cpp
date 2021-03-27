@@ -142,10 +142,13 @@ void WorldBuilderV2::GenerateTiles()
 
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 
+<<<<<<< Updated upstream
 				//Roof
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
 					, "node/Blank_Floor_Tile.node");
 
+=======
+>>>>>>> Stashed changes
 				//
 				// Exterior Walls
 				//
@@ -196,8 +199,14 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
+<<<<<<< Updated upstream
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer((void*)&e);
+=======
+						e.m_hp = 25.f;
+						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(3, 3, 3), 0.f);
+						p.GetBody()->setUserPointer(&fe);
+>>>>>>> Stashed changes
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(0);
 					}
@@ -224,7 +233,11 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						int randY = (rand() % 20) - 10;
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
 						GameObject fe = InstantiatingSystem::InstantiateEmpty("FE");
+<<<<<<< Updated upstream
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);
+=======
+						fe.get<Transform>().SetLocalRotation(90, 0, 0).SetLocalPosition(0, 0, -2);
+>>>>>>> Stashed changes
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();

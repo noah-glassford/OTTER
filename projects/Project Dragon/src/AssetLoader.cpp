@@ -10,7 +10,12 @@ std::vector<GameObject> AssetLoader::GameObjects;
 void AssetLoader::Init() //doing it manually because, actually I don't know why
 {
 	//basic floor tile
+<<<<<<< Updated upstream
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
+=======
+	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj", glm::vec4(1, 1, 1, 1));
+	VertexArrayObject::sptr wall = ObjLoader::LoadFromFile("model/wall.obj", glm::vec4(1, 1, 1, 1));
+>>>>>>> Stashed changes
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
 	Texture2D::sptr test = Texture2D::LoadFromFile("image/test.png"); 
 	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
@@ -130,7 +135,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	}
 	//Fire Enemy
 	{
-		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/FE_IDLE/FE_I_1.obj");
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/FE_I_1.obj");
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
@@ -192,6 +197,94 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(Box);
 		RendererNames.push_back("Air_Enemy");
 	}
+<<<<<<< Updated upstream
+=======
+
+	//model for player hands
+	{
+		Texture2D::sptr hand = Texture2D::LoadFromFile("image/handtexture.png");
+		ShaderMaterial::sptr handMat = ShaderMaterial::Create();
+		handMat->Shader = RenderingManager::BaseShader;
+		handMat->Set("s_Diffuse", hand);
+		handMat->Set("s_Specular", noSpec);
+		handMat->Set("u_Shininess", 1.0f);
+		handMat->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/hand_rest.obj");
+		RendererComponent hands;
+		hands.SetMesh(vao).SetMaterial(handMat);
+		Renderers.push_back(hands);
+		RendererNames.push_back("hands");
+	}
+
+	{
+		Texture2D::sptr hpBar = Texture2D::LoadFromFile("image/HP_FULL.png");
+		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr HP = ShaderMaterial::Create();
+		HP->Shader = RenderingManager::UIShader;
+		HP->Set("s_Diffuse", hpBar);
+		HP->Set("s_Specular", hpBar);
+		HP->Set("u_Shininess", 2.0f);
+		HP->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(HP).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("hpBar");
+	}
+	//crosshairs
+	{
+		Texture2D::sptr hpBar = Texture2D::LoadFromFile("image/crosshair.png");
+		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr HP = ShaderMaterial::Create();
+		HP->Shader = RenderingManager::UIShader;
+		HP->Set("s_Diffuse", hpBar);
+		HP->Set("s_Specular", hpBar);
+		HP->Set("u_Shininess", 2.0f);
+		HP->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(HP).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("crosshair");
+	}
+
+	{
+		Texture2D::sptr menu = Texture2D::LoadFromFile("image/deathscreen.png");
+
+		//Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr HP = ShaderMaterial::Create();
+		HP->Shader = RenderingManager::UIShader;
+		HP->Set("s_Diffuse", menu);
+		HP->Set("s_Specular", menu);
+		HP->Set("u_Shininess", 2.0f);
+		HP->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(HP).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("DeathScreen");
+	}
+
+	{
+		Texture2D::sptr menu = Texture2D::LoadFromFile("image/MainMenu.png");
+		Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		//Material for menu
+		ShaderMaterial::sptr Menu = ShaderMaterial::Create();
+		Menu->Shader = RenderingManager::UIShader;
+		Menu->Set("s_Diffuse", menu);
+		Menu->Set("s_Specular", menu);
+		Menu->Set("u_Shininess", 2.0f);
+		Menu->Set("u_TextureMix", 0.0f);
+		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/plane.obj");
+		RendererComponent hp;
+		hp.SetMaterial(Menu).SetMesh(vao);
+		Renderers.push_back(hp);
+		RendererNames.push_back("MainMenu");
+	}
+>>>>>>> Stashed changes
 }
 RendererComponent& AssetLoader::GetRendererFromStr(std::string name)
 {

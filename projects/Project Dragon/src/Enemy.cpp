@@ -4,6 +4,7 @@
 #include <BtToGlm.h>
 #include <Player.h>
 
+<<<<<<< Updated upstream
 #include <iostream>
 void Enemy::Update(PhysicsBody m_This)
 {
@@ -15,9 +16,13 @@ void Enemy::Update(PhysicsBody m_This)
 		m_This.GetBody()->setCenterOfMassTransform(t);
 	}
 
+=======
+void Enemy::Update(PhysicsBody m_This)
+{
+>>>>>>> Stashed changes
 	mTimer += Timer::dt;
 
-	if (mTimer >= 0.5f)
+	if (mTimer >= 0.1f)
 	{ //Update general enemy information every 2 seconds to reduce computing
 		mTimer = 0.0f;
 		movementDirection.x = 0;
@@ -28,7 +33,6 @@ void Enemy::Update(PhysicsBody m_This)
 		distance.setX(powf(thisPosition.getX() - playerPosition.getX(), 2.0f));
 		distance.setY(powf(thisPosition.getY() - playerPosition.getY(), 2.0f));
 		distance.setZ(powf(thisPosition.getZ() - playerPosition.getZ(), 2.0f));
-	
 
 		//Chance behavior of enemy based on distance
 
@@ -49,7 +53,7 @@ void Enemy::Update(PhysicsBody m_This)
 		else if (distanceNorm < lookRange * 4) {
 			//std::cout << "\Attacking\n";
 		}
-		
+
 		//Yellow Zone
 		if (distanceNorm < lookRange * 8) {
 			//std::cout << "\Hunting\n";
@@ -67,26 +71,37 @@ void Enemy::Update(PhysicsBody m_This)
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
 	//uncomment this to make it move again
+<<<<<<< Updated upstream
 	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,0));
 
+=======
+	m_This.GetBody()->setLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed, -1));
+>>>>>>> Stashed changes
 
 	//check if player should take damage
 	btVector3 Pla_Enemy_Diff;
 	Pla_Enemy_Diff = playerPosition - thisPosition;
 	glm::vec3 distance = BtToGlm::BTTOGLMV3(Pla_Enemy_Diff);
 	float length = glm::length(distance);
-//	std::cout << length << std::endl;
+	//	std::cout << length << std::endl;
 	if (length < 6.7)
 	{
 		if (canBeHit)
 		{
+<<<<<<< Updated upstream
 			/*
+=======
+>>>>>>> Stashed changes
 			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 			player.SetHp(player.GetPlayerData().m_HP - 1);
 			canBeHit = false;
 			HitTimer = 0.f;
+<<<<<<< Updated upstream
 			player.PlayDamageSound();
 			*/
+=======
+			//player.PlayDamageSound();
+>>>>>>> Stashed changes
 		}
 	}
 
@@ -95,7 +110,10 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = true;
 	else
 		canBeHit = false;
+<<<<<<< Updated upstream
 	
 	
 
+=======
+>>>>>>> Stashed changes
 }

@@ -34,6 +34,14 @@ public:
 	btVector3 playerPosition;
 
 	void Update(PhysicsBody m_This);
+<<<<<<< Updated upstream
+=======
+	void TakeDamage(float damage) { m_hp -= damage; };
+	void Kill() { shouldFuckingDie = true; };
+
+	//temp
+	bool died = false;
+>>>>>>> Stashed changes
 
 	//to check if the player should take damage
 };
