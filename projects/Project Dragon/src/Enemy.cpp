@@ -69,7 +69,7 @@ void Enemy::Update(PhysicsBody m_This)
 	Pla_Enemy_Diff = playerPosition - thisPosition;
 	glm::vec3 distance = BtToGlm::BTTOGLMV3(Pla_Enemy_Diff);
 	float length = glm::length(distance);
-//	std::cout << length << std::endl;
+	//	std::cout << length << std::endl;
 	if (length < 6.7)
 	{
 		if (canBeHit)
@@ -89,6 +89,7 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = true;
 	else
 		canBeHit = false;
+<<<<<<< Updated upstream
 	
 	
 	

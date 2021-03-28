@@ -150,7 +150,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	}
 	//Fire Enemy
 	{
-		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/FE_IDLE/FE_I_1.obj");
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/FE_I_1.obj");
 		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/FE_TEXTURE.png");
 		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
