@@ -8,10 +8,9 @@
 
 void Enemy::Update(PhysicsBody m_This)
 {
-	/*
 	mTimer += Timer::dt;
 
-	if (mTimer >= 0.5f)
+	if (mTimer >= 0.1f)
 	{ //Update general enemy information every 2 seconds to reduce computing
 		mTimer = 0.0f;
 		movementDirection.x = 0;
@@ -22,7 +21,6 @@ void Enemy::Update(PhysicsBody m_This)
 		distance.setX(powf(thisPosition.getX() - playerPosition.getX(), 2.0f));
 		distance.setY(powf(thisPosition.getY() - playerPosition.getY(), 2.0f));
 		distance.setZ(powf(thisPosition.getZ() - playerPosition.getZ(), 2.0f));
-	
 
 		//Chance behavior of enemy based on distance
 
@@ -43,7 +41,7 @@ void Enemy::Update(PhysicsBody m_This)
 		else if (distanceNorm < lookRange * 4) {
 			//std::cout << "\Attacking\n";
 		}
-		
+
 		//Yellow Zone
 		if (distanceNorm < lookRange * 8) {
 			//std::cout << "\Hunting\n";
@@ -61,7 +59,9 @@ void Enemy::Update(PhysicsBody m_This)
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
 	//uncomment this to make it move again
-	m_This.GetBody()->applyCentralForce(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,-0));
+
+		m_This.GetBody()->setLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed, -1));
+
 
 
 	//check if player should take damage
@@ -91,6 +91,6 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = false;
 	
 	
-	*/
+	
 }
 

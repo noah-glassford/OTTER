@@ -5,7 +5,7 @@ GO Floor
 RC Floor
 TRNS 0 0 0 20 20 20 90 0 0
 PHYS 0 0 0 0 20 20 1 2
-#GO Broken_Pillar
-#RC Broken_Pillar
-#TRNS 0 0 0 1 1 1 90 0 0
-#PHYS 0 9 0 2 2 2 10 1 
+GO Broken_Pillar
+RC Broken_Pillar
+TRNS 0 0 0 1 1 1 90 0 0
+PHYS 0 9 0 2 2 2 10 1 
