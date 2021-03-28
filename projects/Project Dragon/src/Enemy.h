@@ -37,12 +37,15 @@ public:
 	bool shouldFuckingDie = false;
 
 	void Update(PhysicsBody m_This);
+<<<<<<< HEAD
 	void TakeDamage(float damage) { m_hp -= damage;  };
 	void Kill() { shouldFuckingDie = true; };
 	
 
 	//temp
 	bool died = false;
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 
 	//to check if the player should take damage
 };

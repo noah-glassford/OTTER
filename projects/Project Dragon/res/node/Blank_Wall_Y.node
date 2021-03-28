@@ -3,9 +3,14 @@
 GO Wall
 #GO makes a new game object
 RC Wall
+<<<<<<< HEAD
 TRNS 0 0 -20 20 20 20 180 0 -180
 PHYS 0 0 0 -15 20 1 40 1
 #GO Torch
 #RC Torch
 #TRNS 0 0.7 -10 0.7 0.7 0.7 90 0 0
 #LS 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+=======
+TRNS 0 0 0 10 10 10 0 0 -180
+PHYS 0 0 0 0 10 1 10 1
+>>>>>>> parent of 8b27400 (Uh Shit Happened)

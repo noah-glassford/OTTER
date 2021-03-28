@@ -4,11 +4,25 @@
 #include <BtToGlm.h>
 #include <Player.h>
 
+<<<<<<< HEAD
 
 
 void Enemy::Update(PhysicsBody m_This)
 {
 	/*
+=======
+#include <iostream>
+void Enemy::Update(PhysicsBody m_This)
+{
+	if (m_hp <= 0)
+	{
+		btTransform t;
+		t.setIdentity();
+		t.setOrigin(btVector3(0, 0, -1000));
+		m_This.GetBody()->setCenterOfMassTransform(t);
+	}
+
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 	mTimer += Timer::dt;
 
 	if (mTimer >= 0.5f)
@@ -61,7 +75,11 @@ void Enemy::Update(PhysicsBody m_This)
 		//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 	}
 	//uncomment this to make it move again
+<<<<<<< HEAD
 	m_This.GetBody()->applyCentralForce(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,-0));
+=======
+	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,0));
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 
 
 	//check if player should take damage
@@ -69,18 +87,27 @@ void Enemy::Update(PhysicsBody m_This)
 	Pla_Enemy_Diff = playerPosition - thisPosition;
 	glm::vec3 distance = BtToGlm::BTTOGLMV3(Pla_Enemy_Diff);
 	float length = glm::length(distance);
-	//	std::cout << length << std::endl;
+//	std::cout << length << std::endl;
 	if (length < 6.7)
 	{
 		if (canBeHit)
 		{
+<<<<<<< HEAD
 			
+=======
+			/*
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 			Player& player = RenderingManager::activeScene->FindFirst("Camera").get<Player>();
 			player.m_Hp--;
 			canBeHit = false;
 			HitTimer = 0.f;
+<<<<<<< HEAD
 			//player.PlayDamageSound();
 			
+=======
+			player.PlayDamageSound();
+			*/
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 		}
 	}
 
@@ -89,9 +116,16 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = true;
 	else
 		canBeHit = false;
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 	
 	
 	*/
 }
 
+<<<<<<< HEAD
+=======
+}
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
