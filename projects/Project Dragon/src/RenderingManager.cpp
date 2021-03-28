@@ -39,7 +39,7 @@ bool TextureToggle;
 int NumPasses;
 float Threshold;
 
-void RenderingManager::Init() 
+void RenderingManager::Init()
 {
 	// GL states
 	glEnable(GL_DEPTH_TEST);
@@ -174,7 +174,7 @@ void RenderingManager::Render()
 		}
 
 		});
-	
+	/*
 	LightCount = 0;
 	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
 		
@@ -202,7 +202,7 @@ void RenderingManager::Render()
 		});
 	NoOutline->SetUniform("u_LightCount", LightCount);
 	BaseShader->SetUniform("u_LightCount", LightCount);
-	
+	*/
 
 	//sets the scale for player HP Bar
 	if (BackendHandler::m_ActiveScene == 1)
@@ -303,7 +303,6 @@ void RenderingManager::Render()
 	shadowBuffer->Bind();
 	simpleDepthShader->Bind();
 	// Iterate over the render group components and draw them
-	/*
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		
 		
@@ -314,7 +313,7 @@ void RenderingManager::Render()
 		simpleDepthShader->UnBind();
 		
 	shadowBuffer->Unbind();
-	*/
+	
 	int width, height;
 
 	glfwGetWindowSize(BackendHandler::window, &width, &height);
