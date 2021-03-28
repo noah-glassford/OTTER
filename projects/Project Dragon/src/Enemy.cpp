@@ -5,12 +5,15 @@
 #include <Player.h>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 void Enemy::Update(PhysicsBody m_This)
 {
 	/*
 =======
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 #include <iostream>
 void Enemy::Update(PhysicsBody m_This)
 {
@@ -22,6 +25,9 @@ void Enemy::Update(PhysicsBody m_This)
 		m_This.GetBody()->setCenterOfMassTransform(t);
 	}
 
+<<<<<<< HEAD
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 	mTimer += Timer::dt;
 
@@ -76,8 +82,11 @@ void Enemy::Update(PhysicsBody m_This)
 	}
 	//uncomment this to make it move again
 <<<<<<< HEAD
+<<<<<<< HEAD
 	m_This.GetBody()->applyCentralForce(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,-0));
 =======
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,0));
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 
@@ -93,7 +102,11 @@ void Enemy::Update(PhysicsBody m_This)
 		if (canBeHit)
 		{
 <<<<<<< HEAD
+<<<<<<< HEAD
 			
+=======
+			/*
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 			/*
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
@@ -102,8 +115,13 @@ void Enemy::Update(PhysicsBody m_This)
 			canBeHit = false;
 			HitTimer = 0.f;
 <<<<<<< HEAD
+<<<<<<< HEAD
 			//player.PlayDamageSound();
 			
+=======
+			player.PlayDamageSound();
+			*/
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 			player.PlayDamageSound();
 			*/
@@ -117,7 +135,10 @@ void Enemy::Update(PhysicsBody m_This)
 	else
 		canBeHit = false;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 	
@@ -126,6 +147,10 @@ void Enemy::Update(PhysicsBody m_This)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+}
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 }
 >>>>>>> parent of 8b27400 (Uh Shit Happened)

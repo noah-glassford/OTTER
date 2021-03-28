@@ -143,13 +143,19 @@ void WorldBuilderV2::GenerateTiles()
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 =======
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 				//Roof
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
 					, "node/Blank_Floor_Tile.node");
 
+<<<<<<< HEAD
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 				//
 				// Exterior Walls
@@ -204,9 +210,14 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
 <<<<<<< HEAD
+<<<<<<< HEAD
 						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(3, 3, 3), 3.f);
 						p.GetBody()->setUserPointer(&fe);
+=======
+						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
+						p.GetBody()->setUserPointer((void*)&e);
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer((void*)&e);
@@ -243,7 +254,11 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
 						GameObject fe = InstantiatingSystem::InstantiateEmpty("FE");
 <<<<<<< HEAD
+<<<<<<< HEAD
 						fe.get<Transform>().SetLocalRotation(90, 0, 0).SetLocalPosition(0,0,-2);
+=======
+						fe.get<Transform>().SetLocalRotation(90, 0, 0);
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);
 >>>>>>> parent of 8b27400 (Uh Shit Happened)

@@ -11,8 +11,12 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 {
 	//basic floor tile
 <<<<<<< HEAD
+<<<<<<< HEAD
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj", glm::vec4(1,1,1,1));
 	VertexArrayObject::sptr wall = ObjLoader::LoadFromFile("model/wall.obj", glm::vec4(1, 1, 1, 1));
+=======
+	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
@@ -217,6 +221,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		RendererNames.push_back("Air_Enemy");
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 	//model for player hands
 	{
@@ -306,6 +311,8 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 
 
 
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 }
