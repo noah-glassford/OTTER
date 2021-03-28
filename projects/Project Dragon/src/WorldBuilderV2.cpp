@@ -117,8 +117,8 @@ void WorldBuilderV2::GenerateTiles()
 	//
 	//	TEMP -- Builds the world of empty tiles -- TEMP
 	//
-	for (int x = 0; x < 17; x++) {
-		for (int y = 0; y < 17; y++) {
+	for (int x = 8; x < 17; x++) {
+		for (int y = 8; y < 17; y++) {
 			if (WorldData[x][y] > 0) {
 				//Floor
 
@@ -143,8 +143,7 @@ void WorldBuilderV2::GenerateTiles()
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
 
 
-=======
->>>>>>> Stashed changes
+
 				//
 				// Exterior Walls
 				//
@@ -183,8 +182,8 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 {
 
 	
-	for (int x = 0; x < 19; x++) {
-		for (int y = 0; y < 19; y++) {	//Read through the world data Array
+	for (int x = 8; x < 17; x++) {
+		for (int y = 8; y < 17; y++) {	//Read through the world data Array
 			if (WorldData[x][y] > 0) {	//Find spawned floors and spawn eneies in them
 				int RandEnemyType = rand() % 16;
 				if (RandEnemyType == 0) {

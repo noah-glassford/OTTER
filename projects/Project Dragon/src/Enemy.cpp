@@ -89,7 +89,7 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = true;
 	else
 		canBeHit = false;
-<<<<<<< Updated upstream
+
 	
 	
 	
