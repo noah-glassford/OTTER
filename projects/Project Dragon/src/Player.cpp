@@ -421,6 +421,11 @@ void Player::Update()
 	for (int i = 0; i < m_Lasers.size(); i++)
 	{
 		m_Lasers[i].Update();
+		if (m_Lasers[i].m_Timer > 0.2f)
+		{
+			m_Lasers[i].Delete();
+			m_Lasers.erase(m_Lasers.begin() + i);
+		}
 	}
 
 }
@@ -453,13 +458,8 @@ bool Weapon::Fire()
 void Weap_Laser::Update()
 {
 	//get camera obj
-	GameObject camObj = RenderingManager::activeScene->FindFirst("Camera");
 	m_Timer += Timer::dt;
-	if (m_Timer > 0.2f)
-	{
-		Delete();
-//		camObj.get<Player>().m_Lasers.erase(camObj.get<Player>().m_Lasers.begin() + (int)PlaceInVec - 1);
-	}
+	
 }
 
 void Weap_Laser::Delete()

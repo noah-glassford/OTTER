@@ -180,7 +180,7 @@ void WorldBuilderV2::GenerateTiles()
 int enCount;
 void WorldBuilderV2::PopulateWorld(int dificulty)
 {
-
+	
 	
 	for (int x = 8; x < 17; x++) {
 		for (int y = 8; y < 17; y++) {	//Read through the world data Array

@@ -65,8 +65,8 @@ bool BackendHandler::InitAll()
 		return 1;
 	Framebuffer::InitFullscreenQuad();
 	RenderingManager::Init();
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	
 	//Init Audio
 	AudioEngine& engine = AudioEngine::Instance();
@@ -134,7 +134,8 @@ bool shouldSwitchWeaponL, shouldSwitchWeaponR;
 
 void BackendHandler::UpdateInput()
 {
-	//std::cout << 1 / Timer::dt << "\n";
+	
+	std::cout << 1 / Timer::dt << "\n";
 
 	//creates a single camera object to call
 
@@ -282,7 +283,7 @@ void BackendHandler::UpdateInput()
 		PhysicsSystem::ClearWorld();
 		m_Scenes[m_ActiveScene]->InitGameScene();
 	}
-
+	
 	RenderingManager::activeScene->Registry().view<BehaviourBinding>().each([&](entt::entity entity, BehaviourBinding& binding) {
 		// Iterate over all the behaviour scripts attached to the entity, and update them in sequence (if enabled)
 		for (const auto& behaviour : binding.Behaviours) {

@@ -146,7 +146,7 @@ void MainGameScene::InitGameScene()
 		sunBuf.Bind(0);
 	}
 
-
+	/*
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
 		RightHand.get<Transform>().SetLocalPosition(1, -0.7, -0.5).SetLocalRotation(-0, 0, 90).SetLocalScale(0.5, 0.5, 0.5);
@@ -163,20 +163,9 @@ void MainGameScene::InitGameScene()
 		LeftHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
 
 	}
-
-	GameObject obj4 = scene->CreateEntity("Barrel");
-	{
-		/*
-		obj4.get<Transform>().SetLocalRotation(0, 0, 0);
-		obj4.get<Transform>().SetLocalScale(50, 50, 50);
-		obj4.get<Transform>().SetLocalPosition(1000, 1000, 1000);
-
-		obj4.emplace<GLTFSkinnedMesh>();
-		obj4.get<GLTFSkinnedMesh>().LoadFromFile("model/JellyCube.gltf");
-		obj4.get<GLTFSkinnedMesh>().SetLooping(1);
-		*/
-	}
-
+	
+	
+	
 	//test cubes
 	GameObject FireCubeVisual = scene->CreateEntity("FireCube");
 	{
@@ -212,7 +201,7 @@ void MainGameScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
 		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat).CastShadows = false;
 	}
-
+	*/
 	
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");

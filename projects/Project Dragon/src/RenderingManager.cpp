@@ -1,14 +1,13 @@
 #include "RenderingManager.h"
 #include <RendererComponent.h>
 #include <Transform.h>
-#include "Framebuffer.h"
+
 #include "BackendHandler.h"
-#include <GreyscaleEffect.h>
-#include <ColorCorrection.h>
+
 #include <Player.h>
 #include <Enemy.h>
 #include <AudioEngine.h>
-#include <Bloom.h>
+
 #include <LightSource.h>
 
 #include <UI.h>
@@ -21,8 +20,7 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include <SkinnedMesh.h>
 
-#include <GBuffer.h>
-#include <IlluminationBuffer.h>
+
 
 Shader::sptr RenderingManager::BaseShader = NULL;
 Shader::sptr RenderingManager::NoOutline = NULL;
@@ -31,6 +29,14 @@ Shader::sptr RenderingManager::Passthrough = NULL;
 Shader::sptr RenderingManager::UIShader = NULL;
 Shader::sptr RenderingManager::simpleDepthShader = NULL;
 Shader::sptr RenderingManager::BoneAnimShader = NULL;
+
+Framebuffer* RenderingManager::shadowBuf = nullptr;
+PostEffect* RenderingManager::postEffect = nullptr;
+BloomEffect* RenderingManager::bloomEffect = nullptr;
+ColorCorrectionEffect* RenderingManager::colEffect = nullptr;
+GBuffer* RenderingManager::gBuffer = nullptr;
+IlluminationBuffer* RenderingManager::illuminationBuffer = nullptr;
+Framebuffer* RenderingManager::shadowBuffer = nullptr;
 	
 GameScene::sptr RenderingManager::activeScene;
 
@@ -127,6 +133,7 @@ int LightCount;
 int enemyCount = 0;
 void RenderingManager::Render()
 {
+	/*
 	//Framebuffer* shadowBuf = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
 	PostEffect* postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
 	BloomEffect* bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
@@ -134,6 +141,7 @@ void RenderingManager::Render()
 	GBuffer* gBuffer = &activeScene->FindFirst("G Buffer").get<GBuffer>();
 	IlluminationBuffer* illuminationBuffer = &activeScene->FindFirst("Illumination Buffer").get<IlluminationBuffer>();
 	Framebuffer* shadowBuffer = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
+	*/
 
 	postEffect->Clear();
 	bloomEffect->Clear();
@@ -156,7 +164,7 @@ void RenderingManager::Render()
 
 	
 	
-
+	
 	enemyCount = 0;
 	// Update all world enemies for this frame
 	activeScene->Registry().view<Enemy, PhysicsBody, Transform>().each([](entt::entity entity, Enemy& e, PhysicsBody& p, Transform& t) {
@@ -166,10 +174,6 @@ void RenderingManager::Render()
 		{
 
 			activeScene->Registry().destroy(entity);
-
-			//t.SetLocalPosition(0,0,-1000);
-			//play temp death sound
-			//Placeholder shoot sfx
 			
 		}
 
@@ -226,7 +230,7 @@ void RenderingManager::Render()
 	activeScene->FindFirst("Camera").get<Player>().Update();
 	//temp
 	//activeScene->FindFirst("NumberPlane").get<Transform>().LookAt(camTransform.GetLocalPosition());
-
+	
 #pragma endregion
 	
 #pragma region Rendering
@@ -245,8 +249,13 @@ void RenderingManager::Render()
 	glm::mat4 lightProjectionMatrix = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, -45.0f, 45.0f);
 	glm::mat4 lightViewMatrix = glm::lookAt(camTransform.GetLocalPosition() + glm::vec3(-sun._lightDirection), camTransform.GetLocalPosition(), glm::vec3(0, 0, 1));
 	glm::mat4 lightSpaceViewProj = lightProjectionMatrix * lightViewMatrix;
-	//get the camera mat4s
+
+	//Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
 	glm::mat4 view = glm::inverse(camTransform.LocalTransform());
+	glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
+	glm::mat4 viewProjection = projection * view;
+	//get the camera mat4s
+
 
 
 	//Set shadow stuff
@@ -280,18 +289,15 @@ void RenderingManager::Render()
 
 
 	glViewport(0, 0, 4096, 4096);
-	
 
 
 	//firstly render gltf animations
 	//BoneAnimShader->Bind();
 	/*
-	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t ) {
+	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([&](entt::entity entity, GLTFSkinnedMesh& m, Transform& t ) {
 		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
 		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
-		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
-		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
-		glm::mat4 viewProjection = projection * view;
+	
 
 		m.Draw(simpleDepthShader, viewProjection,  (glm::mat4) t.WorldTransform());
 			
@@ -300,8 +306,8 @@ void RenderingManager::Render()
 		*/
 	//BoneAnimShader->UnBind();
 	
-	shadowBuffer->Bind();
-	simpleDepthShader->Bind();
+	//shadowBuffer->Bind();
+	//simpleDepthShader->Bind();
 	// Iterate over the render group components and draw them
 	/*
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
@@ -323,12 +329,11 @@ void RenderingManager::Render()
 
 	gBuffer->Bind();
 
-	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([](entt::entity entity, GLTFSkinnedMesh& m, Transform& t) {
+
+
+	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([&viewProjection](entt::entity entity, GLTFSkinnedMesh& m, Transform& t) {
 		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
-		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
-		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
-		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
-		glm::mat4 viewProjection = projection * view;
+	
 
 		m.Draw(BoneAnimShader, viewProjection, (glm::mat4)t.WorldTransform());
 
@@ -337,11 +342,9 @@ void RenderingManager::Render()
 
 	
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
+	
 		
-		glm::mat4 view = glm::inverse(camTransform.LocalTransform());
-		glm::mat4 projection = activeScene->FindFirst("Camera").get<Camera>().GetProjection();
-		glm::mat4 viewProjection = projection * view;
-
+	
 		// If the shader has changed, set up it's uniforms
 		if (current != renderer.Material->Shader) {
 			current = renderer.Material->Shader;
@@ -410,4 +413,15 @@ void RenderingManager::Render()
 	
 
 
+}
+
+void RenderingManager::InitPostEffects()
+{
+	
+	postEffect = &activeScene->FindFirst("Basic Effect").get<PostEffect>();
+	bloomEffect = &activeScene->FindFirst("Bloom Effect").get<BloomEffect>();
+	colEffect = &activeScene->FindFirst("ColorGrading Effect").get<ColorCorrectionEffect>();
+	gBuffer = &activeScene->FindFirst("G Buffer").get<GBuffer>();
+	illuminationBuffer = &activeScene->FindFirst("Illumination Buffer").get<IlluminationBuffer>();
+	shadowBuffer = &activeScene->FindFirst("Shadow Buffer").get<Framebuffer>();
 }
