@@ -3,6 +3,8 @@
 GO Wall
 #GO makes a new game object
 RC Wall
+<<<<<<< HEAD
+<<<<<<< HEAD
 TRNS 0 0 -20 20 20 20 180 0 -180
 PHYS 0 0 0 -15 20 1 40 1
 #GO Torch

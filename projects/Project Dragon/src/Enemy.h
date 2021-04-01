@@ -22,7 +22,7 @@ public:
 	int lookRange = 5;
 	float distanceNorm = 100.0f;
 	float mTimer = 0.0f;
-	float m_MovementSpeed = 14.f;
+	float m_MovementSpeed = 100.f;
 
 	float TimeBetweenHits = 1.f;
 	float HitTimer = 0.f;
@@ -37,12 +37,18 @@ public:
 	bool shouldFuckingDie = false;
 
 	void Update(PhysicsBody m_This);
+<<<<<<< HEAD
+<<<<<<< HEAD
 	void TakeDamage(float damage) { m_hp -= damage;  };
 	void Kill() { shouldFuckingDie = true; };
 	
 
 	//temp
 	bool died = false;
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 
 	//to check if the player should take damage
 };

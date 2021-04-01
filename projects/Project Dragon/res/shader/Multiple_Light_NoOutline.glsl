@@ -60,7 +60,7 @@ struct SpotLight {
 #define NR_POINT_LIGHTS 99
 
 
-//uniform DirLight dirLight;
+uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 //uniform SpotLight spotLight;
 
