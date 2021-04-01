@@ -18,7 +18,7 @@ int main()
 	BackendHandler::m_Scenes[1]->InitGameScene();
 	BackendHandler::m_ActiveScene = 1;
 
-	
+	RenderingManager::InitPostEffects();
 
 	///// Game loop /////
 	while (!glfwWindowShouldClose(BackendHandler::window)) {

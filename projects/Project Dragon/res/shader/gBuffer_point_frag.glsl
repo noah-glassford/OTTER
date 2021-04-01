@@ -32,6 +32,9 @@ out vec4 frag_color;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
+
+
+
 // https://learnopengl.com/Advanced-Lighting/Advanced-Lighting
 void main() {
 	
@@ -70,3 +73,4 @@ void main() {
     specular *= attenuation;
     return (ambient + diffuse + specular);
 }
+
