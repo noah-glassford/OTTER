@@ -67,7 +67,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 	{
 		
 
-		
+		 
 		trim(line);
 		ss = std::stringstream(line); 
 		ss >> prefix;

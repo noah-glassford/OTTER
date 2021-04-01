@@ -92,11 +92,11 @@ void main() {
 	vec3 specular = sun._lightSpecularPow * texSpec * spec * sun._lightCol.xyz; // Can also use a specular color
 
 	vec4 fragPosLightSpace = u_LightSpaceMatrix * vec4(fragPos, 1.0);
-	//float shadow = ShadowCalculation(fragPosLightSpace, sun._shadowBias);
+	float shadow = ShadowCalculation(fragPosLightSpace, sun._shadowBias);
 
 	vec3 result = (
 		(sun._ambientPow * sun._ambientCol.xyz) + // global ambient light
-		//(1.0 - shadow) * //Shadow value
+		(1.0 - shadow) * 
 		(diffuse + specular));
 	if(textureColor.a < 0.31)
 {

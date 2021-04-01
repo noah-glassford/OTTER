@@ -306,10 +306,10 @@ void RenderingManager::Render()
 		*/
 	//BoneAnimShader->UnBind();
 	
-	//shadowBuffer->Bind();
-	//simpleDepthShader->Bind();
+	shadowBuffer->Bind();
+	simpleDepthShader->Bind();
 	// Iterate over the render group components and draw them
-	/*
+	
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 		
 		
@@ -320,7 +320,7 @@ void RenderingManager::Render()
 		simpleDepthShader->UnBind();
 		
 	shadowBuffer->Unbind();
-	*/
+	
 	int width, height;
 
 	glfwGetWindowSize(BackendHandler::window, &width, &height);

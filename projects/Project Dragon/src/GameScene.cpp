@@ -146,7 +146,7 @@ void MainGameScene::InitGameScene()
 		sunBuf.Bind(0);
 	}
 
-	/*
+	
 	GameObject RightHand = scene->CreateEntity("RHand");
 	{
 		RightHand.get<Transform>().SetLocalPosition(1, -0.7, -0.5).SetLocalRotation(-0, 0, 90).SetLocalScale(0.5, 0.5, 0.5);
@@ -201,7 +201,7 @@ void MainGameScene::InitGameScene()
 		VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("model/cube.obj", glm::vec4(0, 0, 1, 1));
 		EarthCubeVisual.emplace<RendererComponent>().SetMesh(vao).SetMaterial(Floor_Mat).CastShadows = false;
 	}
-	*/
+	
 	
 	BloomEffect* bloom;
 	GameObject BloomEffectObject = scene->CreateEntity("Bloom Effect");
