@@ -45,7 +45,7 @@ bool TextureToggle;
 int NumPasses;
 float Threshold;
 
-void RenderingManager::Init() 
+void RenderingManager::Init()
 {
 	// GL states
 	glEnable(GL_DEPTH_TEST);
@@ -178,7 +178,7 @@ void RenderingManager::Render()
 		}
 
 		});
-	
+	/*
 	LightCount = 0;
 	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
 		
@@ -206,7 +206,7 @@ void RenderingManager::Render()
 		});
 	NoOutline->SetUniform("u_LightCount", LightCount);
 	BaseShader->SetUniform("u_LightCount", LightCount);
-	
+	*/
 
 	//sets the scale for player HP Bar
 	if (BackendHandler::m_ActiveScene == 1)

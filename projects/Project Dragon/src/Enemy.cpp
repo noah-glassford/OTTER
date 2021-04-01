@@ -4,10 +4,31 @@
 #include <BtToGlm.h>
 #include <Player.h>
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 
 
 void Enemy::Update(PhysicsBody m_This)
 {
+	/*
+=======
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+#include <iostream>
+void Enemy::Update(PhysicsBody m_This)
+{
+	if (m_hp <= 0)
+	{
+		btTransform t;
+		t.setIdentity();
+		t.setOrigin(btVector3(0, 0, -1000));
+		m_This.GetBody()->setCenterOfMassTransform(t);
+	}
+
+<<<<<<< HEAD
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 	mTimer += Timer::dt;
 	thisPosition = m_This.GetBody()->getCenterOfMassTransform().getOrigin();
 	playerPosition = RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->getCenterOfMassTransform().getOrigin();
@@ -64,7 +85,6 @@ void Enemy::Update(PhysicsBody m_This)
 		}
 		//uncomment this to make it move again
 
-		m_This.GetBody()->setLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed, -1));
 
 
 
@@ -99,3 +119,11 @@ void Enemy::Update(PhysicsBody m_This)
 	
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+}
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
+}
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
