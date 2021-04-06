@@ -21,10 +21,25 @@ struct DirectionalLight
 	float _shadowBias;
 };
 
+
+struct PointLight {
+    vec3 position;
+	
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
 layout (std140, binding = 0) uniform u_Lights
 {
 	DirectionalLight sun;
 };
+
+//layout (std140, binding = 1) uniform u_PointLights
+//{
+//	PointLight[150] PointLights;
+//};
+uniform PointLight PointLights[150];
 
 layout(binding = 30) uniform sampler2D s_ShadowMap;
 
@@ -38,6 +53,8 @@ uniform mat4 u_LightSpaceMatrix;
 uniform vec3 u_CamPos;
 
 out vec4 frag_color;
+
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 float ShadowCalculation(vec4 fragPosLightSpace, float bias)
 {
@@ -103,7 +120,37 @@ void main() {
 	result = vec3(1.0, 1.0, 1.0);
 }
 	
+	//calculte the point lights
+	for (int i = 0; i < 150; i++)
+	{
+		result += CalcPointLight(PointLights[i], inNormal, fragPos, viewDir);
+	}
+
 	frag_color = vec4(result, 1.0);
 }
 
 
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+    // diffuse shading
+   // float diff = max(dot(normal, lightDir), 0.0);
+    //   float level = floor(diff * bands);
+    //diff = level / bands;
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1);
+    // attenuation
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (1 + 0.08 * distance + 0.032 * (distance * distance));    
+    // combine results
+    vec3 ambient = light.ambient * vec3(texture(s_albedoTex, inUV));
+    vec3 diffuse = light.diffuse *  vec3(texture(s_albedoTex, inUV));
+    vec3 specular = light.specular * spec * vec3(texture(s_specularTex, inUV));
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+
+   
+    return (ambient + diffuse + specular);
+}

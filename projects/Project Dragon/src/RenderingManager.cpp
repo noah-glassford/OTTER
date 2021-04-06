@@ -129,7 +129,7 @@ void RenderingManager::Init()
 
 }
 bool DeathSoundPlayed = false;
-int LightCount;
+//int LightCount;
 int enemyCount = 0;
 void RenderingManager::Render()
 {
@@ -180,33 +180,36 @@ void RenderingManager::Render()
 		});
 	/*
 	LightCount = 0;
-	activeScene->Registry().view<Transform, LightSource>().each([](entt::entity entity, Transform& t, LightSource& l) {
+	//LightSource Lights[150];
+	activeScene->Registry().view<Transform, LightSource>().each([&](entt::entity entity, Transform& t, LightSource& l) {
 		
-		if (LightCount <= 50)
+		if (LightCount < 150)
 		{
 			//create the string to send to the shader
 			std::string uniformName;
-			uniformName = "pointLights[";
+			uniformName = "PointLights[";
 			uniformName += std::to_string(LightCount);
 			uniformName += "].";
 			//this will be the begining, now we just need to add the part of the struct we want to set
-			BaseShader->SetUniform(uniformName + "position", t.GetLocalPosition());
-			BaseShader->SetUniform(uniformName + "ambient", l.m_Ambient);
-			BaseShader->SetUniform(uniformName + "diffuse", l.m_Diffuse);
-			BaseShader->SetUniform(uniformName + "specular", l.m_Specular);
-			
-			NoOutline->SetUniform(uniformName + "position", t.GetLocalPosition());
-			NoOutline->SetUniform(uniformName + "ambient", l.m_Ambient);
-			NoOutline->SetUniform(uniformName + "diffuse", l.m_Diffuse);
-			NoOutline->SetUniform(uniformName + "specular", l.m_Specular);
-		
+			illuminationBuffer->GetShaders()[0]->SetUniform(uniformName + "position", t.GetLocalPosition());
+			illuminationBuffer->GetShaders()[0]->SetUniform(uniformName + "ambient", l.m_Ambient);
+			illuminationBuffer->GetShaders()[0]->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+			illuminationBuffer->GetShaders()[0]->SetUniform(uniformName + "specular", l.m_Specular);
+
 		}
+
 		LightCount++;
-	
 		});
-	NoOutline->SetUniform("u_LightCount", LightCount);
-	BaseShader->SetUniform("u_LightCount", LightCount);
-	*/
+*/
+	//UniformBuffer lightUniBuf;
+	//lightUniBuf.AllocateMemory(sizeof(LightSource) * 150);
+	//lightUniBuf.SendData(reinterpret_cast<void*>(&Lights), sizeof(LightSource) * 150);
+	//lightUniBuf.Bind(1);
+	//illuminationBuffer->SetPointLights(lightUniBuf);
+
+	//NoOutline->SetUniform("u_LightCount", LightCount);
+	//BaseShader->SetUniform("u_LightCount", LightCount);
+	
 
 	//sets the scale for player HP Bar
 	if (BackendHandler::m_ActiveScene == 1)

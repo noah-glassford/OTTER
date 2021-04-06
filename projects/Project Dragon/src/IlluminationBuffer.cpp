@@ -1,5 +1,6 @@
 #include "IlluminationBuffer.h"
-
+#include <RenderingManager.h>
+#include <Transform.h>
 void IlluminationBuffer::Init(unsigned width, unsigned height)
 {
 	int index = int(_buffers.size());
@@ -40,31 +41,66 @@ void IlluminationBuffer::Init(unsigned width, unsigned height)
 	_shaders[index]->Link();
 
 	_sunBuffer.AllocateMemory(sizeof(DirectionalLight));
-
+	//_pointLights.AllocateMemory(sizeof(LightSource) * _numLights);
 	if (_sunEnabled) {
 		_sunBuffer.SendData(reinterpret_cast<void*>(&_sun), sizeof(DirectionalLight));
 	}
 
+
+
 	PostEffect::Init(width, height);
 }
-
+int LightCount = 0;
 void IlluminationBuffer::ApplyEffect(GBuffer* gBuffer)
 {
+
+
+
+	
+
+
 	_sunBuffer.SendData(reinterpret_cast<void*>(&_sun), sizeof(DirectionalLight));
 	if (_sunEnabled) {
 		_shaders[Lights::DIRECTIONAL]->Bind();
 		_shaders[Lights::DIRECTIONAL]->SetUniformMatrix("u_LightSpaceMatrix", _lightSpaceViewProj);
 		_shaders[Lights::DIRECTIONAL]->SetUniform("u_CamPos", _camPos);
 
+		LightCount = 0;
+		RenderingManager::activeScene->Registry().view<Transform, LightSource>().each([&](entt::entity entity, Transform& t, LightSource& l) {
+			LightCount++;
+				//create the string to send to the shader
+			if (LightCount <= 149)
+			{
+				std::string uniformName;
+				uniformName = "PointLights[";
+				uniformName += std::to_string(LightCount);
+				uniformName += "].";
+				std::cout << "Light Count on frame: " << LightCount << std::endl;
+				std::cout << "Light Position" << t.GetLocalPosition().x << " " << t.GetLocalPosition().y << " " << t.GetLocalPosition().z << " \n";
+				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "position", t.GetLocalPosition());
+				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "ambient", l.m_Ambient);
+				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "specular", l.m_Specular);
+			}
+			
+			});
+
 		_sunBuffer.Bind(0);
 
+	
+		
+		//_pointLights.Bind(1);
 		gBuffer->BindLighting();
 
 		_buffers[1]->RenderToFSQ();
 
 		gBuffer->UnbindLighting();
-
+		
 		_sunBuffer.Unbind(0);
+		//_pointLights.Unbind(1);
+
+		
+
 		_shaders[Lights::DIRECTIONAL]->UnBind();
 	}
 
@@ -93,13 +129,7 @@ void IlluminationBuffer::ApplyEffect(GBuffer* gBuffer)
 	//Bind ambient shader
 	_shaders[2]->Bind();
 	_shaders[2]->SetUniform("u_CamPos", _camPos);
-	std::string uniformName;
-	uniformName = "pointLight.";
-	//this will be the begining, now we just need to add the part of the struct we want to set
-	_shaders[2]->SetUniform(uniformName + "position", glm::vec3(2, 2, 2));
-	_shaders[2]->SetUniform(uniformName + "ambient", glm::vec3(1, 1, 1));
-	_shaders[2]->SetUniform(uniformName + "diffuse", glm::vec3(1, 1, 1));
-	_shaders[2]->SetUniform(uniformName + "specular", glm::vec3(1, 1, 1));
+
 
 	_sunBuffer.Bind(0);
 
@@ -141,6 +171,11 @@ void IlluminationBuffer::SetLightSpaceViewProj(glm::mat4 lightSpaceViewProj)
 void IlluminationBuffer::SetCamPos(glm::vec3 camPos)
 {
 	_camPos = camPos;
+}
+
+void IlluminationBuffer::SetPointLights(UniformBuffer pl)
+{
+	_pointLights = pl;
 }
 
 DirectionalLight& IlluminationBuffer::GetSunRef()

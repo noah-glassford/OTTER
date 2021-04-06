@@ -115,6 +115,7 @@ void InstantiatingSystem::LoadPrefabFromFile(glm::vec3 origin, std::string filen
 			
 
 		}
+		
 		else if (prefix == "LS")
 		{
 			glm::vec3 ambient, diffuse, specular;

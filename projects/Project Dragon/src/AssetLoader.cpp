@@ -10,16 +10,13 @@ std::vector<GameObject> AssetLoader::GameObjects;
 void AssetLoader::Init() //doing it manually because, actually I don't know why
 {
 	//basic floor tile
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj", glm::vec4(1,1,1,1));
 	VertexArrayObject::sptr wall = ObjLoader::LoadFromFile("model/wall.obj", glm::vec4(1, 1, 1, 1));
-=======
-	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
-	VertexArrayObject::sptr plane = ObjLoader::LoadFromFile("model/plane.obj");
->>>>>>> parent of 8b27400 (Uh Shit Happened)
+
+
+
+
 	Texture2D::sptr floor = Texture2D::LoadFromFile("image/floor.png");
 	Texture2D::sptr test = Texture2D::LoadFromFile("image/New_Wall_Tex.png");
 	Texture2D::sptr Wall_Normal = Texture2D::LoadFromFile("image/Wall_Normal_Map.png");
@@ -220,8 +217,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(Box);
 		RendererNames.push_back("Air_Enemy");
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 
 	//model for player hands
 	{
@@ -309,12 +305,6 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		RendererNames.push_back("MainMenu");
 	}
 
-
-
-=======
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
->>>>>>> parent of 8b27400 (Uh Shit Happened)
 }
 RendererComponent& AssetLoader::GetRendererFromStr(std::string name)
 {

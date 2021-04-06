@@ -73,7 +73,7 @@ void MainGameScene::InitGameScene()
 	BarrelMat->Set("u_Shininess", 3.0f);
 	BarrelMat->Set("u_TextureMix", 0.0f);
 
-
+	
 
 	ShaderMaterial::sptr Elm_Cube = ShaderMaterial::Create();
 	Elm_Cube->Shader = RenderingManager::NoOutline;
@@ -254,7 +254,7 @@ void MainGameScene::InitGameScene()
 
 	GameObject illuminationbufferObject = scene->CreateEntity("Illumination Buffer");
 	{
-		illuminationBuffer = &illuminationbufferObject.emplace<IlluminationBuffer>();
+		illuminationBuffer = &illuminationbufferObject.emplace<IlluminationBuffer>(150);
 		illuminationBuffer->Init(width, height);
 	}
 
@@ -288,9 +288,6 @@ void MainGameScene::InitGameScene()
 
 	WorldBuilderV2 builder;
 	builder.BuildNewWorld();
-	btTransform t;
-	t.setIdentity();
-	t.setOrigin(btVector3(1000, 1000, 1000));
 	//cameraObject.get<PhysicsBody>().GetBody()->setWorldTransform(t);
 	//obj4.get<Transform>().SetLocalPosition(cameraObject.get<Transform>().GetLocalPosition());
 }
