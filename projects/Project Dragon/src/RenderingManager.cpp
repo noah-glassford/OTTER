@@ -41,9 +41,12 @@ Framebuffer* RenderingManager::shadowBuffer = nullptr;
 GameScene::sptr RenderingManager::activeScene;
 
 bool ShouldBloom;
-bool TextureToggle;
+bool ShouldColCorrect;
+int LutSelect;
+int TextureToggle = 1;
 int NumPasses;
 float Threshold;
+
 
 void RenderingManager::Init()
 {
@@ -110,9 +113,42 @@ void RenderingManager::Init()
 
 	//creates some IMGUI sliders
 	BackendHandler::imGuiCallbacks.push_back([&]() {
+		if (ImGui::Button("Toggle Textures"))
+		{
+			if (TextureToggle == 1)
+				TextureToggle = 0;
+			else if (TextureToggle == 0)
+				TextureToggle = 1;
+		}
+		if (ImGui::Button("Toggle Bloom"))
+		{
+			if (ShouldBloom == 1)
+				ShouldBloom = 0;
+			else if (ShouldBloom == 0)
+				ShouldBloom = 1;
+		}
+		if (ImGui::Button("Toggle Color Correct"))
+		{
+			if (ShouldColCorrect == 1)
+				ShouldColCorrect = 0;
+			else if (ShouldColCorrect == 0)
+				ShouldColCorrect = 1;
+		}
 		
-		});
+		if (ImGui::SliderInt("For Color Correct: Lut To Choose", &LutSelect, 0, colEffect->_LUTS.size()))
+		{
+			colEffect->_LUT = colEffect->_LUTS[LutSelect];
+		}
 
+		if (ImGui::SliderFloat("For Bloom Effect: Threshold", &Threshold, 0.f, 1.f, "%.3f", 0.01f))
+		{
+			bloomEffect->SetThreshold(Threshold);
+		}
+		if (ImGui::SliderInt("For Bloom Effect: Passes", &NumPasses, 0, 100))
+		{
+			bloomEffect->SetPasses(NumPasses);
+		}
+		});
 	SkyBox = std::make_shared<Shader>();
 	//Want to add a test skybox
 	// Load our shaders
@@ -293,22 +329,23 @@ void RenderingManager::Render()
 
 	glViewport(0, 0, 4096, 4096);
 
-
+	
 	//firstly render gltf animations
-	//BoneAnimShader->Bind();
-	/*
+	BoneAnimShader->Bind();
+	
 	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([&](entt::entity entity, GLTFSkinnedMesh& m, Transform& t ) {
 		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
-		Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
+		//Transform& camTransform = activeScene->FindFirst("Camera").get<Transform>();
 	
-
+		//m.UpdateAnimation();
 		m.Draw(simpleDepthShader, viewProjection,  (glm::mat4) t.WorldTransform());
 			
 
 		});
-		*/
-	//BoneAnimShader->UnBind();
+		
+	BoneAnimShader->UnBind();
 	
+
 	shadowBuffer->Bind();
 	simpleDepthShader->Bind();
 	// Iterate over the render group components and draw them
@@ -329,11 +366,11 @@ void RenderingManager::Render()
 	glfwGetWindowSize(BackendHandler::window, &width, &height);
 
 	glViewport(0, 0, width, height);
-
+	postEffect->BindBuffer(0);
 	gBuffer->Bind();
 
 
-
+	/*
 	activeScene->Registry().view<GLTFSkinnedMesh, Transform>().each([&viewProjection](entt::entity entity, GLTFSkinnedMesh& m, Transform& t) {
 		m.UpdateAnimation(m.GetAnimation(0), Timer::dt);
 	
@@ -342,7 +379,7 @@ void RenderingManager::Render()
 
 
 		});
-
+		*/
 	
 	renderGroup.each([&](entt::entity e, RendererComponent& renderer, Transform& transform) {
 	
@@ -361,6 +398,7 @@ void RenderingManager::Render()
 		}
 
 		// Render the mesh
+		renderer.Material->Shader->SetUniform("u_TextureToggle", TextureToggle);
 		BackendHandler::RenderVAO(renderer.Material->Shader, renderer.Mesh, viewProjection, transform, lightSpaceViewProj);
 		});
 	gBuffer->Unbind();
@@ -377,13 +415,17 @@ void RenderingManager::Render()
 
 	//shadowBuf->UnbindTexture(30);
 
-		//postEffect->UnBindBuffer();
-
-		//bloomEffect->ApplyEffect(postEffect);
-		//bloomEffect->DrawToScreen();
-		//colEffect->ApplyEffect(postEffect);
-		//colEffect->DrawToScreen();
-
+	postEffect->UnBindBuffer();
+	if (ShouldBloom)
+	{
+		bloomEffect->ApplyEffect(illuminationBuffer);
+		bloomEffect->DrawToScreen();
+	}
+	if (ShouldColCorrect)
+	{
+		colEffect->ApplyEffect(illuminationBuffer);
+		colEffect->DrawToScreen();
+	}
 		
 		BackendHandler::RenderImGui();
 

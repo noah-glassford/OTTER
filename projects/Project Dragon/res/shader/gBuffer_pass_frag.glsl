@@ -13,6 +13,7 @@ uniform sampler2D s_Diffuse;
 uniform sampler2D s_Diffuse2;
 uniform sampler2D s_Specular;
 uniform float u_textureMix;
+uniform int u_TextureToggle;
 
 //MULTI RENDER TARGET
 //We can render color to all of these
@@ -28,9 +29,11 @@ void main()
 	vec4 textureColor2 = texture(s_Diffuse2, inUV);
 	vec4 textureColor = mix(textureColor1, textureColor2, u_textureMix);
 
+	if (u_TextureToggle == 1)
+	{
 	//Outputs texture color
 	outColors = textureColor;
-
+	}
 	//Outputs normals color
 	//[-1, 1] -> inNormals range
 	//[0, 1] ->OutNormals range

@@ -1,6 +1,8 @@
 #include "IlluminationBuffer.h"
 #include <RenderingManager.h>
 #include <Transform.h>
+#include <BackendHandler.h>
+int LightingToggle = 1;
 void IlluminationBuffer::Init(unsigned width, unsigned height)
 {
 	int index = int(_buffers.size());
@@ -46,6 +48,15 @@ void IlluminationBuffer::Init(unsigned width, unsigned height)
 		_sunBuffer.SendData(reinterpret_cast<void*>(&_sun), sizeof(DirectionalLight));
 	}
 
+	BackendHandler::imGuiCallbacks.push_back([&]() {
+		if (ImGui::Button("Toggle Lights"))
+		{
+			if (LightingToggle == 1)
+				LightingToggle = 0;
+			else if (LightingToggle == 0)
+				LightingToggle = 1;
+		}
+		});
 
 
 	PostEffect::Init(width, height);
@@ -53,57 +64,63 @@ void IlluminationBuffer::Init(unsigned width, unsigned height)
 int LightCount = 0;
 void IlluminationBuffer::ApplyEffect(GBuffer* gBuffer)
 {
-
+	
 
 
 	
 
+	if (LightingToggle)
+	{
+		_sunBuffer.SendData(reinterpret_cast<void*>(&_sun), sizeof(DirectionalLight));
+		if (_sunEnabled) {
+			_shaders[Lights::DIRECTIONAL]->Bind();
+			_shaders[Lights::DIRECTIONAL]->SetUniformMatrix("u_LightSpaceMatrix", _lightSpaceViewProj);
+			_shaders[Lights::DIRECTIONAL]->SetUniform("u_CamPos", _camPos);
 
-	_sunBuffer.SendData(reinterpret_cast<void*>(&_sun), sizeof(DirectionalLight));
-	if (_sunEnabled) {
-		_shaders[Lights::DIRECTIONAL]->Bind();
-		_shaders[Lights::DIRECTIONAL]->SetUniformMatrix("u_LightSpaceMatrix", _lightSpaceViewProj);
-		_shaders[Lights::DIRECTIONAL]->SetUniform("u_CamPos", _camPos);
+			LightCount = 0;
 
-		LightCount = 0;
-		RenderingManager::activeScene->Registry().view<Transform, LightSource>().each([&](entt::entity entity, Transform& t, LightSource& l) {
-			LightCount++;
+			RenderingManager::activeScene->Registry().view<Transform, LightSource>().each([&](entt::entity entity, Transform& t, LightSource& l) {
+				LightCount++;
 				//create the string to send to the shader
-			if (LightCount <= 149)
-			{
-				std::string uniformName;
-				uniformName = "PointLights[";
-				uniformName += std::to_string(LightCount);
-				uniformName += "].";
-				std::cout << "Light Count on frame: " << LightCount << std::endl;
-				std::cout << "Light Position" << t.GetLocalPosition().x << " " << t.GetLocalPosition().y << " " << t.GetLocalPosition().z << " \n";
-				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "position", t.GetLocalPosition());
-				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "ambient", l.m_Ambient);
-				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "diffuse", l.m_Diffuse);
-				_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "specular", l.m_Specular);
-			}
-			
-			});
+				if (LightCount <= 99)
+				{
+					std::string uniformName;
+					uniformName = "PointLights[";
+					uniformName += std::to_string(LightCount);
+					uniformName += "].";
+					//std::cout << "Light Count on frame: " << LightCount << std::endl;
+					//std::cout << "Light Position" << t.GetLocalPosition().x << " " << t.GetLocalPosition().y << " " << t.GetLocalPosition().z << " \n";
+					_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "position", t.GetLocalPosition());
+					_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "ambient", l.m_Ambient);
+					_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "diffuse", l.m_Diffuse);
+					_shaders[Lights::DIRECTIONAL]->SetUniform(uniformName + "specular", l.m_Specular);
 
-		_sunBuffer.Bind(0);
+				}
 
-	
-		
-		//_pointLights.Bind(1);
-		gBuffer->BindLighting();
+				});
+			_shaders[Lights::DIRECTIONAL]->SetUniform("u_NumLights", LightCount);
 
-		_buffers[1]->RenderToFSQ();
+			//_shaders[Lights::DIRECTIONAL]->SetUniform("u_LightingToggle", LightingToggle);
 
-		gBuffer->UnbindLighting();
-		
-		_sunBuffer.Unbind(0);
-		//_pointLights.Unbind(1);
+			_sunBuffer.Bind(0);
 
-		
 
-		_shaders[Lights::DIRECTIONAL]->UnBind();
+
+			//_pointLights.Bind(1);
+			gBuffer->BindLighting();
+
+			_buffers[1]->RenderToFSQ();
+
+			gBuffer->UnbindLighting();
+
+			_sunBuffer.Unbind(0);
+			//_pointLights.Unbind(1);
+
+
+
+			_shaders[Lights::DIRECTIONAL]->UnBind();
+		}
 	}
-
 	//Bind ambient shader
 	_shaders[Lights::AMBIENT]->Bind();
 

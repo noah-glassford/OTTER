@@ -21,6 +21,7 @@ struct DirectionalLight
 	float _shadowBias;
 };
 
+uniform int u_NumLights;
 
 struct PointLight {
     vec3 position;
@@ -39,7 +40,7 @@ layout (std140, binding = 0) uniform u_Lights
 //{
 //	PointLight[150] PointLights;
 //};
-uniform PointLight PointLights[150];
+uniform PointLight PointLights[100];
 
 layout(binding = 30) uniform sampler2D s_ShadowMap;
 
@@ -53,6 +54,8 @@ uniform mat4 u_LightSpaceMatrix;
 uniform vec3 u_CamPos;
 
 out vec4 frag_color;
+
+//uniform int u_LightingToggle;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
@@ -116,16 +119,17 @@ void main() {
 		(1.0 - shadow) * 
 		(diffuse + specular));
 	if(textureColor.a < 0.31)
-{
-	result = vec3(1.0, 1.0, 1.0);
-}
-	
-	//calculte the point lights
-	for (int i = 0; i < 150; i++)
 	{
-		result += CalcPointLight(PointLights[i], inNormal, fragPos, viewDir);
+	result = vec3(1.0, 1.0, 1.0);
 	}
-
+	//if (u_LightingToggle == 1)
+	//{
+		//calculte the point lights
+		for (int i = 0; i < u_NumLights; i++)
+		{
+			result += CalcPointLight(PointLights[i], inNormal, fragPos, viewDir);
+		}
+//	}
 	frag_color = vec4(result, 1.0);
 }
 

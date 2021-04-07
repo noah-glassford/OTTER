@@ -135,7 +135,7 @@ bool shouldSwitchWeaponL, shouldSwitchWeaponR;
 void BackendHandler::UpdateInput()
 {
 	
-//std::cout << 1 / Timer::dt << "\n";
+std::cout << 1 / Timer::dt << "\n";
 
 	//creates a single camera object to call
 

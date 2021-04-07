@@ -151,10 +151,8 @@ void MainGameScene::InitGameScene()
 	{
 		RightHand.get<Transform>().SetLocalPosition(1, -0.7, -0.5).SetLocalRotation(-0, 0, 90).SetLocalScale(0.5, 0.5, 0.5);
 		RightHand.get<Transform>().SetParent(cameraObject);
-
-		
-
 		RightHand.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("hands");
+
 	}
 	GameObject LeftHand = scene->CreateEntity("LHand");
 	{
@@ -233,9 +231,9 @@ void MainGameScene::InitGameScene()
 
 		//number here doesn't matter
 		colorEffect->LoadLUT("cube/Neutral-512.cube", 0);
-		//colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
-		//colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
-		//colorEffect->LoadLUT("cube/test.cube",0);
+		colorEffect->LoadLUT("cube/BrightenedCorrectionwarm.cube", 0);
+		colorEffect->LoadLUT("cube/colourcorrectcool.cube", 0);
+		colorEffect->LoadLUT("cube/test.cube",0);
 		colorEffect->_LUT = colorEffect->_LUTS[0];
 	}
 
