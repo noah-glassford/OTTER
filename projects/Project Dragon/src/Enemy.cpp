@@ -4,14 +4,12 @@
 #include <BtToGlm.h>
 #include <Player.h>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-
 void Enemy::Update(PhysicsBody m_This)
 {
 	/*
 =======
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 #include <iostream>
@@ -26,6 +24,9 @@ void Enemy::Update(PhysicsBody m_This)
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
@@ -42,7 +43,6 @@ void Enemy::Update(PhysicsBody m_This)
 		distance.setX(powf(thisPosition.getX() - playerPosition.getX(), 2.0f));
 		distance.setY(powf(thisPosition.getY() - playerPosition.getY(), 2.0f));
 		distance.setZ(powf(thisPosition.getZ() - playerPosition.getZ(), 2.0f));
-	
 
 		//Chance behavior of enemy based on distance
 
@@ -63,7 +63,7 @@ void Enemy::Update(PhysicsBody m_This)
 		else if (distanceNorm < lookRange * 4) {
 			//std::cout << "\Attacking\n";
 		}
-		
+
 		//Yellow Zone
 		if (distanceNorm < lookRange * 8) {
 			//std::cout << "\Hunting\n";
@@ -83,13 +83,15 @@ void Enemy::Update(PhysicsBody m_This)
 	//uncomment this to make it move again
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	m_This.GetBody()->applyCentralForce(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,-0));
 =======
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 	m_This.SetLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed,0));
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
-
 
 	//check if player should take damage
 	btVector3 Pla_Enemy_Diff;
@@ -103,7 +105,11 @@ void Enemy::Update(PhysicsBody m_This)
 		{
 <<<<<<< HEAD
 <<<<<<< HEAD
-			
+<<<<<<< HEAD
+
+=======
+			/*
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 			/*
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
@@ -116,16 +122,14 @@ void Enemy::Update(PhysicsBody m_This)
 			HitTimer = 0.f;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 			//player.PlayDamageSound();
-			
+
 =======
 			player.PlayDamageSound();
-			*/
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
+
 			player.PlayDamageSound();
-			*/
->>>>>>> parent of 8b27400 (Uh Shit Happened)
+			player.PlayDamageSound();
 		}
 	}
 
@@ -136,21 +140,14 @@ void Enemy::Update(PhysicsBody m_This)
 		canBeHit = false;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
 =======
 >>>>>>> parent of 8b27400 (Uh Shit Happened)
-	
-	
+=======
+>>>>>>> parent of 8b27400 (Uh Shit Happened)
+
 	*/
 }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-}
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
-}
->>>>>>> parent of 8b27400 (Uh Shit Happened)

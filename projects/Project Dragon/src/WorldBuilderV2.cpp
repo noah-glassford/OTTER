@@ -141,22 +141,10 @@ void WorldBuilderV2::GenerateTiles()
 				RenderingManager::activeScene->FindFirst("Camera").get<PhysicsBody>().GetBody()->setWorldTransform(t);
 
 				currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-
-=======
-=======
->>>>>>> parent of 8b27400 (Uh Shit Happened)
 				//Roof
 				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
 					, "node/Blank_Floor_Tile.node");
 
-<<<<<<< HEAD
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
->>>>>>> parent of 8b27400 (Uh Shit Happened)
 				//
 				// Exterior Walls
 				//
@@ -193,8 +181,6 @@ void WorldBuilderV2::GenerateTiles()
 int enCount;
 void WorldBuilderV2::PopulateWorld(int dificulty)
 {
-
-	
 	for (int x = 8; x < 17; x++) {
 		for (int y = 8; y < 17; y++) {	//Read through the world data Array
 			if (WorldData[x][y] > 0) {	//Find spawned floors and spawn eneies in them
@@ -209,19 +195,15 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Fire_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
-<<<<<<< HEAD
-<<<<<<< HEAD
 						e.m_hp = 25.f;
 						p.AddBody(1.f, btVector3(x * nodeSize + randX, y * nodeSize + randY, 10), btVector3(3, 3, 3), 3.f);
 						p.GetBody()->setUserPointer(&fe);
-=======
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer((void*)&e);
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
 						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
 						p.GetBody()->setUserPointer((void*)&e);
->>>>>>> parent of 8b27400 (Uh Shit Happened)
+						p.AddBody(1.f, btVector3(x * 20 + randX, y * 20 + randY, 10), btVector3(2, 2, 2), 3.f);
+						p.GetBody()->setUserPointer((void*)&e);
 						p.GetBody()->setUserIndex(2);
 						p.GetBody()->setUserIndex2(0);
 						p.GetBody()->setUserIndex3((unsigned)fe.entity());
@@ -253,15 +235,10 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 						enCount++;
 						//Instantiate at glm::vec3((x * 20) + randX, (y * 20) + randY), 10);
 						GameObject fe = InstantiatingSystem::InstantiateEmpty("FE");
-<<<<<<< HEAD
-<<<<<<< HEAD
-						fe.get<Transform>().SetLocalRotation(90, 0, 0).SetLocalPosition(0,0,-2);
-=======
+						fe.get<Transform>().SetLocalRotation(90, 0, 0).SetLocalPosition(0, 0, -2);
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);
->>>>>>> parent of 8b27400 (Uh Shit Happened)
-=======
 						fe.get<Transform>().SetLocalRotation(90, 0, 0);
->>>>>>> parent of 8b27400 (Uh Shit Happened)
+						fe.get<Transform>().SetLocalRotation(90, 0, 0);
 						fe.emplace<RendererComponent>() = AssetLoader::GetRendererFromStr("Water_Enemy");
 						PhysicsBody& p = fe.emplace<PhysicsBody>();
 						Enemy& e = fe.emplace<Enemy>();
@@ -294,5 +271,4 @@ void WorldBuilderV2::PopulateWorld(int dificulty)
 			}
 		}
 	}
-	
 }
