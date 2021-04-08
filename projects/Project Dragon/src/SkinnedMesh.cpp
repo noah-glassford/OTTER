@@ -101,9 +101,19 @@ bool GLTFSkinnedMesh::LoadFromFile(std::string const path)
 	// * - The model's scene is not empty		*
 	// * - The default scene index is in bounds *
 	// ******************************************
+
+
 	
 	return LoadNodes();
 }
+
+void GLTFSkinnedMesh::LoadAnimationIntoVec()
+{
+	//_KeyFrames = RetrieveModelData();
+	
+
+}
+
 
 SimpleTransform* const GLTFSkinnedMesh::FindNodeSimpleTransform(int const nodeIndex) const
 {

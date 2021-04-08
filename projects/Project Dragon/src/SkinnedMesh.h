@@ -42,6 +42,25 @@ public:
     static const std::vector<BufferAttribute> V_DECL;
 };
 
+
+union KF_Output
+{
+    glm::vec4 v4;
+    glm::vec3 v3;
+
+};
+
+class KeyFrame
+{
+public:
+
+    std::vector<float> _input;
+    std::vector<KF_Output> _output;
+};
+
+
+
+
 struct GLTFMesh
 {
 public:
@@ -79,6 +98,8 @@ public:
 
     bool LoadFromFile(std::string const path);
 
+    void LoadAnimationIntoVec();
+
     template<typename T, typename ComponentType>
     std::vector<T> RetrieveDataFromAccessor(tinygltf::Accessor& const accessor) const;
     template<typename T, typename ComponentType>
@@ -108,6 +129,10 @@ public:
     void SetLooping(bool const shouldLoop) { m_animationLooping = shouldLoop; }
 
     SimpleTransform* const FindNodeSimpleTransform(int const nodeIndex) const;
+
+    //sampling vectors for storing
+    
+    std::vector<KeyFrame> _KeyFrames;
 
 private:
     bool LoadNodes();

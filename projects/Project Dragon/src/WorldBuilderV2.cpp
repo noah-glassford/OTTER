@@ -153,10 +153,15 @@ void WorldBuilderV2::GenerateTiles()
 				// Exterior Walls
 				//
 
+				int WallRand = rand() % 2;
+
 				if (WorldData[x][y + 1] < 1) {
-					InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) + (nodeSize / 2), nodeSize / 2)
-						, "node/Blank_Wall_Y.node");
-					currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
+					if (WallRand == 0)
+					{
+						InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) + (nodeSize / 2), nodeSize / 2)
+							, "node/Blank_Wall_Y.node");
+						currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
+					}
 				}
 
 				if (WorldData[x][y - 1] < 1) {

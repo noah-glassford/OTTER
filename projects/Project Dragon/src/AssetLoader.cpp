@@ -121,6 +121,24 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 		Renderers.push_back(Box);
 		RendererNames.push_back("Torch");
 	}
+	/*
+	//side buildings
+	{
+		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/side_buildings.obj");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/side_building.png");
+		//	Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
+		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
+		box_Mat->Shader = RenderingManager::BaseShader;
+		box_Mat->Set("s_Diffuse", box_tex);
+		box_Mat->Set("s_Specular", noSpec);
+		box_Mat->Set("u_Shininess", 2.0f);
+		box_Mat->Set("u_TextureMix", 0.0f);
+		RendererComponent Box;
+		Box.SetMaterial(box_Mat).SetMesh(box_Mesh);
+		Renderers.push_back(Box);
+		RendererNames.push_back("SideBuildings");
+	}
+	*/
 	//Pillar
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/pillar.obj");
@@ -172,7 +190,7 @@ void AssetLoader::Init() //doing it manually because, actually I don't know why
 	//Water Enemy
 	{
 		VertexArrayObject::sptr box_Mesh = ObjLoader::LoadFromFile("model/waterenemy.obj");
-		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/stone_001_diffuse.png");
+		Texture2D::sptr box_tex = Texture2D::LoadFromFile("image/WE_TEXTURE.png");
 		Texture2D::sptr noSpec = Texture2D::LoadFromFile("image/grassSpec.png");
 		ShaderMaterial::sptr box_Mat = ShaderMaterial::Create();
 		box_Mat->Shader = RenderingManager::NoOutline;
