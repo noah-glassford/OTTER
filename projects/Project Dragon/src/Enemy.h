@@ -19,10 +19,10 @@ public:
 	btVector3 thisPosition;
 	btVector3 distance;
 	int entityNumber = 2;
-	int lookRange = 5;
-	float distanceNorm = 100.0f;
+	int lookRange = 20;
+	float distanceNorm = 20;
 	float mTimer = 0.0f;
-	float m_MovementSpeed = 100.f;
+	float m_MovementSpeed = 15.f;
 
 	float TimeBetweenHits = 1.f;
 	float HitTimer = 0.f;

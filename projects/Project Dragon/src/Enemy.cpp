@@ -28,8 +28,8 @@ void Enemy::Update(PhysicsBody m_This)
 	distance.setY(powf(thisPosition.getY() - playerPosition.getY(), 2.0f));
 	distance.setZ(powf(thisPosition.getZ() - playerPosition.getZ(), 2.0f));
 
-	if (distance.length() < 150.f)
-	{
+	//if (distance.length() < 150.f)
+	//{
 		if (mTimer >= 0.1f)
 		{ //Update general enemy information every 2 seconds to reduce computing
 			mTimer = 0.0f;
@@ -76,7 +76,7 @@ void Enemy::Update(PhysicsBody m_This)
 			//	std::cout << "\nDistance: " << distanceNorm << "\n\n\n\n";
 		}
 		//uncomment this to make it move again
-
+		m_This.GetBody()->setLinearVelocity(btVector3(movementDirection.x * m_MovementSpeed, movementDirection.y * m_MovementSpeed, -1));
 
 
 
@@ -106,7 +106,7 @@ void Enemy::Update(PhysicsBody m_This)
 		else
 			canBeHit = false;
 
-	}
+	//}
 
 
 }
