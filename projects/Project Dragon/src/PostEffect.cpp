@@ -79,7 +79,7 @@ void PostEffect::Unload()
 
 void PostEffect::BindBuffer(int index)
 {
-	_buffers[index]->Bind();
+ 	_buffers[index]->Bind();
 }
 
 void PostEffect::UnBindBuffer()

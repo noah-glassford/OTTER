@@ -181,12 +181,12 @@ std::cout << 1 / Timer::dt << "\n";
 		AudioEngine& engine = AudioEngine::Instance();
 		AudioEvent& tempJump = engine.GetEvent("Enemy Jump");
 
-		if (p.m_CanJump)
-		{
+		//if (p.m_CanJump)
+	//	{
 			tempJump.Play();
 
 			verticalVelo = 20.f;
-		}
+	//	}
 	}
 	//std::cout << t.GetLocalPosition().x << ", " << t.GetLocalPosition().y << ", " << t.GetLocalPosition().z << "\n";
 	phys.SetLinearVelocity(btVector3(movement.getX() * 50.f, movement.getY() * 50.f, verticalVelo));

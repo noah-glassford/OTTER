@@ -28,7 +28,7 @@ void WorldBuilderV2::BuildNewWorld()
 
 void WorldBuilderV2::ResetWorldData()
 {
-	for each (bool i in WorldData) {
+	for each (int i in WorldData) {
 		i = 0;
 		std::cout << i << '\n';
 	}
@@ -45,7 +45,7 @@ void WorldBuilderV2::DestroyCurrentWorld()
 
 void WorldBuilderV2::FillWorldData()
 {
-	srand(time(NULL));
+	srand(time(0));
 
 	bool isBuilding = true;
 	bool canLeft, canRight, canUp, canDown;
@@ -56,6 +56,8 @@ void WorldBuilderV2::FillWorldData()
 
 	while (isBuilding)
 	{
+		
+
 		canLeft = false; canRight = false; canUp = false; canDown = false;
 		//Sets tile at start
 		WorldData[currentX][currentY] = 5;
@@ -145,8 +147,7 @@ void WorldBuilderV2::GenerateTiles()
 
 
 				//Roof
-				InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * 20, y * 20, 20)
-					, "node/Blank_Floor_Tile.node");
+			
 
 
 				//
@@ -156,12 +157,12 @@ void WorldBuilderV2::GenerateTiles()
 				int WallRand = rand() % 2;
 
 				if (WorldData[x][y + 1] < 1) {
-					if (WallRand == 0)
-					{
+					//if (WallRand == 0)
+				//	{
 						InstantiatingSystem::LoadPrefabFromFile(glm::vec3(x * nodeSize, (y * nodeSize) + (nodeSize / 2), nodeSize / 2)
 							, "node/Blank_Wall_Y.node");
 						currentWorldGOs.push_back(InstantiatingSystem::m_Instantiated[InstantiatingSystem::m_Instantiated.size() - 1]);
-					}
+				//	}
 				}
 
 				if (WorldData[x][y - 1] < 1) {
